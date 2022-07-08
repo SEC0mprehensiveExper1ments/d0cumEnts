@@ -112,3 +112,132 @@ from  f37535626241b02001bb6339479e1db25fecae38  to  9c8a16a26084f3add39e5d4da855
 78		deletions
 ```
 
+## 前端重构记录
+
+### 第 1 次重构
+
+重构动机：
+1、在部署到服务器上后，原有的页面跳转会出现问题，在更换为hook方法后不能在class中使用，因此改为const。
+2、用了大量的state来保存表单数据，会给dom的“比较-更新”式渲染造成很大的负担，而且也不利于状态的更新保存。
+
+参与人员：肖毓哲，严思远
+
+时间起止：2022.05.19 - 2022.05.21，2022.06.26 - 2022.06.27
+
+重构内容：填表页面、审核页面
+
+提交记录：
+
+```
+
+commit d5f220e7e7ace54f2da9b482d04a9b961b5cee8a
+
+2		files changed
+674	    additions
+787	    deletions
+
+commit  5c6a663f1445e42e1754114312e4d8c06e6b7551
+
+2       files changed
+202     additions
+275     deletions
+
+```
+
+### 第 2 次重构
+
+重构动机：
+1、原先使用useEffect()钩子来获取数据的用法较为复杂，且具有出错的可能性。
+2、为实现加载时页面的可视化，需要额外实现loading界面
+3、使用antdpro自带的request方法能够轻松解决上述问题
+
+参与人员：蔡鸿彬
+
+时间起止：2022.05.28 - 2022.05.29
+
+重构内容：填表页面和展示页面
+
+提交记录：
+
+```
+
+commit ca14d2f4093ebee2b25e8586d3f50f78c73141d2
+
+5       files changed
+1202    additions
+1181    deletions
+
+```
+
+### 第 3 次重构
+
+重构动机：原本使用 url 传参的方式进行页面跳转，但是部署到服务器上后这种方式会出现 404 的错误，因此全部改为 history.push({ query: xx }) + useLocation()。
+
+参与人员：严思远，毕一帆
+
+时间起止：2022.06.05 - 2022.06.10 , 2022.06.26 - 2022.06.27
+
+提交记录：
+
+```
+commit 97616c8886cefc5da6be227c0134d4967d1e6141
+
+7       files changed
+156     additions
+146     deletions
+
+commit 76b42072de1f1e9cdb9fd2906e8c9eb75970de67
+
+17      files changed
+471     additions 
+323     deletions
+
+commit ea785669983426959d3af98fc34c5b36f4151a67
+
+40      files changed
+6,095   additions 
+50      deletions
+
+```
+
+### 第 4 次重构
+
+重构动机：原有的页面布局和排版稍显杂乱，对于用户浏览各项内容而言体验仍有待改进，使用ProCard组件对一些页面的展示进行布局修改，页面代码结构更加清晰，前端展示效果也更优秀。
+
+参与人员：张宇晨，蔡鸿彬
+
+时间起止：2022.07.01 - 2022.07.05
+
+提交记录：
+
+```
+
+from e872a1f4cbce7670585155dedc903fec2e86473a
+to bbf03114967796e6f71696fca8896c47f4147000
+
+5       files changed
+294     additions
+4       deletions
+
+from 78783ea4fd638764d6b3afa6ea74ccb84c6d0c8d
+to 251f712a2cbaa3201b454f24188d624279dd879c
+
+3		files changed
+540		additions
+16		deletions
+
+from c226faf5f5935e3b4c70740f0e32cbc58632f85b
+to 414b8c9463114315935fb06c44b4a5de10a4328a
+
+2		files changed
+524		additions
+593		deletions
+
+from 9038094e89b8fe85f8ddf7ece196231e2aac11f5
+to 15fa337f32940726b941e452e1f97ed1e1803dae
+
+1		files changed
+304		additions
+171		deletions
+```
+
