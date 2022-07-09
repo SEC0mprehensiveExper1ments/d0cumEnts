@@ -1,0 +1,6 @@
+spring:
+  datasource:
+    url: jdbc:mysql://210.28.133.13:21271/user_db
+  redis:
+    host: 210.28.133.13
+    port: 21273

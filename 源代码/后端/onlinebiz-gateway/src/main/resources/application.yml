@@ -1,0 +1,101 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: dev
+  application:
+    name: onlinebiz-gateway
+  cloud:
+    gateway:
+      # 使用DiscoveryClient
+      discovery:
+        locator:
+          enabled: true
+      # 配置网关路由
+      routes:
+        - id: user-service-public
+          uri: lb://onlinebiz-user
+          predicates:
+            - name: Path
+              args:
+                patterns:
+                  - /api/login
+                  - /api/logout
+                  - /api/register
+                  - /api/account/username
+                  - /api/account/password
+                  - /api/account
+                  - /api/user/search
+                  - /api/user/{userId}
+
+        - id: user-service-private
+          uri: lb://onlinebiz-user
+          predicates:
+            - name: Path
+              args:
+                patterns:
+                  - /api/account/role
+          filters:
+            - AddIdentity
+
+        - id: entrust-service
+          uri: lb://onlinebiz-entrust
+          predicates:
+            - name: Path
+              args:
+                patterns:
+                  - /api/entrust/**
+          filters:
+            - AddIdentity
+
+        - id: contract-service
+          uri: lb://onlinebiz-contract
+          predicates:
+            - name: Path
+              args:
+                patterns:
+                  - /api/contract/**
+          filters:
+            - AddIdentity
+
+        - id: document-service
+          uri: lb://onlinebiz-document
+          predicates:
+            - name: Path
+              args:
+                patterns:
+                  - /api/doc/**
+          filters:
+            - AddIdentity
+
+        - id: test-service
+          uri: lb://onlinebiz-test
+          predicates:
+            - name: Path
+              args:
+                patterns:
+                  - /api/test/**
+                  - /api/review/**
+          filters:
+            - AddIdentity
+
+        - id: sample-service
+          uri: lb://onlinebiz-sample
+          predicates:
+            - name: Path
+              args:
+                patterns:
+                  - /api/sample/**
+          filters:
+            - AddIdentity
+
+
+eureka:
+  instance:
+    instance-id: gateway8080
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
