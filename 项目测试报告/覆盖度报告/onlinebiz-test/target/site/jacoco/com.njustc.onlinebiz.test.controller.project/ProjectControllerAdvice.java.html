@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProjectControllerAdvice.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-test</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.test.controller.project</a> &gt; <span class="el_source">ProjectControllerAdvice.java</span></div><h1>ProjectControllerAdvice.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.test.controller.project;
+
+import com.njustc.onlinebiz.test.exception.project.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+
+/**如果全部异常处理返回json，
+ * 那么可以使用 @RestControllerAdvice 代替 @ControllerAdvice ，
+ * 这样在方法上就可以不需要添加 @ResponseBody
+ * 项目控制异常处理类
+ *
+ */
+<span class="fc" id="L16">@Slf4j</span>
+@RestControllerAdvice
+<span class="fc" id="L18">public class ProjectControllerAdvice {</span>
+
+    /**
+     * 处理拒绝访问异常
+     *
+     * @param e e
+     * @return {@link String}
+     */@ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(ProjectPermissionDeniedException.class)
+    public String handlePermissionDeniedException(ProjectPermissionDeniedException e) {
+<span class="nc" id="L28">        log.warn(&quot;Permission Denied Exception: &quot; + e.getMessage());</span>
+<span class="nc" id="L29">        e.printStackTrace();</span>
+<span class="nc" id="L30">        return e.getMessage();</span>
+    }
+
+
+    /**
+     * 处理dao failure异常
+     *
+     * @param e e
+     * @return {@link String}
+     */@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(ProjectDAOFailureException.class)
+    public String handleDAOFailureException(ProjectDAOFailureException e) {
+<span class="nc" id="L42">        log.error(&quot;DAO Failure Detected: &quot; + e.getMessage());</span>
+<span class="nc" id="L43">        e.printStackTrace();</span>
+<span class="nc" id="L44">        return e.getMessage();</span>
+    }
+
+
+    /**
+     * 处理无效阶段异常
+     *
+     * @param e e
+     * @return {@link String}
+     */@ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ProjectInvalidStageException.class)
+    public String handleInvalidStageException(ProjectInvalidStageException e) {
+<span class="nc" id="L56">        log.warn(&quot;Invalid Stage Detected: &quot; + e.getMessage());</span>
+<span class="nc" id="L57">        e.printStackTrace();</span>
+<span class="nc" id="L58">        return e.getMessage();</span>
+    }
+
+
+    /**
+     * 处理未找到异常
+     *
+     * @param e e
+     * @return {@link String}
+     */@ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(ProjectNotFoundException.class)
+    public String handleNotFoundException(ProjectNotFoundException e) {
+<span class="nc" id="L70">        log.warn(&quot;Project Not Found: &quot; + e.getMessage());</span>
+<span class="nc" id="L71">        e.printStackTrace();</span>
+<span class="nc" id="L72">        return e.getMessage();</span>
+    }
+
+
+    /**
+     * 处理无效参数异常
+     *
+     * @param e e
+     * @return {@link String}
+     */@ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(ProjectInvalidArgumentException.class)
+    public String handleInvalidArgumentException(ProjectInvalidArgumentException e) {
+<span class="nc" id="L84">        log.warn(&quot;Invalid Argument encountered: &quot; + e.getMessage());</span>
+<span class="nc" id="L85">        e.printStackTrace();</span>
+<span class="nc" id="L86">        return e.getMessage();</span>
+    }
+
+    /**
+     * 处理ioexception
+     *
+     * @param e e
+     * @return {@link String}
+     */@ResponseBody
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(IOException.class)
+    public String handleIOException(IOException e) {
+<span class="nc" id="L98">        log.warn(&quot;IO Exception: &quot; + e.getMessage());</span>
+<span class="nc" id="L99">        e.printStackTrace();</span>
+<span class="nc" id="L100">        return e.getMessage();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

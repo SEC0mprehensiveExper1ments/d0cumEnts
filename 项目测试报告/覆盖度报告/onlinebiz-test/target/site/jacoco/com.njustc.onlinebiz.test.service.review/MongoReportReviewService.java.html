@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MongoReportReviewService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-test</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.test.service.review</a> &gt; <span class="el_source">MongoReportReviewService.java</span></div><h1>MongoReportReviewService.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.test.service.review;
+
+import com.njustc.onlinebiz.common.model.Role;
+import com.njustc.onlinebiz.common.model.test.project.ProjectStage;
+import com.njustc.onlinebiz.common.model.test.review.ReportReview;
+import com.njustc.onlinebiz.test.dao.project.ProjectDAO;
+import com.njustc.onlinebiz.test.dao.review.ReportReviewDAO;
+import com.njustc.onlinebiz.test.exception.review.ReviewDAOFailureException;
+import com.njustc.onlinebiz.test.exception.review.ReviewInvalidStageException;
+import com.njustc.onlinebiz.test.exception.review.ReviewNotFoundException;
+import com.njustc.onlinebiz.test.exception.review.ReviewPermissionDeniedException;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+@Service
+public class MongoReportReviewService implements ReportReviewService {
+    private static final String SCANNED_COPY_DIR = &quot;/root/test/review/&quot;;
+    private final ReportReviewDAO reportReviewDAO;
+    private final ProjectDAO projectDAO;
+
+<span class="fc" id="L27">    public MongoReportReviewService(ReportReviewDAO reportReviewDAO, ProjectDAO projectDAO) {</span>
+<span class="fc" id="L28">        this.reportReviewDAO = reportReviewDAO;</span>
+<span class="fc" id="L29">        this.projectDAO = projectDAO;</span>
+<span class="fc" id="L30">    }</span>
+
+    @Override
+    public String createReportReview(String projectId, Long userId, Role userRole) {
+<span class="pc bpc" id="L34" title="2 of 6 branches missed.">        if (userRole != Role.ADMIN &amp;&amp; userRole != Role.MARKETER &amp;&amp; userRole != Role.MARKETING_SUPERVISOR) {</span>
+<span class="fc" id="L35">            throw new ReviewPermissionDeniedException(&quot;只有负责测试项目的市场部人员或主管可以创建测试报告评审表&quot;);</span>
+        }
+        //创建一份空的检查表
+<span class="fc" id="L38">        ReportReview reportReview = new ReportReview();</span>
+<span class="fc" id="L39">        reportReview.setProjectId(projectId);</span>
+        //获取检查表id
+<span class="fc" id="L41">        return reportReviewDAO.insertReportReview(reportReview).getId();</span>
+    }
+
+    @Override
+    public ReportReview findReportReview(String reportReviewId, Long userId, Role userRole) {
+<span class="fc" id="L46">        ReportReview reportReview = reportReviewDAO.findReportReviewById(reportReviewId);</span>
+<span class="fc bfc" id="L47" title="All 2 branches covered.">        if (reportReview == null) {</span>
+<span class="fc" id="L48">            throw new ReviewNotFoundException(&quot;该测试报告检查表不存在: &quot; + reportReviewId);</span>
+<span class="fc bfc" id="L49" title="All 2 branches covered.">        } else if (!hasAuthorityToCheck(reportReview, userId, userRole)) {</span>
+<span class="fc" id="L50">            throw new ReviewPermissionDeniedException(&quot;您没有权限查看该测试报告检查表&quot;);</span>
+        }
+
+<span class="fc" id="L53">        ProjectStage projectStage = projectDAO.findProjectById(reportReview.getProjectId()).getStatus().getStage();</span>
+<span class="pc bpc" id="L54" title="6 of 18 branches missed.">        if (projectStage != ProjectStage.REPORT_AUDITING &amp;&amp; projectStage != ProjectStage.REPORT_QA_DENIED</span>
+                &amp;&amp; projectStage != ProjectStage.REPORT_QA_PASSED &amp;&amp; projectStage != ProjectStage.REPORT_WAIT_SENT_TO_CUSTOMER &amp;&amp; projectStage != ProjectStage.REPORT_WAIT_CUSTOMER
+                &amp;&amp; projectStage != ProjectStage.REPORT_CUSTOMER_CONFIRM &amp;&amp; projectStage != ProjectStage.REPORT_CUSTOMER_REJECT
+                &amp;&amp; projectStage != ProjectStage.QA_ALL_REJECTED &amp;&amp; projectStage != ProjectStage.QA_ALL_PASSED) {
+<span class="fc" id="L58">            throw new ReviewInvalidStageException(&quot;无权在此阶段查看测试报告检查表&quot;);</span>
+        }
+
+<span class="fc" id="L61">        return reportReview;</span>
+    }
+
+    @Override
+    public void updateReportReview(String reportReviewId, ReportReview reportReview, Long userId, Role userRole) {
+<span class="fc" id="L66">        ReportReview origin = reportReviewDAO.findReportReviewById(reportReviewId);</span>
+<span class="pc bpc" id="L67" title="1 of 2 branches missed.">        if (origin == null) {</span>
+<span class="nc" id="L68">            throw new ReviewNotFoundException(&quot;该测试报告检查表不存在&quot;);</span>
+        }
+<span class="fc bfc" id="L70" title="All 2 branches covered.">        if (!origin.getId().equals(reportReview.getId())) {</span>
+<span class="fc" id="L71">            throw new ReviewPermissionDeniedException(&quot;测试报告检查表ID不一致&quot;);</span>
+        }
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        if (!hasAuthorityToUpdateOrDelete(reportReview, userId, userRole)) {</span>
+<span class="fc" id="L74">            throw new ReviewPermissionDeniedException(&quot;无权修改此测试报告检查表&quot;);</span>
+        }
+
+<span class="fc" id="L77">        ProjectStage projectStage = projectDAO.findProjectById(origin.getProjectId()).getStatus().getStage();</span>
+<span class="fc bfc" id="L78" title="All 2 branches covered.">        if(projectStage != ProjectStage.REPORT_AUDITING){</span>
+<span class="fc" id="L79">            throw new ReviewInvalidStageException(&quot;此阶段不能修改测试报告检查表&quot;);</span>
+        }
+
+        // 更新测试报告检查表
+<span class="fc bfc" id="L83" title="All 2 branches covered.">        if (!reportReviewDAO.updateReportReview(reportReviewId, reportReview)) {</span>
+<span class="fc" id="L84">            throw new ReviewDAOFailureException(&quot;更新测试报告检查表失败&quot;);</span>
+        }
+<span class="fc" id="L86">    }</span>
+
+    @Override
+    public void saveScannedCopy(String reportReviewId, MultipartFile scannedCopy, Long userId, Role userRole) throws IOException {
+<span class="fc" id="L90">        ReportReview origin = reportReviewDAO.findReportReviewById(reportReviewId);</span>
+<span class="fc bfc" id="L91" title="All 2 branches covered.">        if (scannedCopy.isEmpty()) {</span>
+<span class="fc" id="L92">            throw new ReviewNotFoundException(&quot;测试报告检查表的扫描件为空&quot;);</span>
+        }
+<span class="fc" id="L94">        ReportReview reportReview = findReportReview(reportReviewId, userId, userRole);</span>
+
+        // 检查权限
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">        if (!hasAuthorityToUploadOrDownload(reportReview, userId, userRole)) {</span>
+<span class="nc" id="L98">            throw new ReviewPermissionDeniedException(&quot;无权上传测试报告检查表&quot;);</span>
+        }
+
+        //检查状态
+<span class="fc" id="L102">        ProjectStage projectStage = projectDAO.findProjectById(origin.getProjectId()).getStatus().getStage();</span>
+<span class="pc bpc" id="L103" title="1 of 2 branches missed.">        if(projectStage != ProjectStage.REPORT_QA_PASSED){</span>
+<span class="nc" id="L104">            throw new ReviewInvalidStageException(&quot;此阶段不能上传测试报告检查表扫描件&quot;);</span>
+        }
+
+        // 保存测试报告检查表到磁盘
+<span class="fc" id="L108">        String originalFilename = scannedCopy.getOriginalFilename();</span>
+<span class="fc bfc" id="L109" title="All 2 branches covered.">        if (originalFilename == null) {</span>
+<span class="fc" id="L110">            throw new ReviewNotFoundException(&quot;扫描文件名不能为空&quot;);</span>
+        }
+<span class="fc" id="L112">        String suffix = originalFilename.substring(originalFilename.lastIndexOf('.'));</span>
+<span class="fc" id="L113">        String path = SCANNED_COPY_DIR + reportReviewId + suffix;</span>
+<span class="fc" id="L114">        scannedCopy.transferTo(new File(path.replaceAll(&quot;\\\\&quot;, &quot;/&quot;)));</span>
+        // 将路径保存到合同对象中
+<span class="fc bfc" id="L116" title="All 2 branches covered.">        if (!reportReviewDAO.updateScannedCopyPath(reportReviewId, path)) {</span>
+<span class="fc" id="L117">            throw new ReviewDAOFailureException(&quot;保存扫描文件路径失败&quot;);</span>
+        }
+<span class="fc" id="L119">    }</span>
+
+    @Override
+    public Resource getScannedCopy(String reportReviewId, Long userId, Role userRole) throws IOException {
+<span class="fc" id="L123">        ReportReview reportReview = findReportReview(reportReviewId, userId, userRole);</span>
+        // 检查权限
+<span class="nc bnc" id="L125" title="All 2 branches missed.">        if (!hasAuthorityToUploadOrDownload(reportReview, userId, userRole)) {</span>
+<span class="nc" id="L126">            throw new ReviewPermissionDeniedException(&quot;无权下载扫描件&quot;);</span>
+        }
+        // 从磁盘读取文件
+<span class="nc" id="L129">        return new InputStreamResource(new FileInputStream(reportReview.getScannedCopyPath()));</span>
+    }
+
+    @Override
+    public String getScannedCopyFileName(String reportReviewId, Long userId, Role userRole) {
+<span class="nc" id="L134">        ReportReview reportReview = findReportReview(reportReviewId, userId, userRole);</span>
+        // 检查权限
+<span class="nc bnc" id="L136" title="All 2 branches missed.">        if (!hasAuthorityToUploadOrDownload(reportReview, userId, userRole)) {</span>
+<span class="nc" id="L137">            throw new ReviewPermissionDeniedException(&quot;无权下载扫描件&quot;);</span>
+        }
+        // 从磁盘读取文件
+<span class="nc" id="L140">        return reportReview.getScannedCopyPath().substring(reportReview.getScannedCopyPath().lastIndexOf('/') + 1);</span>
+    }
+
+    @Override
+    public void removeReportReview(String reportReviewId, Long userId, Role userRole) {
+<span class="fc" id="L145">        ReportReview reportReview = findReportReview(reportReviewId, userId, userRole);</span>
+<span class="pc bpc" id="L146" title="1 of 2 branches missed.">        if (!hasAuthorityToUpdateOrDelete(reportReview, userId, userRole)) {</span>
+<span class="nc" id="L147">            throw new ReviewPermissionDeniedException(&quot;无权删除此测试报告检查表&quot;);</span>
+        }
+<span class="fc bfc" id="L149" title="All 2 branches covered.">        if (!reportReviewDAO.deleteReportAuditById(reportReview.getId())) {</span>
+<span class="fc" id="L150">            throw new ReviewDAOFailureException(&quot;删除测试报告检查表失败&quot;);</span>
+        }
+<span class="fc" id="L152">    }</span>
+
+    private Boolean hasAuthorityToCheck(ReportReview reportReview, Long userId, Role userRole) {
+<span class="pc bpc" id="L155" title="2 of 4 branches missed.">        if (userId == null || userRole == null) {</span>
+<span class="nc" id="L156">            return false;</span>
+<span class="pc bpc" id="L157" title="1 of 2 branches missed.">        } else if (userRole == Role.ADMIN) {</span>
+<span class="nc" id="L158">            return true;</span>
+<span class="pc bpc" id="L159" title="1 of 4 branches missed.">        } else if (userRole == Role.MARKETING_SUPERVISOR || userRole == Role.QA_SUPERVISOR) {</span>
+<span class="fc" id="L160">            return true;</span>
+        }
+        // 质量部相关人员均可查看
+<span class="fc bfc" id="L163" title="All 2 branches covered.">        else if (userId.equals(projectDAO.findProjectById(reportReview.getProjectId()).getProjectBaseInfo().getQaId())) {</span>
+<span class="fc" id="L164">            return true;</span>
+        }
+        // 测试部相关人员均可查看
+<span class="fc" id="L167">        else return userId.equals(projectDAO.findProjectById(reportReview.getProjectId()).getProjectBaseInfo().getTesterId());</span>
+    }
+
+    private Boolean hasAuthorityToUpdateOrDelete(ReportReview reportReview, Long userId, Role userRole) {
+<span class="pc bpc" id="L171" title="2 of 4 branches missed.">        if (userId == null || userRole == null) {</span>
+<span class="nc" id="L172">            return false;</span>
+<span class="pc bpc" id="L173" title="1 of 2 branches missed.">        } else if (userRole == Role.ADMIN) {</span>
+<span class="nc" id="L174">            return true;</span>
+<span class="pc bpc" id="L175" title="1 of 4 branches missed.">        } else if (userRole == Role.MARKETING_SUPERVISOR || userRole == Role.QA_SUPERVISOR) {</span>
+<span class="fc" id="L176">            return true;</span>
+        }
+        // 质量部相关人员均可删改
+<span class="fc bfc" id="L179" title="All 2 branches covered.">        else if (userId.equals(projectDAO.findProjectById(reportReview.getProjectId()).getProjectBaseInfo().getQaId())) {</span>
+<span class="fc" id="L180">            return true;</span>
+        }
+        // 测试部相关人员均可删改
+<span class="fc" id="L183">        else return userId.equals(projectDAO.findProjectById(reportReview.getProjectId()).getProjectBaseInfo().getTesterId());</span>
+    }
+
+    private Boolean hasAuthorityToUploadOrDownload(ReportReview reportReview, Long userId, Role userRole) {
+<span class="pc bpc" id="L187" title="2 of 4 branches missed.">        if (userId == null || userRole == null) {</span>
+<span class="nc" id="L188">            return false;</span>
+<span class="pc bpc" id="L189" title="1 of 2 branches missed.">        } else if (userRole == Role.ADMIN) {</span>
+<span class="nc" id="L190">            return true;</span>
+<span class="pc bpc" id="L191" title="2 of 4 branches missed.">        } else if (userRole == Role.MARKETING_SUPERVISOR || userRole == Role.QA_SUPERVISOR) {</span>
+<span class="nc" id="L192">            return true;</span>
+        }
+        // 项目的质量相关人员也可以上传下载
+<span class="fc" id="L195">        else return userId.equals(projectDAO.findProjectById(reportReview.getProjectId()).getProjectBaseInfo().getQaId());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

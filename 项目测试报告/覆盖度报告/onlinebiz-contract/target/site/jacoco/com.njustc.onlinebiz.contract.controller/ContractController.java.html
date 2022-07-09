@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ContractController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-contract</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.contract.controller</a> &gt; <span class="el_source">ContractController.java</span></div><h1>ContractController.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.contract.controller;
+
+import com.njustc.onlinebiz.common.model.Role;
+import com.njustc.onlinebiz.common.model.contract.Contract;
+import com.njustc.onlinebiz.common.model.contract.ContractStatus;
+import com.njustc.onlinebiz.common.model.contract.NonDisclosureAgreement;
+import com.njustc.onlinebiz.contract.service.ContractService;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+
+@RestController
+@RequestMapping(&quot;/api&quot;)
+public class ContractController {
+
+    private final ContractService contractService;
+
+<span class="nc" id="L22">    public ContractController(ContractService contractService) {</span>
+<span class="nc" id="L23">        this.contractService = contractService;</span>
+<span class="nc" id="L24">    }</span>
+
+    // 创建合同，返回创建的合同ID
+    @PostMapping(&quot;/contract&quot;)
+    public String createContract(
+            @RequestParam(&quot;entrustId&quot;) String entrustId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L33">        return contractService.createContract(entrustId, userId, userRole);</span>
+    }
+
+    // 获取合同详情
+    @GetMapping(&quot;/contract/{contractId}&quot;)
+    public Contract getContract(
+            @PathVariable(&quot;contractId&quot;) String contractId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L43">        return contractService.findContract(contractId, userId, userRole);</span>
+    }
+
+    // 更新合同内容
+    @PostMapping(&quot;/contract/{contractId}&quot;)
+    public void updateContract(
+            @PathVariable(&quot;contractId&quot;) String contractId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole,
+            @RequestBody Contract contract
+    ) {
+<span class="nc" id="L54">        contractService.updateContract(contractId, contract, userId, userRole);</span>
+<span class="nc" id="L55">    }</span>
+
+    // 同意合同
+    @PostMapping(&quot;/contract/{contractId}/acceptance&quot;)
+    public void approveContract(
+            @PathVariable(&quot;contractId&quot;) String contractId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L64">        contractService.approveContract(contractId, userId, userRole);</span>
+<span class="nc" id="L65">    }</span>
+
+    // 拒绝合同
+    @PostMapping(&quot;/contract/{contractId}/denial&quot;)
+    public void denyContract(
+            @PathVariable(&quot;contractId&quot;) String contractId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole,
+            @RequestParam(value = &quot;message&quot;, required = false) String message
+    ) {
+<span class="nc" id="L75">        contractService.denyContract(contractId, message, userId, userRole);</span>
+<span class="nc" id="L76">    }</span>
+
+    // 更新合同的客户
+    @PostMapping(&quot;/contract/{contractId}/customer&quot;)
+    public void updateCustomer(
+            @PathVariable(&quot;contractId&quot;) String contractId,
+            @RequestParam(&quot;customerId&quot;) Long customerId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L86">        contractService.updateCustomerId(contractId, customerId, userId, userRole);</span>
+<span class="nc" id="L87">    }</span>
+
+    // 更新合同对应的市场部人员
+    @PostMapping(&quot;/contract/{contractId}/marketer&quot;)
+    public void updateMarketer(
+            @PathVariable(&quot;contractId&quot;) String contractId,
+            @RequestParam(&quot;marketerId&quot;) Long marketerId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L97">        contractService.updateMarketerId(contractId, marketerId, userId, userRole);</span>
+<span class="nc" id="L98">    }</span>
+
+    // 更新合同状态
+    @PostMapping(&quot;/contract/{contractId}/status&quot;)
+    public void updateStatus(
+            @PathVariable(&quot;contractId&quot;) String contractId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole,
+            @RequestBody ContractStatus status
+    ) {
+<span class="nc" id="L108">        contractService.updateStatus(contractId, status, userId, userRole);</span>
+<span class="nc" id="L109">    }</span>
+
+    // 上传合同扫描件
+    @PutMapping(&quot;/contract/{contractId}/upload&quot;)
+    public void updateScannedCopy(
+            @PathVariable(&quot;contractId&quot;) String contractId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole,
+            @RequestPart(&quot;scannedCopy&quot;) MultipartFile scannedCopy
+    ) throws IOException {
+<span class="nc" id="L119">        contractService.saveScannedCopy(contractId, scannedCopy, userId, userRole);</span>
+<span class="nc" id="L120">    }</span>
+
+    // 下载合同扫描件
+    @GetMapping(&quot;/contract/{contractId}/download&quot;)
+    public ResponseEntity&lt;Resource&gt; downloadScannedCopy(
+            @PathVariable(&quot;contractId&quot;) String contractId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) throws IOException {
+<span class="nc" id="L129">        String fileName = contractService.getScannedCopyFileName(contractId, userId, userRole);</span>
+<span class="nc" id="L130">        Resource resource = contractService.getScannedCopy(contractId, userId, userRole);</span>
+<span class="nc" id="L131">        return ResponseEntity.ok().header(&quot;Content-Disposition&quot;,&quot;attachment; filename=&quot; + fileName).contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);</span>
+    }
+
+    // 更新合同保密协议
+    @PostMapping(&quot;/contract/{contractId}/non-disclosure&quot;)
+    public void updateNonDisclosureAgreement(
+            @PathVariable(&quot;contractId&quot;) String contractId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole,
+            @RequestBody NonDisclosureAgreement nonDisclosureAgreement
+    ) {
+<span class="nc" id="L142">        contractService.updateNonDisclosure(contractId, nonDisclosureAgreement, userId, userRole);</span>
+<span class="nc" id="L143">    }</span>
+
+    // 删除合同
+    @DeleteMapping(&quot;/contract/{contractId}&quot;)
+    public void deleteContract(
+            @PathVariable(&quot;contractId&quot;) String contractId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L152">        contractService.removeContract(contractId, userId, userRole);</span>
+<span class="nc" id="L153">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

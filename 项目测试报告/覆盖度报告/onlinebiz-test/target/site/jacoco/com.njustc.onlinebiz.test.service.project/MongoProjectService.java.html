@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MongoProjectService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-test</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.test.service.project</a> &gt; <span class="el_source">MongoProjectService.java</span></div><h1>MongoProjectService.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.test.service.project;
+
+import com.njustc.onlinebiz.common.model.EntrustDto;
+import com.njustc.onlinebiz.common.model.PageResult;
+import com.njustc.onlinebiz.common.model.Role;
+import com.njustc.onlinebiz.common.model.test.project.*;
+import com.njustc.onlinebiz.common.model.test.report.Report;
+import com.njustc.onlinebiz.test.dao.project.ProjectDAO;
+import com.njustc.onlinebiz.test.exception.project.*;
+import com.njustc.onlinebiz.test.service.report.ReportService;
+import com.njustc.onlinebiz.test.service.review.EntrustTestReviewService;
+import com.njustc.onlinebiz.test.service.review.ReportReviewService;
+import com.njustc.onlinebiz.test.service.review.SchemeReviewService;
+import com.njustc.onlinebiz.test.service.scheme.SchemeService;
+import com.njustc.onlinebiz.test.service.testcase.TestcaseService;
+import com.njustc.onlinebiz.test.service.testissue.TestIssueService;
+import com.njustc.onlinebiz.test.service.testrecord.TestRecordService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
+import java.util.Objects;
+
+
+<span class="fc" id="L27">@Slf4j</span>
+@Service
+public class MongoProjectService implements ProjectService {
+
+    private final ProjectDAO projectDAO;
+    private final SchemeService schemeService;
+    private final SchemeReviewService schemeReviewService;
+    private final TestcaseService testcaseService;
+    private final TestRecordService testRecordService;
+    private final ReportService reportService;
+    private final EntrustTestReviewService entrustTestReviewService;
+    private final ReportReviewService reportReviewService;
+    private final TestIssueService testIssueService;
+
+    private final RestTemplate restTemplate;
+    private static final String ENTRUST_SERVICE = &quot;http://onlinebiz-entrust&quot;;
+
+    public MongoProjectService(ProjectDAO projectDAO,
+                               SchemeService schemeService,
+                               SchemeReviewService schemeReviewService,
+                               TestcaseService testcaseService,
+                               TestRecordService testRecordService,
+                               ReportService reportService,
+                               EntrustTestReviewService entrustTestReviewService,
+                               ReportReviewService reportReviewService,
+                               TestIssueService testIssueService,
+<span class="fc" id="L53">                               RestTemplate restTemplate) {</span>
+<span class="fc" id="L54">        this.projectDAO = projectDAO;</span>
+<span class="fc" id="L55">        this.schemeService = schemeService;</span>
+<span class="fc" id="L56">        this.schemeReviewService = schemeReviewService;</span>
+<span class="fc" id="L57">        this.testcaseService = testcaseService;</span>
+<span class="fc" id="L58">        this.testRecordService = testRecordService;</span>
+<span class="fc" id="L59">        this.reportService = reportService;</span>
+<span class="fc" id="L60">        this.entrustTestReviewService = entrustTestReviewService;</span>
+<span class="fc" id="L61">        this.reportReviewService = reportReviewService;</span>
+<span class="fc" id="L62">        this.testIssueService = testIssueService;</span>
+<span class="fc" id="L63">        this.restTemplate = restTemplate;</span>
+<span class="fc" id="L64">    }</span>
+
+    @Override
+    public String createTestProject(Long userId, Role userRole, String entrustId) {
+        //非法人员尝试生成项目
+<span class="pc bpc" id="L69" title="2 of 6 branches missed.">        if (userRole != Role.ADMIN &amp;&amp; userRole != Role.MARKETER &amp;&amp; userRole != Role.MARKETING_SUPERVISOR) {</span>
+<span class="fc" id="L70">            throw new ProjectPermissionDeniedException(&quot;无权生成新的测试项目&quot;);</span>
+        }
+        EntrustDto entrustDto;
+<span class="fc" id="L73">        String params = &quot;?userId=&quot; + userId + &quot;&amp;userRole=&quot; + userRole;</span>
+<span class="fc" id="L74">        String url = ENTRUST_SERVICE + &quot;/api/entrust/&quot; + entrustId + &quot;/get_dto&quot;;</span>
+        try {
+<span class="fc" id="L76">            entrustDto = restTemplate.getForObject(url + params, EntrustDto.class);</span>
+<span class="nc" id="L77">        } catch (HttpClientErrorException e) {</span>
+<span class="nc" id="L78">            throw new ProjectDAOFailureException(&quot;请求DTO失败：&quot; + e.getResponseBodyAsString());</span>
+<span class="fc" id="L79">        }</span>
+        // 检查entrustDto非空
+<span class="fc bfc" id="L81" title="All 2 branches covered.">        if (entrustDto == null) {</span>
+<span class="fc" id="L82">            throw new ProjectDAOFailureException(&quot;entrustDto为空&quot;);</span>
+        }
+        // 检查项目是否已被创建
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">        if (entrustDto.getProjectId() != null) {</span>
+<span class="nc" id="L86">            throw new ProjectDAOFailureException(&quot;该委托已有测试项目&quot;);</span>
+        }
+        // 检查创建者匹配
+<span class="pc bpc" id="L89" title="1 of 4 branches missed.">        if (userRole == Role.MARKETER &amp;&amp; !Objects.equals(userId, entrustDto.getMarketerId())) {</span>
+<span class="fc" id="L90">            throw new ProjectPermissionDeniedException(&quot;市场部人员信息不一致, 创建失败&quot;);</span>
+        }
+        // 设置项目基本信息
+<span class="fc" id="L93">        ProjectBaseInfo projectBaseInfo = new ProjectBaseInfo(entrustId, entrustDto);</span>
+
+        // 设置项目表格信息 [在updateQa中在创建]
+        // 只添加了项目的基本信息，并将项目状态初始化设置为 WAIT_FOR_QA
+<span class="fc" id="L97">        Project project = new Project().setProjectBaseInfo(projectBaseInfo);</span>
+<span class="fc" id="L98">        project.setStatus(new ProjectStatus(ProjectStage.WAIT_FOR_QA, &quot;等待质量部主管分配质量部员工&quot;));</span>
+        // 获取项目ID
+<span class="fc" id="L100">        String projectId = projectDAO.insertProject(project).getId();</span>
+        // 将项目ID注册到委托对象中
+<span class="fc" id="L102">        params = &quot;?projectId=&quot; + projectId;</span>
+<span class="fc" id="L103">        url = ENTRUST_SERVICE + &quot;/api/entrust/&quot; + entrustId + &quot;/register_project&quot;;</span>
+        try {
+<span class="fc" id="L105">            restTemplate.postForEntity(url + params, null, Void.class);</span>
+<span class="nc" id="L106">        } catch (HttpClientErrorException e) {</span>
+<span class="nc" id="L107">            throw new InternalError(&quot;注册项目ID失败：&quot; + e.getResponseBodyAsString());</span>
+<span class="fc" id="L108">        }</span>
+<span class="fc" id="L109">        return projectId;</span>
+    }
+
+    @Override
+    public Project findProject(String projectId, Long userId, Role userRole) {
+<span class="fc" id="L114">        Project project = projectDAO.findProjectById(projectId);</span>
+<span class="fc bfc" id="L115" title="All 2 branches covered.">        if (project == null) {</span>
+<span class="fc" id="L116">            throw new ProjectNotFoundException(&quot;该测试项目不存在&quot;);</span>
+        }
+<span class="fc" id="L118">        ProjectStage curStage = project.getStatus().getStage();</span>
+        // 检查阶段
+<span class="fc bfc" id="L120" title="All 2 branches covered.">        if (curStage == ProjectStage.WAIT_FOR_QA) {</span>
+<span class="fc" id="L121">            throw new ProjectInvalidStageException(&quot;待分配质量部人员&quot;);</span>
+        }
+<span class="fc" id="L123">        return project;</span>
+    }
+
+    @Override
+    public PageResult&lt;ProjectOutline&gt; findProjectOutlines(Integer page, Integer pageSize, Long userId, Role userRole) {
+<span class="fc bfc" id="L128" title="All 4 branches covered.">        if (page &lt;= 0 || pageSize &lt;= 0) {</span>
+<span class="fc" id="L129">            throw new ProjectInvalidArgumentException(&quot;页号或每页大小必须为正整数&quot;);</span>
+        }
+        long total;
+        List&lt;ProjectOutline&gt; list;
+        // 根据用户角色不同，返回不同结果
+<span class="pc bpc" id="L134" title="3 of 8 branches missed.">        if (userRole == Role.ADMIN || userRole == Role.MARKETING_SUPERVISOR</span>
+                || userRole == Role.QA_SUPERVISOR || userRole == Role.TESTING_SUPERVISOR) {
+<span class="fc" id="L136">            total = projectDAO.countAll();</span>
+<span class="fc" id="L137">            list = projectDAO.findAllProjects(page, pageSize);</span>
+        }
+<span class="fc bfc" id="L139" title="All 2 branches covered.">        else if (userRole == Role.MARKETER) {</span>
+<span class="fc" id="L140">            total = projectDAO.countByMarketerId(userId);</span>
+<span class="fc" id="L141">            list = projectDAO.findProjectByMarketerId(userId, page, pageSize);</span>
+        }
+<span class="fc bfc" id="L143" title="All 2 branches covered.">        else if (userRole == Role.TESTER) {</span>
+<span class="fc" id="L144">            total = projectDAO.countByTesterId(userId);</span>
+<span class="fc" id="L145">            list = projectDAO.findProjectByTesterId(userId, page, pageSize);</span>
+        }
+<span class="fc bfc" id="L147" title="All 2 branches covered.">        else if (userRole == Role.QA) {</span>
+<span class="fc" id="L148">            total = projectDAO.countByQaId(userId);</span>
+<span class="fc" id="L149">            list = projectDAO.findProjectByQaId(userId, page, pageSize);</span>
+        }
+        else {
+<span class="fc" id="L152">            throw new ProjectPermissionDeniedException(&quot;无权查看测试项目列表&quot;);</span>
+        }
+<span class="fc" id="L154">        return new PageResult&lt;&gt;(page, pageSize, total, list);</span>
+    }
+
+    // 该函数只是为了在项目分配质量部员工以后，创建项目中各表单，没有做权限/阶段检查，谨慎调用
+    private Boolean createProjectForms(String projectId) {
+<span class="fc" id="L159">        Project project = projectDAO.findProjectById(projectId);</span>
+<span class="fc" id="L160">        ProjectBaseInfo projectBaseInfo = project.getProjectBaseInfo();</span>
+<span class="fc" id="L161">        String entrustId = projectBaseInfo.getEntrustId();</span>
+<span class="fc" id="L162">        Long marketerId = projectBaseInfo.getMarketerId();</span>
+<span class="fc" id="L163">        Long testerId = projectBaseInfo.getTesterId();</span>
+<span class="fc" id="L164">        Long qaId = projectBaseInfo.getQaId();</span>
+<span class="fc" id="L165">        String serialNumber = projectBaseInfo.getSerialNumber();</span>
+
+<span class="fc" id="L167">        ProjectFormIds projectFormIds = new ProjectFormIds();</span>
+        /*TODO: 根据其他部分给出的接口新建各表，并将表编号填入testProject中字段，替换null*/
+        /* 每个文档可以传入projectId，然后根据projectId可进行查找质量部人员Id */
+        /* 如有相互关联表，可在自己的类中注入project service，然后根据其中提供的 getFormIds 找到所要关联的表单 */
+        // 创建时，可以取消相关权限检查，可以默认到这一步前面都符合，表单的create函数从上述提供的人员ID参数中，各取所需即可
+
+        // 对应的测试方案 id (JS006)
+<span class="fc" id="L174">        String testSchemeId = schemeService.createScheme(entrustId, null, marketerId, Role.MARKETER, projectId);</span>
+<span class="fc" id="L175">        projectFormIds.setTestSchemeId(testSchemeId);</span>
+<span class="fc" id="L176">        Report.ReportContent reportContent = new Report.ReportContent();</span>
+<span class="fc" id="L177">        reportContent.setProjectSerialNumber(serialNumber);</span>
+<span class="fc" id="L178">        String testReportId = reportService.createReport(projectId, entrustId, reportContent, marketerId, Role.MARKETER);</span>
+<span class="fc" id="L179">        projectFormIds.setTestReportId(testReportId);</span>
+<span class="fc" id="L180">        String testcaseListId = testcaseService.createTestcaseList(projectId, entrustId, null, marketerId, Role.MARKETER);</span>
+<span class="fc" id="L181">        projectFormIds.setTestcaseListId(testcaseListId);</span>
+<span class="fc" id="L182">        String testRecordListId = testRecordService.createTestRecordList(projectId, entrustId, null, marketerId, Role.MARKETER);</span>
+<span class="fc" id="L183">        projectFormIds.setTestRecordListId(testRecordListId);</span>
+        // 对应的测试报告检查表 id (JS010)
+<span class="fc" id="L185">        String testReportChecklistId = reportReviewService.createReportReview(projectId, marketerId, Role.MARKETER);</span>
+<span class="fc" id="L186">        projectFormIds.setTestReportCecklistId(testReportChecklistId);</span>
+        // 对应的测试问题清单 id (JS011)
+<span class="fc" id="L188">        String testIssueListId = testIssueService.createTestIssueList(projectId, entrustId, null, marketerId, Role.MARKETER);</span>
+<span class="fc" id="L189">        projectFormIds.setTestIssueListId(testIssueListId);</span>
+        // 对应的工作检查表 id (JS012)
+<span class="fc" id="L191">        String workChecklistId = entrustTestReviewService.createEntrustTestReview(projectId, marketerId, Role.MARKETER);</span>
+<span class="fc" id="L192">        projectFormIds.setWorkChecklistId(workChecklistId);</span>
+        // 对应的测试方案评审表 (JS013)
+<span class="fc" id="L194">        String testSchemeChecklistId = schemeReviewService.createSchemeReview(projectId, serialNumber, qaId, testerId);</span>
+<span class="fc" id="L195">        projectFormIds.setTestSchemeChecklistId(testSchemeChecklistId);</span>
+
+        // 更新测试项目的formIds
+<span class="fc" id="L198">        return projectDAO.updateFormIds(projectId, projectFormIds);</span>
+    }
+
+    @Override
+    public void updateQa(String projectId, Long qaId, Long userId, Role userRole) {
+<span class="fc" id="L203">        Project project = projectDAO.findProjectById(projectId);</span>
+        // 检查测试项目阶段
+<span class="fc" id="L205">        ProjectStage curStage = project.getStatus().getStage();</span>
+<span class="fc bfc" id="L206" title="All 2 branches covered.">        if (curStage != ProjectStage.WAIT_FOR_QA) {</span>
+<span class="fc" id="L207">            throw new ProjectInvalidStageException(&quot;此阶段不能分配测试部人员&quot;);</span>
+        }
+        // 检查用户权限
+<span class="pc bpc" id="L210" title="1 of 4 branches missed.">        if (userRole != Role.ADMIN &amp;&amp; userRole != Role.QA_SUPERVISOR) {</span>
+<span class="fc" id="L211">            throw new ProjectPermissionDeniedException(&quot;无权分配质量部人员&quot;);</span>
+        }
+        // 检查数据库操作是否成功
+<span class="pc bpc" id="L214" title="1 of 2 branches missed.">        if (!projectDAO.updateQaId(projectId, qaId)) {</span>
+<span class="nc" id="L215">            throw new ProjectDAOFailureException(&quot;更新质量部人员失败&quot;);</span>
+        }
+        // 生成表格
+<span class="pc bpc" id="L218" title="1 of 2 branches missed.">        if (!createProjectForms(projectId)) {</span>
+<span class="nc" id="L219">            throw new ProjectDAOFailureException(&quot;创建各测试表单失败&quot;);</span>
+        }
+<span class="fc" id="L221">    }</span>
+
+    @Override
+    public void removeProject(String projectId, Long userId, Role userRole) {
+<span class="fc bfc" id="L225" title="All 2 branches covered.">        if (userRole != Role.ADMIN) {</span>
+<span class="fc" id="L226">            throw new ProjectPermissionDeniedException(&quot;无权删除项目&quot;);</span>
+        }
+<span class="fc" id="L228">        Project project = findProject(projectId, userId, userRole);</span>
+
+        // TODO: 删除项目时需先级联删除各表
+<span class="fc" id="L231">        ProjectFormIds projectFormIds = project.getProjectFormIds();</span>
+<span class="fc" id="L232">        schemeReviewService.removeSchemeReview(projectFormIds.getTestSchemeChecklistId(), userId, userRole);</span>
+
+<span class="fc bfc" id="L234" title="All 2 branches covered.">        if (!projectDAO.deleteProject(project.getId())) {</span>
+<span class="fc" id="L235">            throw new ProjectDAOFailureException(&quot;删除项目失败&quot;);</span>
+        }
+<span class="fc" id="L237">    }</span>
+
+    @Override
+    public void updateStatus(String projectId, ProjectStatus nextStatus, Long userId, Role userRole) {
+<span class="fc" id="L241">        Project project = projectDAO.findProjectById(projectId);</span>
+        // 检查用户权限
+<span class="pc bpc" id="L243" title="2 of 6 branches missed.">        if (userRole != Role.ADMIN &amp;&amp; userRole != Role.TESTING_SUPERVISOR &amp;&amp; userRole != Role.QA_SUPERVISOR</span>
+<span class="pc bpc" id="L244" title="1 of 2 branches missed.">            &amp;&amp; !userId.equals(project.getProjectBaseInfo().getCustomerId())     // 项目有关的用户</span>
+<span class="pc bpc" id="L245" title="1 of 2 branches missed.">            &amp;&amp; !userId.equals(project.getProjectBaseInfo().getTesterId())       // 项目有关的测试部人员</span>
+<span class="pc bpc" id="L246" title="1 of 2 branches missed.">            &amp;&amp; !userId.equals(project.getProjectBaseInfo().getQaId())           // 项目有关的质量部人员</span>
+<span class="pc bpc" id="L247" title="1 of 2 branches missed.">            &amp;&amp; !userId.equals(project.getProjectBaseInfo().getMarketerId()))    // 项目有关的市场部人员</span>
+        {
+<span class="fc" id="L249">            throw new ProjectPermissionDeniedException(&quot;无权更新项目状态&quot;);</span>
+        }
+
+<span class="pc bpc" id="L252" title="1 of 2 branches missed.">        if (userId.equals(project.getProjectBaseInfo().getCustomerId())) {</span>
+            // 测试报告已签发，待客户接受, next: REPORT_CUSTOMER_CONFIRM 或 REPORT_CUSTOMER_REJECT
+<span class="nc bnc" id="L254" title="All 2 branches missed.">            if (project.getStatus().getStage() != ProjectStage.REPORT_WAIT_CUSTOMER</span>
+<span class="nc bnc" id="L255" title="All 2 branches missed.">                    || (nextStatus.getStage() != ProjectStage.REPORT_CUSTOMER_CONFIRM</span>
+<span class="nc bnc" id="L256" title="All 2 branches missed.">                    &amp;&amp; nextStatus.getStage() != ProjectStage.REPORT_CUSTOMER_REJECT)) {</span>
+<span class="nc" id="L257">                throw new ProjectInvalidStageException(&quot;更新的下一个状态不合法&quot;);</span>
+            }
+<span class="nc bnc" id="L259" title="All 2 branches missed.">            if (!projectDAO.updateStatus(project.getId(), nextStatus)) {</span>
+<span class="nc" id="L260">                throw new ProjectDAOFailureException(&quot;更改测试项目状态失败&quot;);</span>
+            }
+<span class="nc" id="L262">            return;</span>
+        }
+
+<span class="fc bfc" id="L265" title="All 12 branches covered.">        switch (project.getStatus().getStage()) {</span>
+            case WAIT_FOR_QA:               // 等待分配质量人员（所有表不能改）, next: SCHEME_UNFILLED
+<span class="pc bpc" id="L267" title="1 of 4 branches missed.">                if (nextStatus.getStage() != ProjectStage.SCHEME_UNFILLED || project.getProjectBaseInfo().getQaId() == null) {</span>
+<span class="fc" id="L268">                    throw new ProjectInvalidStageException(&quot;更新的下一个状态不合法&quot;);</span>
+                }
+                break;
+            case SCHEME_UNFILLED:           // 测试方案未填写, next: SCHEME_AUDITING
+            case SCHEME_AUDITING_DENIED:    // 测试方案经质量部审核不通过, next: SCHEME_AUDITING
+<span class="pc bpc" id="L273" title="1 of 2 branches missed.">                if (nextStatus.getStage() != ProjectStage.SCHEME_AUDITING) {</span>
+<span class="fc" id="L274">                    throw new ProjectInvalidStageException(&quot;更新的下一个状态不合法&quot;);</span>
+                }
+                break;
+            case SCHEME_AUDITING:           // 测试方案已提交，质量部可审核, next: SCHEME_AUDITING_DENIED 或 SCHEME_AUDITING_PASSED
+<span class="pc bpc" id="L278" title="2 of 4 branches missed.">                if (nextStatus.getStage() != ProjectStage.SCHEME_AUDITING_DENIED &amp;&amp; nextStatus.getStage() != ProjectStage.SCHEME_AUDITING_PASSED) {</span>
+<span class="fc" id="L279">                    throw new ProjectInvalidStageException(&quot;更新的下一个状态不合法&quot;);</span>
+                }
+                break;
+            case SCHEME_AUDITING_PASSED:    // 测试方案经质量部审核通过, next: SCHEME_REVIEW_UPLOADED
+<span class="pc bpc" id="L283" title="1 of 2 branches missed.">                if (nextStatus.getStage() != ProjectStage.SCHEME_REVIEW_UPLOADED) {</span>
+<span class="fc" id="L284">                    throw new ProjectInvalidStageException(&quot;更新的下一个状态不合法&quot;);</span>
+                }
+                break;
+            case SCHEME_REVIEW_UPLOADED:    // 测试方案评审表已上传，进行相关测试，测试报告填写中, next: REPORT_AUDITING, 测试报告提交触发
+            case REPORT_QA_DENIED:          // 测试报告经质量部审核不通过, next: REPORT_AUDITING,测试报告提交时触发
+            case REPORT_CUSTOMER_REJECT:    // 测试报告被客户不接受, next: REPORT_AUDITING
+<span class="pc bpc" id="L290" title="1 of 2 branches missed.">                if (nextStatus.getStage() != ProjectStage.REPORT_AUDITING) {</span>
+<span class="fc" id="L291">                    throw new ProjectInvalidStageException(&quot;更新的下一个状态不合法&quot;);</span>
+                }
+                break;
+            case REPORT_AUDITING:           // 测试报告已提交，质量部可审核, next: REPORT_QA_DENIED 或 REPORT_QA_PASSED
+<span class="pc bpc" id="L295" title="2 of 4 branches missed.">                if (nextStatus.getStage() != ProjectStage.REPORT_QA_DENIED &amp;&amp; nextStatus.getStage() != ProjectStage.REPORT_QA_PASSED) {</span>
+<span class="fc" id="L296">                    throw new ProjectInvalidStageException(&quot;更新的下一个状态不合法&quot;);</span>
+                }
+                break;
+            case REPORT_QA_PASSED:          // 测试报告经质量部审核通过，待上传测试报告检查表, next: REPORT_WAIT_SENT_TO_CUSTOMER
+<span class="fc bfc" id="L300" title="All 2 branches covered.">                if (nextStatus.getStage() != ProjectStage.REPORT_WAIT_SENT_TO_CUSTOMER) {</span>
+<span class="fc" id="L301">                    throw new ProjectInvalidStageException(&quot;更新的下一个状态不合法&quot;);</span>
+                }
+                break;
+            case REPORT_WAIT_SENT_TO_CUSTOMER: // 测试报告检查表已上传，待市场部点击向用户签发报告, next: REPORT_WAIT_CUSTOMER
+<span class="pc bpc" id="L305" title="1 of 2 branches missed.">                if (nextStatus.getStage() != ProjectStage.REPORT_WAIT_CUSTOMER) {</span>
+<span class="fc" id="L306">                    throw new ProjectInvalidStageException(&quot;更新的下一个状态不合法&quot;);</span>
+                }
+                break;
+//            case REPORT_WAIT_CUSTOMER:      // 测试报告已签发，待客户接受, next: REPORT_CUSTOMER_CONFIRM 或 REPORT_CUSTOMER_REJECT
+//                if (nextStatus.getStage() != ProjectStage.REPORT_CUSTOMER_CONFIRM &amp;&amp; nextStatus.getStage() != ProjectStage.REPORT_CUSTOMER_REJECT) {
+//                    throw new ProjectInvalidStageException(&quot;更新的下一个状态不合法&quot;);
+//                }
+//                break;
+            case REPORT_CUSTOMER_CONFIRM:   // 测试报告被客户接受，质量部可审计测试文档, next: QA_ALL_REJECTED 或 QA_ALL_PASSED
+<span class="pc bpc" id="L315" title="2 of 4 branches missed.">                if (nextStatus.getStage() != ProjectStage.QA_ALL_REJECTED &amp;&amp; nextStatus.getStage() != ProjectStage.QA_ALL_PASSED) {</span>
+<span class="fc" id="L316">                    throw new ProjectInvalidStageException(&quot;更新的下一个状态不合法&quot;);</span>
+                }
+                break;
+            case QA_ALL_REJECTED:           // 质量部审计测试文档不合格, next: REPORT_CUSTOMER_CONFIRM
+<span class="pc bpc" id="L320" title="1 of 2 branches missed.">                if (nextStatus.getStage() != ProjectStage.REPORT_CUSTOMER_CONFIRM) {</span>
+<span class="fc" id="L321">                    throw new ProjectInvalidStageException(&quot;更新的下一个状态不合法&quot;);</span>
+                }
+                break;
+            case QA_ALL_PASSED:             // 质量部审计测试文档合格，完成（无可填，全可看）
+<span class="fc" id="L325">                throw new ProjectInvalidStageException(&quot;项目已结项&quot;);</span>
+            default:
+<span class="fc" id="L327">                throw new ProjectInvalidStageException(&quot;无法解析该状态或更新的下一个状态不合法&quot;);</span>
+        }
+<span class="fc bfc" id="L329" title="All 2 branches covered.">        if (!projectDAO.updateStatus(project.getId(), nextStatus)) {</span>
+<span class="fc" id="L330">            throw new ProjectDAOFailureException(&quot;更改测试项目状态失败&quot;);</span>
+        }
+<span class="fc" id="L332">    }</span>
+
+    @Override
+    public ProjectFormIds getProjectFormIds(String projectId) {
+<span class="fc" id="L336">        Project project = projectDAO.findProjectById(projectId);</span>
+<span class="fc bfc" id="L337" title="All 2 branches covered.">        if (project == null) {</span>
+<span class="fc" id="L338">            throw new ProjectNotFoundException(&quot;该测试项目不存在&quot;);</span>
+        }
+<span class="fc" id="L340">        return project.getProjectFormIds();</span>
+    }
+
+    @Override
+    public ProjectBaseInfo getProjectBaseInfo(String projectId) {
+<span class="fc" id="L345">        Project project = projectDAO.findProjectById(projectId);</span>
+<span class="fc bfc" id="L346" title="All 2 branches covered.">        if (project == null) {</span>
+<span class="fc" id="L347">            throw new ProjectNotFoundException(&quot;该测试项目不存在&quot;);</span>
+        }
+<span class="fc" id="L349">        return project.getProjectBaseInfo();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

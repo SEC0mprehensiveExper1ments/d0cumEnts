@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>HeaderFooter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-document</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.doc.util</a> &gt; <span class="el_source">HeaderFooter.java</span></div><h1>HeaderFooter.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.doc.util;
+
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
+
+public class HeaderFooter extends PdfPageEventHelper {
+    String header;
+    String[] footer;
+    int headerToPage;               // 添加页眉，从第一页直到某页为止， 可设为0或-1，表示不添加
+    int footerFromPage;             // 页脚从哪一页开始， 如果是-1，则没有页脚
+    boolean isHaderLine;            // 该文档是否需要页眉处画直线
+    boolean isFooterLine;           // 该文档是否需要页脚处画直线
+    float[] headerLoc;
+    float[] footerLoc;
+    float headLineOff, footLineOff;
+
+    public HeaderFooter(String header, String[] footer, int headerToPage, int footerFromPage, boolean isHaderLine, boolean isFooterLine,
+<span class="fc" id="L18">                 float[] headerLoc, float[] footerLoc, float headLineOff, float footLineOff) {</span>
+<span class="fc" id="L19">        this.header = header;</span>
+<span class="fc" id="L20">        this.footer = footer;</span>
+<span class="fc" id="L21">        this.headerToPage = headerToPage;</span>
+<span class="fc" id="L22">        this.footerFromPage = footerFromPage;</span>
+<span class="fc" id="L23">        this.isHaderLine = isHaderLine;</span>
+<span class="fc" id="L24">        this.isFooterLine = isFooterLine;</span>
+<span class="fc" id="L25">        this.headerLoc = headerLoc;</span>
+<span class="fc" id="L26">        this.footerLoc = footerLoc;</span>
+<span class="fc" id="L27">        this.headLineOff = headLineOff;</span>
+<span class="fc" id="L28">        this.footLineOff = footLineOff;</span>
+<span class="fc" id="L29">    }</span>
+
+    PdfTemplate totalPage;  // 总页数模板
+    static BaseFont headerBf, footerBf;
+    static Font headFont, feetFont;
+<span class="fc" id="L34">    static float headFontSize = 10f;</span>
+<span class="fc" id="L35">    static float footFontSize = 9.5f;</span>
+    static {
+        try {
+<span class="fc" id="L38">            headerBf = BaseFont.createFont(&quot;font/simhei.ttf&quot;, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);</span>
+<span class="fc" id="L39">            footerBf = BaseFont.createFont(&quot;font/simsun.ttf&quot;, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);</span>
+<span class="fc" id="L40">            headFont = new Font(headerBf, headFontSize, Font.NORMAL);</span>
+<span class="fc" id="L41">            feetFont = new Font(footerBf, footFontSize, Font.NORMAL);</span>
+<span class="nc" id="L42">        } catch (Exception e) {</span>
+<span class="nc" id="L43">            e.printStackTrace();</span>
+<span class="fc" id="L44">        }</span>
+<span class="fc" id="L45">    }</span>
+
+    /**
+     * 打开文档时，创建一个总页数的模版
+     * */
+    @Override
+    public void onOpenDocument(PdfWriter writer, Document document) {
+<span class="fc" id="L52">        PdfContentByte cb =writer.getDirectContent();</span>
+<span class="fc" id="L53">        totalPage = cb.createTemplate(50, 50);      // 共 页 的矩形的长宽高</span>
+<span class="fc" id="L54">    }</span>
+
+    /**
+     * 一页加载完成触发，写入页眉和页脚
+     * */
+    @Override
+    public void onEndPage(PdfWriter writer, Document document) {
+        try {
+//            table.getDefaultCell().setHorizontalAlignment(Element.ALIGN_RIGHT);
+<span class="fc bfc" id="L63" title="All 2 branches covered.">            if (writer.getPageNumber() &lt;= headerToPage) {                         // 写入页眉</span>
+<span class="fc" id="L64">                ColumnText.showTextAligned(writer.getDirectContent(), Element.ALIGN_RIGHT, new Phrase(header, headFont), headerLoc[0], headerLoc[1], 0);</span>
+            }
+<span class="fc bfc" id="L66" title="All 4 branches covered.">            if ( footerFromPage &gt; -1 &amp;&amp; writer.getPageNumber() &gt;= footerFromPage) {     // 写入页脚</span>
+<span class="fc" id="L67">                int pageS = writer.getPageNumber();</span>
+<span class="fc" id="L68">                String foot1 = footer[0] + pageS + footer[1];</span>
+<span class="fc" id="L69">                Phrase halfFooter = new Phrase(foot1, feetFont);</span>
+<span class="fc" id="L70">                float len = footerBf.getWidthPoint(foot1, footFontSize);</span>
+<span class="fc" id="L71">                PdfContentByte cb = writer.getDirectContent();</span>
+<span class="fc" id="L72">                ColumnText.showTextAligned(cb, Element.ALIGN_LEFT, halfFooter, footerLoc[0], footerLoc[1], 0);</span>
+<span class="fc" id="L73">                cb.addTemplate(totalPage, footerLoc[0] + len, footerLoc[1]); // 调节模版显示的位置</span>
+            }
+<span class="fc bfc" id="L75" title="All 2 branches covered.">            if (isHaderLine) {                                                      // 写入页眉处直线</span>
+<span class="fc" id="L76">                PdfPTable table = new PdfPTable(1);             // 用来画页眉页脚处直线</span>
+<span class="fc" id="L77">                table.setTotalWidth(document.right() - document.left());</span>
+<span class="fc" id="L78">                PdfPCell cell = table.getDefaultCell();</span>
+<span class="fc" id="L79">                cell.setBorderWidth(1.0f);</span>
+<span class="fc" id="L80">                cell.setBorder(Rectangle.BOTTOM);</span>
+<span class="fc" id="L81">                table.addCell(cell);</span>
+<span class="fc" id="L82">                table.writeSelectedRows(0, 1, document.left(), headerLoc[1] + headLineOff, writer.getDirectContent());</span>
+            }
+<span class="fc bfc" id="L84" title="All 2 branches covered.">            if (isFooterLine) {                                                     // 写入页脚处直线</span>
+<span class="fc" id="L85">                PdfPTable table = new PdfPTable(1);             // 用来画页眉页脚处直线</span>
+<span class="fc" id="L86">                table.setTotalWidth(document.right() - document.left());</span>
+<span class="fc" id="L87">                PdfPCell cell = table.getDefaultCell();</span>
+<span class="fc" id="L88">                cell.setBorder(Rectangle.TOP);</span>
+<span class="fc" id="L89">                cell.setBorderWidth(0.3f);</span>
+<span class="fc" id="L90">                table.addCell(cell);</span>
+<span class="fc" id="L91">                table.writeSelectedRows(0, 1, document.left(), footerLoc[1] + footLineOff, writer.getDirectContent());</span>
+            }
+<span class="nc" id="L93">        } catch (Exception de) {</span>
+<span class="nc" id="L94">            throw new ExceptionConverter(de);</span>
+<span class="fc" id="L95">        }</span>
+<span class="fc" id="L96">    }</span>
+
+    /**
+     * 关闭文档时，将模板替换成实际的Y值。至此，page x of y 制作完毕，完美兼容各种文档size。
+     * */
+    @Override
+    public void onCloseDocument(PdfWriter writer, Document document) {
+<span class="fc" id="L103">        totalPage.beginText();</span>
+<span class="fc" id="L104">        totalPage.setFontAndSize(footerBf, footFontSize);           // 生成的模版的字体、颜色</span>
+<span class="fc" id="L105">        totalPage.showText(writer.getPageNumber() + footer[2]);       // 模版显示的内容</span>
+<span class="fc" id="L106">        totalPage.endText();</span>
+<span class="fc" id="L107">        totalPage.closePath();</span>
+<span class="fc" id="L108">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

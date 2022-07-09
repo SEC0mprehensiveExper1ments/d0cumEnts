@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DocServiceJS006.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-document</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.doc.service</a> &gt; <span class="el_source">DocServiceJS006.java</span></div><h1>DocServiceJS006.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.doc.service;
+
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
+import com.njustc.onlinebiz.common.model.test.scheme.Modification;
+import com.njustc.onlinebiz.doc.dao.OSSProvider;
+import com.njustc.onlinebiz.doc.model.JS006;
+import com.njustc.onlinebiz.doc.util.HeaderFooter;
+import com.njustc.onlinebiz.doc.util.ItextUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+
+@Service
+public class DocServiceJS006 {
+    private final OSSProvider ossProvider;
+
+<span class="fc" id="L23">    public DocServiceJS006(OSSProvider ossProvider) {</span>
+<span class="fc" id="L24">        this.ossProvider = ossProvider;</span>
+<span class="fc" id="L25">    }</span>
+
+    private static final float marginLeft;
+    private static final float marginRight;
+    private static final float marginTop;
+    private static final float marginBottom;
+
+    @Value(&quot;${document-dir}&quot;)
+    private String DOCUMENT_DIR;
+
+    static {
+        // 在 iText 中每一个单位大小默认近似于点（pt）
+        // 1mm = 72 ÷ 25.4 ≈ 2.834645...（pt）
+<span class="fc" id="L38">        marginLeft = 90f;</span>
+<span class="fc" id="L39">        marginRight = 90f;</span>
+<span class="fc" id="L40">        marginTop = 72f;</span>
+<span class="fc" id="L41">        marginBottom = 72f;</span>
+<span class="fc" id="L42">    }</span>
+
+    private static JS006 JS006Json;
+    /**
+     * 填充
+     *
+     * @param schemeId 委托id
+     * @param newJson 新json
+     * @return {@link String} OSS下载链接
+     */
+
+    public String fill(String schemeId, JS006 newJson) {
+<span class="fc" id="L54">        JS006Json = newJson;</span>
+<span class="fc" id="L55">        String pdfPath = DOCUMENT_DIR + &quot;JS006_&quot; + schemeId + &quot;.pdf&quot;;</span>
+//        System.out.println(&quot;pdfPath: &quot; + pdfPath);
+        try {
+            // 1.新建document对象
+<span class="fc" id="L59">            Document document = new Document(PageSize.A4);// 建立一个Document对象</span>
+<span class="fc" id="L60">            document.setMargins(marginLeft, marginRight, marginTop, marginBottom);</span>
+            // 2.建立一个书写器(Writer)与document对象关联
+<span class="fc" id="L62">            File file = new File(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;));</span>
+//            System.out.println(&quot;file: &quot; + file);
+<span class="fc" id="L64">            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(file));</span>
+
+            // 2.5 添加页眉/页脚
+<span class="fc" id="L67">            String header = &quot;NST－04－JS006－2011&quot;;</span>
+<span class="fc" id="L68">            String[] footer = new String[]{&quot;第 &quot;, &quot; 页，共 &quot;, &quot; 页&quot;};</span>
+<span class="fc" id="L69">            int headerToPage = 100;</span>
+<span class="fc" id="L70">            int footerFromPage = 2;</span>
+<span class="fc" id="L71">            boolean isHaderLine = true;</span>
+<span class="fc" id="L72">            boolean isFooterLine = false;</span>
+<span class="fc" id="L73">            float[] headerLoc = new float[]{document.right() - 5, document.top() + 15};</span>
+<span class="fc" id="L74">            float[] footerLoc = new float[]{document.right() - 10, document.bottom() - 20};</span>
+<span class="fc" id="L75">            float headLineOff = -5f;</span>
+<span class="fc" id="L76">            float footLineOff = 12f;</span>
+<span class="fc" id="L77">            writer.setPageEvent(new HeaderFooter(header, footer, headerToPage, footerFromPage, isHaderLine, isFooterLine,</span>
+                    headerLoc, footerLoc, headLineOff, footLineOff));
+            // 3.打开文档
+<span class="fc" id="L80">            document.open();</span>
+
+            // 4.向文档中添加内容
+<span class="fc" id="L83">            generatePage(document);</span>
+            // 5.关闭文档
+<span class="fc" id="L85">            document.close();</span>
+<span class="nc" id="L86">        } catch (Exception e) {</span>
+<span class="nc" id="L87">            e.printStackTrace();</span>
+<span class="nc" id="L88">            return &quot;unable to generate a pdf&quot;;</span>
+<span class="fc" id="L89">        }</span>
+        // 上传pdf
+        //System.out.println(pdfPath);
+        try {
+<span class="pc bpc" id="L93" title="1 of 2 branches missed.">            if (ossProvider.upload(</span>
+<span class="fc" id="L94">                    &quot;doc&quot;, &quot;JS006_&quot; + schemeId + &quot;.pdf&quot;, Files.readAllBytes(Path.of(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;))), &quot;application/pdf&quot;)) {</span>
+                //System.out.println(pdfPath);
+<span class="fc" id="L96">                deleteOutFile(pdfPath);</span>
+<span class="fc" id="L97">                return &quot;https://oss.syh1en.asia/doc/JS006_&quot; + schemeId + &quot;.pdf&quot;;</span>
+            } else {
+<span class="nc" id="L99">                deleteOutFile(pdfPath);</span>
+<span class="nc" id="L100">                return &quot;upload failed&quot;;</span>
+            }
+<span class="nc" id="L102">        } catch (Exception e) {</span>
+<span class="nc" id="L103">            e.printStackTrace();</span>
+<span class="nc" id="L104">            deleteOutFile(pdfPath);</span>
+<span class="nc" id="L105">            return &quot;minio error&quot;;</span>
+        }
+    }
+
+    /**
+     * 删除中间的out文件
+     */
+    private void deleteOutFile(String pdfPath) {
+        try {
+<span class="fc" id="L114">            File file = new File(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;));</span>
+<span class="pc bpc" id="L115" title="1 of 2 branches missed.">            if (file.delete()) {</span>
+<span class="fc" id="L116">                System.out.println(file.getName() + &quot; is deleted!&quot;);</span>
+            } else {
+<span class="nc" id="L118">                System.out.println(&quot;Delete&quot; + file.getName() + &quot;is failed.&quot;);</span>
+            }
+<span class="nc" id="L120">        } catch (Exception e) {</span>
+<span class="nc" id="L121">            e.printStackTrace();</span>
+<span class="fc" id="L122">        }</span>
+<span class="fc" id="L123">    }</span>
+
+    private static BaseFont bfChinese;
+    private static BaseFont bfHeiTi;
+    private static Font titlefont1;
+    private static Font titlefont2;
+    private static Font normal5song;
+    private static Font bold5song;
+    private static Font bold4songblue;
+    private static Font bold2song;
+    private static Font bold3song;
+
+    public void generatePage(Document document) throws Exception {
+        try {
+<span class="fc" id="L137">            bfChinese =</span>
+<span class="fc" id="L138">                    BaseFont.createFont(</span>
+                            DOCUMENT_DIR + &quot;font/simsun.ttf&quot;, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+<span class="fc" id="L140">            bfHeiTi =</span>
+<span class="fc" id="L141">                    BaseFont.createFont(</span>
+                            DOCUMENT_DIR + &quot;font/simhei.ttf&quot;, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+<span class="fc" id="L143">            titlefont1 = new Font(bfChinese, 40, Font.NORMAL);</span>
+<span class="fc" id="L144">            titlefont2 = new Font(bfHeiTi, 22, Font.NORMAL);</span>
+<span class="fc" id="L145">            normal5song = new Font(bfChinese, 10.5f, Font.NORMAL);</span>
+<span class="fc" id="L146">            bold5song = new Font(bfChinese, 10.5f, Font.BOLD);</span>
+<span class="fc" id="L147">            bold4songblue = new Font(bfChinese, 14f, Font.BOLD);</span>
+<span class="fc" id="L148">            bold4songblue.setColor(new BaseColor(61, 89, 171));</span>
+<span class="fc" id="L149">            bold2song = new Font(bfChinese, 22f, Font.BOLD);</span>
+<span class="fc" id="L150">            bold3song = new Font(bfChinese, 16f, Font.BOLD);</span>
+<span class="nc" id="L151">        } catch (Exception e) {</span>
+<span class="nc" id="L152">            e.printStackTrace();</span>
+<span class="fc" id="L153">        }</span>
+        // 标题
+<span class="fc" id="L155">        Paragraph title = new Paragraph(&quot;软件测试方案&quot;, titlefont1);</span>
+<span class="fc" id="L156">        title.setAlignment(1); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L157">        title.setSpacingBefore(80f); // 设置段落上空白</span>
+
+<span class="fc" id="L159">        PdfPTable table = new PdfPTable(1);             //蓝线</span>
+<span class="fc" id="L160">        table.setWidthPercentage(100);                  //表格宽度100%</span>
+<span class="fc" id="L161">        PdfPCell cell = table.getDefaultCell();</span>
+<span class="fc" id="L162">        cell.setBorderWidth(1.0f);</span>
+<span class="fc" id="L163">        cell.setBorder(Rectangle.BOTTOM);</span>
+<span class="fc" id="L164">        cell.setBorderColor(new BaseColor(61, 89, 171));</span>
+<span class="fc" id="L165">        table.addCell(cell);</span>
+
+<span class="fc" id="L167">        Paragraph version = new Paragraph(JS006Json.getInputBanBenHao(), titlefont2);</span>
+<span class="fc" id="L168">        version.setAlignment(1); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L169">        version.setSpacingBefore(10f); // 设置段落上空白</span>
+
+<span class="fc" id="L171">        document.add(new Paragraph(&quot;\n\n\n&quot;));</span>
+<span class="fc" id="L172">        document.add(title);</span>
+<span class="fc" id="L173">        document.add(new Paragraph(&quot;\n&quot;));</span>
+<span class="fc" id="L174">        document.add(table);</span>
+<span class="fc" id="L175">        document.add(version);</span>
+
+<span class="fc" id="L177">        document.newPage();</span>
+<span class="fc" id="L178">        document.add(new Paragraph(&quot;\n&quot;));</span>
+
+<span class="fc" id="L180">        Paragraph modificationTitle = new Paragraph(&quot;文档修改记录&quot;, bold5song);</span>
+        //modificationTitle.setSpacingBefore(60f); // 设置段落上空白
+<span class="fc" id="L182">        modificationTitle.setSpacingAfter(40f); // 设置段落下空白</span>
+<span class="fc" id="L183">        modificationTitle.setAlignment(1); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L184">        document.add(modificationTitle);</span>
+
+        // 表格
+<span class="fc" id="L187">        float[] paddings3 = new float[]{4f, 4f, 3f, 3f};        // 上下左右的间距</span>
+<span class="fc" id="L188">        float borderWidth = 0.3f;</span>
+<span class="fc" id="L189">        PdfPTable modificationTable = new PdfPTable(43);</span>
+<span class="fc" id="L190">        modificationTable.setWidthPercentage(100);</span>
+
+        // 第一行
+<span class="fc" id="L193">        modificationTable.addCell(ItextUtils.createGreyCell(&quot;版本&quot;, normal5song, Element.ALIGN_LEFT, 4, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L194">        modificationTable.addCell(ItextUtils.createGreyCell(&quot;日期&quot;, normal5song, Element.ALIGN_LEFT, 17, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L195">        modificationTable.addCell(ItextUtils.createGreyCell(&quot;AMD&quot;, normal5song, Element.ALIGN_LEFT, 4, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L196">        modificationTable.addCell(ItextUtils.createGreyCell(&quot;修订者&quot;, normal5song, Element.ALIGN_LEFT, 8, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L197">        modificationTable.addCell(ItextUtils.createGreyCell(&quot;说明&quot;, normal5song, Element.ALIGN_LEFT, 10, 2, paddings3, borderWidth));</span>
+
+<span class="fc" id="L199">        List&lt;Modification&gt; modifications = JS006Json.getWenDangXiuGaiJiLu();</span>
+<span class="fc bfc" id="L200" title="All 2 branches covered.">        for (Modification modification : modifications) {</span>
+<span class="fc" id="L201">            modificationTable.addCell(ItextUtils.createCell(modification.getVersion(), normal5song, Element.ALIGN_LEFT, 4, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L202">            modificationTable.addCell(ItextUtils.createCell(modification.getModificationDate(), normal5song, Element.ALIGN_LEFT, 17, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L203">            modificationTable.addCell(ItextUtils.createCell(modification.getMethod().toString(), normal5song, Element.ALIGN_LEFT, 4, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L204">            modificationTable.addCell(ItextUtils.createCell(modification.getModifier(), normal5song, Element.ALIGN_LEFT, 8, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L205">            modificationTable.addCell(ItextUtils.createCell(modification.getIllustration(), normal5song, Element.ALIGN_LEFT, 10, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L206">        }</span>
+<span class="fc" id="L207">        document.add(modificationTable);</span>
+<span class="fc" id="L208">        Paragraph AMDComment = new Paragraph(&quot;   （A-添加，M-修改，D-删除）&quot;, normal5song);</span>
+<span class="fc" id="L209">        AMDComment.setSpacingBefore(10f); // 设置段落上空白</span>
+<span class="fc" id="L210">        AMDComment.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L211">        document.add(AMDComment);</span>
+
+<span class="fc" id="L213">        document.newPage();</span>
+        //document.add(new Paragraph(&quot;\n&quot;));
+
+<span class="fc" id="L216">        Paragraph directoryTitle = new Paragraph(&quot;目录&quot;, bold4songblue);</span>
+<span class="fc" id="L217">        directoryTitle.setSpacingBefore(60f); // 设置段落上空白</span>
+<span class="fc" id="L218">        directoryTitle.setSpacingAfter(10f); // 设置段落下空白</span>
+<span class="fc" id="L219">        directoryTitle.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L220">        Paragraph directory = new Paragraph();</span>
+<span class="fc" id="L221">        directory.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L222">        directory.add(</span>
+                new Phrase(
+                        &quot;&quot;
+                                + &quot;1 引言………………………………………………………………………………………………4\n&quot;
+                                + &quot;     1.1标识………………………………………………………………………………………4\n&quot;
+                                + &quot;     1.2系统概述…………………………………………………………………………………4\n&quot;
+                                + &quot;     1.3文档概述…………………………………………………………………………………4\n&quot;
+                                + &quot;     1.4基线………………………………………………………………………………………4\n&quot;
+                                + &quot;2 引用文件…………………………………………………………………………………………4\n&quot;
+                                + &quot;3 软件测试环境……………………………………………………………………………………4\n&quot;
+                                + &quot;     3.1硬件………………………………………………………………………………………4\n&quot;
+                                + &quot;     3.2软件………………………………………………………………………………………4\n&quot;
+                                + &quot;     3.3其他………………………………………………………………………………………4\n&quot;
+                                + &quot;     3.4参与组织…………………………………………………………………………………5\n&quot;
+                                + &quot;     3.5人员………………………………………………………………………………………5\n&quot;
+                                + &quot;4 计划………………………………………………………………………………………………5\n&quot;
+                                + &quot;     4.1总体设计…………………………………………………………………………………5\n&quot;
+                                + &quot;           4.1.1测试级别………………………………………………………………………5\n&quot;
+                                + &quot;           4.1.2测试类别………………………………………………………………………5\n&quot;
+                                + &quot;           4.1.3一般测试条件…………………………………………………………………5\n&quot;
+                                + &quot;     4.2计划执行的测试…………………………………………………………………………5\n&quot;
+                                + &quot;     4.3测试用例…………………………………………………………………………………5\n&quot;
+                                + &quot;5 测试进度表………………………………………………………………………………………6\n&quot;
+                                + &quot;6 需求的可追踪性…………………………………………………………………………………6\n&quot;
+                        , normal5song));
+<span class="fc" id="L247">        document.add(directoryTitle);</span>
+<span class="fc" id="L248">        document.add(directory);</span>
+
+<span class="fc" id="L250">        document.newPage();</span>
+
+//        Chapter chapter1 = new Chapter(new Paragraph(&quot;第1单元  &quot;, normal5song),1);
+<span class="fc" id="L253">        Paragraph YinYan = new Paragraph(&quot;1 引言&quot;, bold2song);</span>
+<span class="fc" id="L254">        YinYan.setSpacingBefore(80f); // 设置段落上空白</span>
+        //YinYan.setSpacingAfter(30f); // 设置段落下空白
+<span class="fc" id="L256">        YinYan.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L257">        document.add(YinYan);</span>
+
+//        Section section1_1 = chapter1.addSection(new Paragraph(&quot;第1节&quot;,normal5song));
+<span class="fc" id="L260">        Paragraph BiaoShi = new Paragraph(&quot;1.1 标识&quot;, bold3song);</span>
+<span class="fc" id="L261">        BiaoShi.setSpacingBefore(20f); // 设置段落上空白</span>
+        //BiaoShi.setSpacingAfter(30f); // 设置段落下空白
+<span class="fc" id="L263">        BiaoShi.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L264">        document.add(BiaoShi);</span>
+
+<span class="fc" id="L266">        Paragraph BiaoShiContent = new Paragraph(&quot;    &quot; + JS006Json.getInputBiaoShi(), normal5song);</span>
+<span class="fc" id="L267">        BiaoShiContent.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L268">        BiaoShiContent.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L269">        document.add(BiaoShiContent);</span>
+
+//        Section section1_2 = chapter1.addSection(new Paragraph(&quot;第2节&quot;,normal5song));
+<span class="fc" id="L272">        Paragraph XiTongGaiShu = new Paragraph(&quot;1.2 系统概述&quot;, bold3song);</span>
+<span class="fc" id="L273">        XiTongGaiShu.setSpacingBefore(20f); // 设置段落上空白</span>
+        //BiaoShi.setSpacingAfter(30f); // 设置段落下空白
+<span class="fc" id="L275">        XiTongGaiShu.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L276">        document.add(XiTongGaiShu);</span>
+
+<span class="fc" id="L278">        Paragraph XiTongGaiShuContent = new Paragraph(&quot;    &quot; + JS006Json.getInputXiTongGaiShu(), normal5song);</span>
+<span class="fc" id="L279">        XiTongGaiShuContent.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L280">        XiTongGaiShuContent.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L281">        document.add(XiTongGaiShuContent);</span>
+
+//        Section section1_3 = chapter1.addSection(new Paragraph(&quot;第3节&quot;,normal5song));
+<span class="fc" id="L284">        Paragraph WenDangGaiShu = new Paragraph(&quot;1.3 文档概述&quot;, bold3song);</span>
+<span class="fc" id="L285">        WenDangGaiShu.setSpacingBefore(20f); // 设置段落上空白</span>
+        //BiaoShi.setSpacingAfter(30f); // 设置段落下空白
+<span class="fc" id="L287">        WenDangGaiShu.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L288">        document.add(WenDangGaiShu);</span>
+
+<span class="fc" id="L290">        Paragraph WenDangGaiShuContent = new Paragraph(&quot;    &quot; + JS006Json.getInputWenDangGaiShu(), normal5song);</span>
+<span class="fc" id="L291">        WenDangGaiShuContent.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L292">        WenDangGaiShuContent.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L293">        document.add(WenDangGaiShuContent);</span>
+
+//        Section section1_4 = chapter1.addSection(new Paragraph(&quot;第4节&quot;,normal5song));
+<span class="fc" id="L296">        Paragraph JiXian = new Paragraph(&quot;1.4 基线&quot;, bold3song);</span>
+<span class="fc" id="L297">        JiXian.setSpacingBefore(20f); // 设置段落上空白</span>
+        //BiaoShi.setSpacingAfter(30f); // 设置段落下空白
+<span class="fc" id="L299">        JiXian.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L300">        document.add(JiXian);</span>
+
+<span class="fc" id="L302">        Paragraph JiXianContent = new Paragraph(&quot;    &quot; + JS006Json.getInputJiXian(), normal5song);</span>
+<span class="fc" id="L303">        JiXianContent.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L304">        JiXianContent.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L305">        document.add(JiXianContent);</span>
+
+//        Chapter chapter2 = new Chapter(new Paragraph(&quot;第2单元  &quot;, normal5song),2);
+<span class="fc" id="L308">        Paragraph YinYongWenJian = new Paragraph(&quot;2 引用文件&quot;, bold2song);</span>
+<span class="fc" id="L309">        YinYongWenJian.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L310">        YinYongWenJian.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L311">        document.add(YinYongWenJian);</span>
+
+<span class="fc" id="L313">        Paragraph YinYongWenJianContent = new Paragraph(&quot;    &quot; + &quot;《计算机软件文档编制规范》GB/T 8567－2006。&quot;, normal5song);</span>
+<span class="fc" id="L314">        YinYongWenJianContent.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L315">        YinYongWenJianContent.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L316">        document.add(YinYongWenJianContent);</span>
+
+//        Chapter chapter3 = new Chapter(new Paragraph(&quot;第3单元  &quot;, normal5song),3);
+<span class="fc" id="L319">        Paragraph HuanJing = new Paragraph(&quot;3 软件测试环境&quot;, bold2song);</span>
+<span class="fc" id="L320">        HuanJing.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L321">        HuanJing.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L322">        document.add(HuanJing);</span>
+
+//        Section section3_1 = chapter3.addSection(new Paragraph(&quot;第1节&quot;,normal5song));
+<span class="fc" id="L325">        Paragraph YingJian = new Paragraph(&quot;3.1 硬件&quot;, bold3song);</span>
+<span class="fc" id="L326">        YingJian.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L327">        YingJian.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L328">        document.add(YingJian);</span>
+
+<span class="fc" id="L330">        Paragraph YingJianContent = new Paragraph(&quot;    &quot; + JS006Json.getInputYingJian(), normal5song);</span>
+<span class="fc" id="L331">        YingJianContent.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L332">        YingJianContent.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L333">        document.add(YingJianContent);</span>
+
+//        Section section3_2 = chapter3.addSection(new Paragraph(&quot;第2节&quot;,normal5song));
+<span class="fc" id="L336">        Paragraph RuanJian = new Paragraph(&quot;3.2 软件&quot;, bold3song);</span>
+<span class="fc" id="L337">        RuanJian.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L338">        RuanJian.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L339">        document.add(RuanJian);</span>
+
+<span class="fc" id="L341">        Paragraph RuanJianContent = new Paragraph(&quot;    &quot; + JS006Json.getInputRuanJian(), normal5song);</span>
+<span class="fc" id="L342">        RuanJianContent.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L343">        RuanJianContent.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L344">        document.add(RuanJianContent);</span>
+
+//        Section section3_3 = chapter3.addSection(new Paragraph(&quot;第3节&quot;,normal5song));
+<span class="fc" id="L347">        Paragraph QiTa = new Paragraph(&quot;3.3 其他&quot;, bold3song);</span>
+<span class="fc" id="L348">        QiTa.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L349">        QiTa.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L350">        document.add(QiTa);</span>
+
+<span class="fc" id="L352">        Paragraph QiTaContent = new Paragraph(&quot;    &quot; + JS006Json.getInputQiTa(), normal5song);</span>
+<span class="fc" id="L353">        QiTaContent.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L354">        QiTaContent.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L355">        document.add(QiTaContent);</span>
+
+//        Section section3_4 = chapter3.addSection(new Paragraph(&quot;第4节&quot;,normal5song));
+<span class="fc" id="L358">        Paragraph CanYuZuZhi = new Paragraph(&quot;3.4 参与组织&quot;, bold3song);</span>
+<span class="fc" id="L359">        CanYuZuZhi.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L360">        CanYuZuZhi.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L361">        document.add(CanYuZuZhi);</span>
+
+<span class="fc" id="L363">        Paragraph CanYuZuZhiContent = new Paragraph(&quot;    &quot; + JS006Json.getInputCanYuZuZhi(), normal5song);</span>
+<span class="fc" id="L364">        CanYuZuZhiContent.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L365">        CanYuZuZhiContent.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L366">        document.add(CanYuZuZhiContent);</span>
+
+//        Section section3_5 = chapter3.addSection(new Paragraph(&quot;第5节&quot;,normal5song));
+<span class="fc" id="L369">        Paragraph RenYuan = new Paragraph(&quot;3.5 人员&quot;, bold3song);</span>
+<span class="fc" id="L370">        RenYuan.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L371">        RenYuan.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L372">        document.add(RenYuan);</span>
+
+<span class="fc" id="L374">        Paragraph RenYuanContent = new Paragraph(&quot;    &quot; + JS006Json.getInputRenYuan(), normal5song);</span>
+<span class="fc" id="L375">        RenYuanContent.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L376">        RenYuanContent.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L377">        document.add(RenYuanContent);</span>
+
+//        Chapter chapter4 = new Chapter(new Paragraph(&quot;第4单元  &quot;, normal5song),4);
+<span class="fc" id="L380">        Paragraph JiHua = new Paragraph(&quot;4 计划&quot;, bold2song);</span>
+<span class="fc" id="L381">        JiHua.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L382">        JiHua.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L383">        document.add(JiHua);</span>
+
+<span class="fc" id="L385">        Paragraph JiHuaContent = new Paragraph(&quot;    &quot; + &quot;本章描述了计划测试的总范围并且描述了本测试计划适用的每个测试，包括对相关文档的审查。&quot;, normal5song);</span>
+<span class="fc" id="L386">        JiHuaContent.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L387">        JiHuaContent.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L388">        document.add(JiHuaContent);</span>
+
+//        Section section4_1 = chapter4.addSection(new Paragraph(&quot;第1节&quot;,normal5song));
+<span class="fc" id="L391">        Paragraph ZongTiSheJi = new Paragraph(&quot;4.1 总体设计&quot;, bold3song);</span>
+<span class="fc" id="L392">        ZongTiSheJi.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L393">        ZongTiSheJi.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L394">        document.add(ZongTiSheJi);</span>
+
+//        Section section4_1_1 = chapter4.addSection(new Paragraph(&quot;第1题&quot;,normal5song));
+<span class="fc" id="L397">        Paragraph CeShiJiBie = new Paragraph(&quot;4.1.1 测试级别&quot;, bold3song);</span>
+<span class="fc" id="L398">        CeShiJiBie.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L399">        CeShiJiBie.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L400">        document.add(CeShiJiBie);</span>
+
+<span class="fc" id="L402">        Paragraph CeShiJiBieContent = new Paragraph(&quot;    &quot; + JS006Json.getInputCeShiJiBie(), normal5song);</span>
+<span class="fc" id="L403">        CeShiJiBieContent.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L404">        CeShiJiBieContent.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L405">        document.add(CeShiJiBieContent);</span>
+
+//        Section section4_1_2 = chapter4.addSection(new Paragraph(&quot;第2题&quot;,normal5song));
+<span class="fc" id="L408">        Paragraph CeShiLeiBie = new Paragraph(&quot;4.1.2 测试类别&quot;, bold3song);</span>
+<span class="fc" id="L409">        CeShiLeiBie.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L410">        CeShiLeiBie.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L411">        document.add(CeShiLeiBie);</span>
+
+<span class="fc" id="L413">        Paragraph CeShiLeiBieContent = new Paragraph(&quot;    &quot; + JS006Json.getInputCeShiLeiBie(), normal5song);</span>
+<span class="fc" id="L414">        CeShiLeiBieContent.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L415">        CeShiLeiBieContent.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L416">        document.add(CeShiLeiBieContent);</span>
+
+//        Section section4_1_3 = chapter4.addSection(new Paragraph(&quot;第3题&quot;,normal5song));
+<span class="fc" id="L419">        Paragraph YiBanCeShiTiaoJian = new Paragraph(&quot;4.1.3 一般测试条件&quot;, bold3song);</span>
+<span class="fc" id="L420">        YiBanCeShiTiaoJian.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L421">        YiBanCeShiTiaoJian.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L422">        document.add(YiBanCeShiTiaoJian);</span>
+
+<span class="fc" id="L424">        Paragraph YiBanCeShiTiaoJianContent = new Paragraph(&quot;    &quot; + JS006Json.getInputYiBanCeShiTiaoJian(), normal5song);</span>
+<span class="fc" id="L425">        YiBanCeShiTiaoJianContent.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L426">        YiBanCeShiTiaoJianContent.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L427">        document.add(YiBanCeShiTiaoJianContent);</span>
+
+//        Section section4_2 = chapter4.addSection(new Paragraph(&quot;第2节&quot;,normal5song));
+<span class="fc" id="L430">        Paragraph JiHuaZhiXingDeCeShi = new Paragraph(&quot;4.2 计划执行的测试&quot;, bold3song);</span>
+<span class="fc" id="L431">        JiHuaZhiXingDeCeShi.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L432">        JiHuaZhiXingDeCeShi.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L433">        document.add(JiHuaZhiXingDeCeShi);</span>
+
+<span class="fc" id="L435">        Paragraph JiHuaZhiXingDeCeShiContent = new Paragraph(&quot;    &quot; + JS006Json.getInputJiHuaZhiXingDeCeShi(), normal5song);</span>
+<span class="fc" id="L436">        JiHuaZhiXingDeCeShiContent.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L437">        JiHuaZhiXingDeCeShiContent.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L438">        document.add(JiHuaZhiXingDeCeShiContent);</span>
+
+//        Section section4_3 = chapter4.addSection(new Paragraph(&quot;第3节&quot;,normal5song));
+<span class="fc" id="L441">        Paragraph CeShiYongLi = new Paragraph(&quot;4.3 测试用例&quot;, bold3song);</span>
+<span class="fc" id="L442">        CeShiYongLi.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L443">        CeShiYongLi.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L444">        document.add(CeShiYongLi);</span>
+
+<span class="fc" id="L446">        Paragraph CeShiYongLiContent = new Paragraph(&quot;    &quot; + JS006Json.getInputCeShiYongLi(), normal5song);</span>
+<span class="fc" id="L447">        CeShiYongLiContent.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L448">        CeShiYongLiContent.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L449">        document.add(CeShiYongLiContent);</span>
+
+//        Chapter chapter5 = new Chapter(new Paragraph(&quot;第5单元  &quot;, normal5song),5);
+<span class="fc" id="L452">        Paragraph CeShiJinDuBiao = new Paragraph(&quot;5 测试进度表&quot;, bold2song);</span>
+<span class="fc" id="L453">        CeShiJinDuBiao.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L454">        CeShiJinDuBiao.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L455">        document.add(CeShiJinDuBiao);</span>
+
+<span class="fc" id="L457">        Paragraph CeShiJinDuBiaoContent = new Paragraph(&quot;    &quot; + &quot;此项目主要分为：业务测试和文档审查两部分的工作。两部分的工作可以并行完成。测试方为完成本方案所述的测试所需时间大约为&quot;+JS006Json.getInputYuJiGongZuoRi()+&quot;个工作日，如测试需求产生变更会导致测试时间的变化。\n&quot;+&quot;    &quot;+&quot;下表大致估计了本次测试各个阶段所需工作量及起止时间。下表大致估计了本次测试各个阶段所需工作量及起止时间。&quot;, normal5song);</span>
+<span class="fc" id="L458">        CeShiJinDuBiaoContent.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L459">        CeShiJinDuBiaoContent.setSpacingAfter(20f); // 设置段落下空白</span>
+<span class="fc" id="L460">        CeShiJinDuBiaoContent.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L461">        document.add(CeShiJinDuBiaoContent);</span>
+
+<span class="fc" id="L463">        PdfPTable CeShiJinDuTable = new PdfPTable(4);</span>
+<span class="fc" id="L464">        CeShiJinDuTable.setWidthPercentage(100);</span>
+
+        // 第一行
+<span class="fc" id="L467">        CeShiJinDuTable.addCell(ItextUtils.createCell(&quot;里程碑任务&quot;, normal5song, Element.ALIGN_LEFT, 1, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L468">        CeShiJinDuTable.addCell(ItextUtils.createCell(&quot;工作量&quot;, normal5song, Element.ALIGN_LEFT, 1, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L469">        CeShiJinDuTable.addCell(ItextUtils.createCell(&quot;开始时间&quot;, normal5song, Element.ALIGN_LEFT, 1, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L470">        CeShiJinDuTable.addCell(ItextUtils.createCell(&quot;结束时间&quot;, normal5song, Element.ALIGN_LEFT, 1, 2, paddings3, borderWidth));</span>
+        // 第二行
+<span class="fc" id="L472">        CeShiJinDuTable.addCell(ItextUtils.createCell(&quot;制定测试计划&quot;, normal5song, Element.ALIGN_LEFT, 1, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L473">        CeShiJinDuTable.addCell(ItextUtils.createCell(JS006Json.getZhiDingJiHua().getWorkload(), normal5song, Element.ALIGN_LEFT, 1, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L474">        CeShiJinDuTable.addCell(ItextUtils.createCell(JS006Json.getZhiDingJiHua().getStartDate(), normal5song, Element.ALIGN_LEFT, 1, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L475">        CeShiJinDuTable.addCell(ItextUtils.createCell(JS006Json.getZhiDingJiHua().getEndDate(), normal5song, Element.ALIGN_LEFT, 1, 2, paddings3, borderWidth));</span>
+        // 第三行
+<span class="fc" id="L477">        CeShiJinDuTable.addCell(ItextUtils.createCell(&quot;设计测试&quot;, normal5song, Element.ALIGN_LEFT, 1, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L478">        CeShiJinDuTable.addCell(ItextUtils.createCell(JS006Json.getSheJiCeShi().getWorkload(), normal5song, Element.ALIGN_LEFT, 1, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L479">        CeShiJinDuTable.addCell(ItextUtils.createCell(JS006Json.getSheJiCeShi().getStartDate(), normal5song, Element.ALIGN_LEFT, 1, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L480">        CeShiJinDuTable.addCell(ItextUtils.createCell(JS006Json.getSheJiCeShi().getEndDate(), normal5song, Element.ALIGN_LEFT, 1, 2, paddings3, borderWidth));</span>
+        // 第四行
+<span class="fc" id="L482">        CeShiJinDuTable.addCell(ItextUtils.createCell(&quot;执行测试&quot;, normal5song, Element.ALIGN_LEFT, 1, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L483">        CeShiJinDuTable.addCell(ItextUtils.createCell(JS006Json.getZhiXingCeShi().getWorkload(), normal5song, Element.ALIGN_LEFT, 1, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L484">        CeShiJinDuTable.addCell(ItextUtils.createCell(JS006Json.getZhiXingCeShi().getStartDate(), normal5song, Element.ALIGN_LEFT, 1, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L485">        CeShiJinDuTable.addCell(ItextUtils.createCell(JS006Json.getZhiXingCeShi().getEndDate(), normal5song, Element.ALIGN_LEFT, 1, 2, paddings3, borderWidth));</span>
+        // 第五行
+<span class="fc" id="L487">        CeShiJinDuTable.addCell(ItextUtils.createCell(&quot;评估测试&quot;, normal5song, Element.ALIGN_LEFT, 1, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L488">        CeShiJinDuTable.addCell(ItextUtils.createCell(JS006Json.getPingGuCeShi().getWorkload(), normal5song, Element.ALIGN_LEFT, 1, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L489">        CeShiJinDuTable.addCell(ItextUtils.createCell(JS006Json.getPingGuCeShi().getStartDate(), normal5song, Element.ALIGN_LEFT, 1, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L490">        CeShiJinDuTable.addCell(ItextUtils.createCell(JS006Json.getPingGuCeShi().getEndDate(), normal5song, Element.ALIGN_LEFT, 1, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L491">        document.add(CeShiJinDuTable);</span>
+
+//        Chapter chapter6 = new Chapter(new Paragraph(&quot;第6单元  &quot;, normal5song),6);
+<span class="fc" id="L494">        Paragraph XuQiuKeZhuiZongXing = new Paragraph(&quot;6 需求的可追踪性&quot;, bold2song);</span>
+<span class="fc" id="L495">        XuQiuKeZhuiZongXing.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L496">        XuQiuKeZhuiZongXing.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L497">        document.add(XuQiuKeZhuiZongXing);</span>
+
+<span class="fc" id="L499">        Paragraph XuQiuKeZhuiZongXingContent = new Paragraph(&quot;    &quot; + JS006Json.getInputXuQiuKeZhuiZongXing(), normal5song);</span>
+<span class="fc" id="L500">        XuQiuKeZhuiZongXingContent.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L501">        XuQiuKeZhuiZongXingContent.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L502">        document.add(XuQiuKeZhuiZongXingContent);</span>
+<span class="fc" id="L503">    }</span>
+
+    //页码监听
+//    private static class ContentEvent extends PdfPageEventHelper {
+//
+//        private int page;
+//        Map&lt;String, Integer&gt; index = new LinkedHashMap&lt;String, Integer&gt;();
+//
+//        @Override
+//        public void onStartPage (PdfWriter writer, Document document) {
+//            page++;
+//        }
+//
+//        @Override
+//        public void onChapter (PdfWriter writer, Document document, float paragraphPosition, Paragraph title) {
+//            index.put(title.getContent(), page);
+//        }
+//
+//        @Override
+//        public void onSection (PdfWriter writer, Document document, float paragraphPosition, int depth, Paragraph title) {
+//            onChapter(writer, document, paragraphPosition, title);
+//        }
+//    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

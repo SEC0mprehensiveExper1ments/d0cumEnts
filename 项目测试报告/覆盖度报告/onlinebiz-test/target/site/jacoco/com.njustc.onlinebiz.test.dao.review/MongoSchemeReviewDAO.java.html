@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MongoSchemeReviewDAO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-test</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.test.dao.review</a> &gt; <span class="el_source">MongoSchemeReviewDAO.java</span></div><h1>MongoSchemeReviewDAO.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.test.dao.review;
+
+import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
+import com.njustc.onlinebiz.common.model.test.review.SchemeReview;
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MongoSchemeReviewDAO implements SchemeReviewDAO{
+    public static final String COLLECTION_NAME = &quot;schemeReview&quot;;
+    private final MongoTemplate mongoTemplate;
+
+<span class="fc" id="L18">    public MongoSchemeReviewDAO(MongoTemplate mongoTemplate) { this.mongoTemplate = mongoTemplate; }</span>
+
+    @Override
+    public SchemeReview insertSchemeReview(SchemeReview schemeReview) {
+<span class="nc" id="L22">        return mongoTemplate.insert(schemeReview, COLLECTION_NAME);</span>
+    }
+
+    @Override
+    public SchemeReview findSchemeReviewById(String schemeReviewId) {
+<span class="nc" id="L27">        return mongoTemplate.findById(schemeReviewId, SchemeReview.class);</span>
+    }
+
+    @Override
+    public Boolean updateSchemeReview(String schemeReviewId, SchemeReview schemeReview) {
+<span class="nc" id="L32">        Update update = new Update()</span>
+<span class="nc" id="L33">                .set(&quot;softwareName&quot;, schemeReview.getSoftwareName())</span>
+<span class="nc" id="L34">                .set(&quot;version&quot;, schemeReview.getVersion())</span>
+<span class="nc" id="L35">                .set(&quot;projectId&quot;, schemeReview.getProjectId())</span>
+<span class="nc" id="L36">                .set(&quot;testType&quot;, schemeReview.getTestType())</span>
+<span class="nc" id="L37">                .set(&quot;conclusions&quot;, schemeReview.getConclusions());</span>
+<span class="nc" id="L38">        return updateFirstWithId(schemeReviewId, update);</span>
+    }
+
+    @Override
+    public Boolean updateScannedCopyPath(String schemeReviewId, String path) {
+<span class="nc" id="L43">        Update update = new Update().set(&quot;scannedCopyPath&quot;, path);</span>
+<span class="nc" id="L44">        return updateFirstWithId(schemeReviewId, update);</span>
+    }
+
+    @Override
+    public Boolean deleteSchemeAuditById(String schemeReviewId) {
+<span class="nc" id="L49">        Query query = new Query().addCriteria(Criteria.where(&quot;_id&quot;).is(new ObjectId(schemeReviewId)));</span>
+<span class="nc" id="L50">        DeleteResult result = mongoTemplate.remove(query, COLLECTION_NAME);</span>
+<span class="nc bnc" id="L51" title="All 4 branches missed.">        return result.wasAcknowledged() &amp;&amp; result.getDeletedCount() == 1;</span>
+    }
+
+    // 根据方案评审 id 更新方案评审表，由传入的 Update 对象设置要更新的部分
+    private Boolean updateFirstWithId(String schemeReviewId, Update update) {
+<span class="nc" id="L56">        Query query = new Query().addCriteria(Criteria.where(&quot;_id&quot;).is(new ObjectId(schemeReviewId)));</span>
+<span class="nc" id="L57">        UpdateResult result = mongoTemplate.updateFirst(query, update, COLLECTION_NAME);</span>
+<span class="nc bnc" id="L58" title="All 4 branches missed.">        return result.wasAcknowledged() &amp;&amp; result.getMatchedCount() == 1;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

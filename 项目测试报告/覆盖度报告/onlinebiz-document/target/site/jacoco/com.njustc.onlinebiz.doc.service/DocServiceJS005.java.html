@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DocServiceJS005.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-document</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.doc.service</a> &gt; <span class="el_source">DocServiceJS005.java</span></div><h1>DocServiceJS005.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.doc.service;
+
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.njustc.onlinebiz.doc.dao.OSSProvider;
+import com.njustc.onlinebiz.doc.model.JS005;
+import com.njustc.onlinebiz.doc.util.HeaderFooter;
+import com.njustc.onlinebiz.doc.util.ItextUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+@Service
+public class DocServiceJS005 {
+
+    private final OSSProvider ossProvider;
+
+
+<span class="fc" id="L25">    public DocServiceJS005(OSSProvider ossProvider) {</span>
+<span class="fc" id="L26">        this.ossProvider = ossProvider;</span>
+<span class="fc" id="L27">    }</span>
+
+    /**
+     * 以下是文档生成部分
+     * */
+    private static final float marginLeft;
+    private static final float marginRight;
+    private static final float marginTop;
+    private static final float marginBottom;
+
+    @Value(&quot;${document-dir}&quot;)
+    private String DOCUMENT_DIR;
+    static {
+        // absolutePath = Objects.requireNonNull(Objects.requireNonNull(ClassUtils.getDefaultClassLoader()).getResource(&quot;font&quot;)).getPath().substring(1);
+        // 在 iText 中每一个单位大小默认近似于点（pt）
+        // 1mm = 72 ÷ 25.4 ≈ 2.834645...（pt）
+<span class="fc" id="L43">        marginLeft = 85f;</span>
+<span class="fc" id="L44">        marginRight = 85f;</span>
+<span class="fc" id="L45">        marginTop = 60;</span>
+<span class="fc" id="L46">        marginBottom = 72;</span>
+<span class="fc" id="L47">    }</span>
+
+    private static JS005 JS005Json;
+    /**
+     * 填充JS005文档
+     * */
+    public String fill(String contractId, JS005 newJson) {
+<span class="fc" id="L54">        JS005Json = newJson;</span>
+<span class="fc" id="L55">        String pdfPath = DOCUMENT_DIR + &quot;JS005_&quot; + contractId +  &quot;out.pdf&quot;;</span>
+        try {
+            // 1.新建document对象
+<span class="fc" id="L58">            Document document = new Document(PageSize.A4);// 建立一个Document对象</span>
+<span class="fc" id="L59">            document.setMargins(marginLeft, marginRight, marginTop, marginBottom);</span>
+            // 2.建立一个书写器(Writer)与document对象关联
+<span class="fc" id="L61">            File file = new File(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;));</span>
+<span class="fc" id="L62">            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(file));</span>
+            // 2.5 添加页眉/页脚
+<span class="fc" id="L64">            String header = &quot;NST－04－JS005－2011&quot;;</span>
+<span class="fc" id="L65">            String[] footer = new String[]{&quot;第 &quot;, &quot; 页 共 &quot;, &quot; 页&quot;};</span>
+<span class="fc" id="L66">            int headerToPage = 100;</span>
+<span class="fc" id="L67">            int footerFromPage = 1;</span>
+<span class="fc" id="L68">            boolean isHaderLine = true;</span>
+<span class="fc" id="L69">            boolean isFooterLine = false;</span>
+<span class="fc" id="L70">            float[] headerLoc = new float[]{document.right() - 5, document.top() + 15};</span>
+<span class="fc" id="L71">            float[] footerLoc = new float[]{(document.left() + document.right()) / 2.0f - 35, document.bottom() - 30};</span>
+<span class="fc" id="L72">            float headLineOff = -5f;</span>
+<span class="fc" id="L73">            float footLineOff = 12f;</span>
+<span class="fc" id="L74">            writer.setPageEvent(new HeaderFooter(header, footer, headerToPage, footerFromPage, isHaderLine, isFooterLine,</span>
+                    headerLoc, footerLoc, headLineOff, footLineOff));
+            // 3.打开文档
+<span class="fc" id="L77">            document.open();</span>
+            // 4.向文档中添加内容
+<span class="fc" id="L79">            generatePageOne(document);</span>
+            // 5.关闭文档
+<span class="fc" id="L81">            document.close();</span>
+<span class="pc" id="L82">        } catch (Exception e) { e.printStackTrace(); return &quot;unable to generate a pdf&quot;; }</span>
+        // 上传pdf
+        try {
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">            if(ossProvider.upload(</span>
+<span class="fc" id="L86">                    &quot;doc&quot;, &quot;JS005_&quot; + contractId + &quot;.pdf&quot;, Files.readAllBytes(Path.of(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;))), &quot;application/pdf&quot;)) {</span>
+<span class="fc" id="L87">                System.out.println(pdfPath);</span>
+<span class="fc" id="L88">                deleteOutFile(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;));</span>
+<span class="fc" id="L89">                return &quot;https://oss.syh1en.asia/doc/JS005_&quot; + contractId + &quot;.pdf&quot;;</span>
+<span class="nc" id="L90">            } else { deleteOutFile(pdfPath); return &quot;upload failed&quot;; }</span>
+<span class="nc" id="L91">        } catch (Exception e) { e.printStackTrace(); deleteOutFile(pdfPath); return &quot;minio error&quot;; }</span>
+    }
+
+    /**
+     * 删除中间的out文件
+     * */
+    private void deleteOutFile(String pdfPath) {
+        try {
+<span class="fc" id="L99">            File file = new File(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;));</span>
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">            if (file.delete()) {</span>
+<span class="fc" id="L101">                System.out.println(file.getName() + &quot; is deleted!&quot;);</span>
+<span class="nc" id="L102">            } else { System.out.println(&quot;Delete&quot; + file.getName() + &quot;is failed.&quot;); }</span>
+<span class="pc" id="L103">        } catch(Exception e) { e.printStackTrace(); }</span>
+<span class="fc" id="L104">    }</span>
+
+    private Font titlefont;
+    private Font textfont;
+
+    /**
+     * 生成JS005文档第一页
+     * */
+    public void generatePageOne(Document document) throws Exception {
+        // 加载字体
+        try {
+<span class="fc" id="L115">            BaseFont bfSimSun = BaseFont.createFont(DOCUMENT_DIR + &quot;font/simsun.ttf&quot;, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);</span>
+<span class="fc" id="L116">            titlefont = new Font(bfSimSun, 15.5f, Font.BOLD);</span>
+<span class="fc" id="L117">            textfont = new Font(bfSimSun, 12f, Font.NORMAL);</span>
+<span class="pc" id="L118">        } catch (Exception e) { e.printStackTrace(); }</span>
+
+
+        // 标题
+<span class="fc" id="L122">        Paragraph title = new Paragraph(&quot;软件项目委托测试保密协议&quot;, titlefont);</span>
+<span class="fc" id="L123">        title.setAlignment(1); //设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L124">        title.setSpacingBefore(-15f); //设置段落上空白</span>
+<span class="fc" id="L125">        title.setSpacingAfter(25f); //设置段落下空白</span>
+
+<span class="fc" id="L127">        Paragraph text1 = new Paragraph();</span>
+<span class="fc" id="L128">        text1.setAlignment(Element.ALIGN_JUSTIFIED);</span>
+<span class="fc" id="L129">        text1.setLeading(24f);</span>
+<span class="fc" id="L130">        Chunk chunk1 = new Chunk(JS005Json.getInputJiaFang(), textfont);</span>
+<span class="fc" id="L131">        chunk1.setUnderline(0.3f, -3f);</span>
+<span class="fc" id="L132">        Chunk chunk2 = new Chunk(JS005Json.getInputWeiTuoXiangMu(), textfont);</span>
+<span class="fc" id="L133">        chunk2.setUnderline(0.3f, -3f);</span>
+
+<span class="fc" id="L135">        text1.add(new Chunk(&quot;    委托方&quot;, textfont));</span>
+<span class="fc" id="L136">        text1.add(chunk1);</span>
+<span class="fc" id="L137">        text1.add(new Chunk(&quot;（以下简称“甲方”）与南京大学计算机软件新技术国家重点实验室（简称“乙方”）在签订《&quot;, textfont));</span>
+<span class="fc" id="L138">        text1.add(chunk2);</span>
+<span class="fc" id="L139">        text1.add(new Chunk(&quot;软件项目委托测试》委托合同的前提下，为保证双方的合法权利，经协双方达成如下保密协议：\n&quot;, textfont));</span>
+<span class="fc" id="L140">        text1.add(new Chunk(&quot;    1、甲方不得向第三方透露在合作期间获得和知晓的乙方(包括其分支机构) 的商业秘密和其他有关的保密信息。商业秘密包括技术秘密和经营秘密，&quot; +</span>
+                &quot;其中技术秘密包括计算机软件、数据库、技术报告、测试报告、检测报告、实验数据、测试结果、操作手册、技术文档、相关的函电等。经营秘密包括但不限于双方洽谈的情况、签署的任何文件，包括合同、协议、备忘录等文件中所包含的一切信息、&quot; +
+                &quot;定价政策、设备资源、人力资源信息等。\n&quot;, textfont));
+<span class="fc" id="L143">        text1.add(new Chunk(&quot;    2、乙方负有对甲方委托测试的软件保密的责任，保密内容包括：软件产品代码、软件可执行程序、测试报告、测试结果、操作手册、技术文档、用户手册等。\n&quot;, textfont));</span>
+<span class="fc" id="L144">        text1.add(new Chunk(&quot;    3、未经对方书面同意，任何一方不得在双方合作目的之外使用或向第三方透露对方的任何商业秘密，不管这些商业秘密是口头的或是书面的，还是以磁 盘、胶片或电子邮件等形式存在的。\n&quot;, textfont));</span>
+<span class="fc" id="L145">        text1.add(new Chunk(&quot;    4、在对方公司内活动时，应尊重对方有关保密的管理规定，听从接待人员的安排和引导。未经允许不得进入对方实验室、办公室内受控的工作环境，与对方技术人员进行的交流，仅限于合作项目有关的内容。\n&quot;, textfont));</span>
+<span class="fc" id="L146">        text1.add(new Chunk(&quot;    5、如果一方违反上述条款，另一方有权根据违反的程度以及造成的损害采取以下措施：\n&quot;, textfont));</span>
+<span class="fc" id="L147">        text1.add(new Chunk(&quot;    （1）终止双方的合作；\n&quot;, textfont));</span>
+<span class="fc" id="L148">        text1.add(new Chunk(&quot;    （2）要求赔偿因失密造成的损失。\n&quot;, textfont));</span>
+<span class="fc" id="L149">        text1.add(new Chunk(&quot;    在采取上述措施之前，一方将给予违约的另一方合理的在先通知。\n&quot;, textfont));</span>
+<span class="fc" id="L150">        text1.add(new Chunk(&quot;    6、负有保密义务的双方，如果涉密人因本方无法控制的原因(如擅自离职) 造成由涉密人有意泄密，其相应的民事和法律责任由当事人承担。\n&quot;, textfont));</span>
+<span class="fc" id="L151">        text1.add(new Chunk(&quot;    7、与本协议有关的任何争议，双方应通过友好协商解决。如协商不成，任何一方可将此争议提交南京市仲裁委员会进行仲裁。仲裁裁决是终局的，对双方均有约束力。\n&quot;, textfont));</span>
+<span class="fc" id="L152">        text1.add(new Chunk(&quot;    8、本协议作为委托测试合同的附件，一式两份，双方各执一份，与合同具有同等法律效力。\n&quot;, textfont));</span>
+<span class="fc" id="L153">        text1.add(new Chunk(&quot;    本协议自双方授权代表签字盖章之日起生效，但有效期不限于合同有效期。\n&quot;, textfont));</span>
+<span class="fc" id="L154">        text1.setSpacingAfter(30f); //设置段落下空白</span>
+
+<span class="fc" id="L156">        float tableWidth = document.right() - document.left();</span>
+<span class="fc" id="L157">        PdfPTable table = ItextUtils.createTable(new float[] {tableWidth/4+30, tableWidth/4-30, tableWidth/4+30, tableWidth/4-30}, tableWidth);</span>
+<span class="fc" id="L158">        table.addCell(ItextUtils.createCell(&quot;甲 方：(公章)&quot;, textfont, Element.ALIGN_LEFT, ItextUtils.NO_BORDER, new float[]{40f+5f, 40f, 0f, 0f}));</span>
+<span class="fc" id="L159">        table.addCell(ItextUtils.createCell(&quot;&quot;, textfont, Element.ALIGN_RIGHT, ItextUtils.NO_BORDER, new float[]{40f+5f, 40f, 0f, 0f}));</span>
+<span class="fc" id="L160">        table.addCell(ItextUtils.createCell(&quot;乙 方：(公章)&quot;, textfont, Element.ALIGN_LEFT, ItextUtils.NO_BORDER, new float[]{40f+5f, 40f, 0f, 0f}));</span>
+<span class="fc" id="L161">        table.addCell(ItextUtils.createCell(&quot;&quot;, textfont, Element.ALIGN_RIGHT, ItextUtils.NO_BORDER, new float[]{40f+5f, 40f, 0f, 0f}));</span>
+<span class="fc" id="L162">        table.addCell(ItextUtils.createCell(&quot;法人代表：\n\n\n\n&quot;, textfont, Element.ALIGN_LEFT, ItextUtils.NO_BORDER, new float[]{40f+5f, 40f, 0f, 0f}));</span>
+<span class="fc" id="L163">        table.addCell(ItextUtils.createCell(&quot;&quot;, textfont, Element.ALIGN_LEFT, ItextUtils.NO_BORDER, new float[]{40f+5f, 40f, 0f, 0f}));</span>
+<span class="fc" id="L164">        table.addCell(ItextUtils.createCell(&quot;法人代表：\n\n\n\n&quot;, textfont, Element.ALIGN_LEFT, ItextUtils.NO_BORDER, new float[]{40f+5f, 40f, 0f, 0f}));</span>
+<span class="fc" id="L165">        table.addCell(ItextUtils.createCell(&quot;&quot;, textfont, Element.ALIGN_LEFT, ItextUtils.NO_BORDER, new float[]{40f+5f, 40f, 0f, 0f}));</span>
+<span class="fc" id="L166">        table.addCell(ItextUtils.createCell(&quot;     年   月    日&quot;, textfont, Element.ALIGN_LEFT, ItextUtils.NO_BORDER, new float[]{40f+5f, 40f, 0f, 0f}));</span>
+<span class="fc" id="L167">        table.addCell(ItextUtils.createCell(&quot;&quot;, textfont, Element.ALIGN_LEFT, ItextUtils.NO_BORDER, new float[]{40f+5f, 40f, 0f, 0f}));</span>
+<span class="fc" id="L168">        table.addCell(ItextUtils.createCell(&quot;     年   月    日&quot;, textfont, Element.ALIGN_LEFT, ItextUtils.NO_BORDER, new float[]{40f+5f, 40f, 0f, 0f}));</span>
+<span class="fc" id="L169">        table.addCell(ItextUtils.createCell(&quot;&quot;, textfont, Element.ALIGN_LEFT, ItextUtils.NO_BORDER, new float[]{40f+5f, 40f, 0f, 0f}));</span>
+
+<span class="fc" id="L171">        document.add(new Paragraph(&quot;\n&quot;));</span>
+<span class="fc" id="L172">        document.add(title);</span>
+<span class="fc" id="L173">        document.add(text1);</span>
+<span class="fc" id="L174">        document.add(new Paragraph(&quot;\n\n\n\n\n\n\n\n&quot;));</span>
+<span class="fc" id="L175">        document.add(table);</span>
+<span class="fc" id="L176">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

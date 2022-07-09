@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MongoEntrustDAO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-entrust</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.entrust.dao</a> &gt; <span class="el_source">MongoEntrustDAO.java</span></div><h1>MongoEntrustDAO.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.entrust.dao;
+
+import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
+import com.njustc.onlinebiz.common.model.entrust.*;
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * 使用MongoDB的数据访问层实现。这里假设服务层已经校验了参数的合法性。
+ */
+@Component
+public class MongoEntrustDAO implements EntrustDAO {
+
+    public static final String COLLECTION_NAME = &quot;entrust&quot;;
+
+    private final MongoTemplate mongoTemplate;
+
+<span class="nc" id="L26">    public MongoEntrustDAO(MongoTemplate mongoTemplate) {</span>
+<span class="nc" id="L27">        this.mongoTemplate = mongoTemplate;</span>
+<span class="nc" id="L28">    }</span>
+
+    @Override
+    public Entrust insertEntrust(Entrust entrust) {
+<span class="nc" id="L32">        return mongoTemplate.insert(entrust, COLLECTION_NAME);</span>
+    }
+
+    @Override
+    public Entrust findEntrustById(String entrustId) {
+<span class="nc" id="L37">        return mongoTemplate.findById(entrustId, Entrust.class);</span>
+    }
+
+    @Override
+    public List&lt;EntrustOutline&gt; findAllEntrusts(Integer page, Integer pageSize) {
+<span class="nc" id="L42">        Query query = new Query();</span>
+<span class="nc" id="L43">        return findWithProjection(query, page, pageSize);</span>
+    }
+
+    @Override
+    public long countAll() {
+<span class="nc" id="L48">        return mongoTemplate.count(new Query(), COLLECTION_NAME);</span>
+    }
+
+    @Override
+    public List&lt;EntrustOutline&gt; findEntrustsByCustomerId(Long customerId, Integer page, Integer pageSize) {
+<span class="nc" id="L53">        Query query = new Query().addCriteria(Criteria.where(&quot;customerId&quot;).is(customerId));</span>
+<span class="nc" id="L54">        return findWithProjection(query, page, pageSize);</span>
+    }
+
+    @Override
+    public long countByCustomerId(Long customerId) {
+<span class="nc" id="L59">        Query query = new Query().addCriteria(Criteria.where(&quot;customerId&quot;).is(customerId));</span>
+<span class="nc" id="L60">        return mongoTemplate.count(query, COLLECTION_NAME);</span>
+    }
+
+    @Override
+    public List&lt;EntrustOutline&gt; findEntrustsByMarketerId(Long marketerId, Integer page, Integer pageSize) {
+<span class="nc" id="L65">        Query query = new Query().addCriteria(Criteria.where(&quot;marketerId&quot;).is(marketerId));</span>
+<span class="nc" id="L66">        return findWithProjection(query, page, pageSize);</span>
+    }
+
+    @Override
+    public long countByMarketerId(Long marketerId) {
+<span class="nc" id="L71">        Query query = new Query().addCriteria(Criteria.where(&quot;marketerId&quot;).is(marketerId));</span>
+<span class="nc" id="L72">        return mongoTemplate.count(query, COLLECTION_NAME);</span>
+    }
+
+    @Override
+    public List&lt;EntrustOutline&gt; findEntrustsByTesterId(Long testerId, Integer page, Integer pageSize) {
+<span class="nc" id="L77">        Query query = new Query().addCriteria(Criteria.where(&quot;testerId&quot;).is(testerId));</span>
+<span class="nc" id="L78">        return findWithProjection(query, page, pageSize);</span>
+    }
+
+    @Override
+    public long countByTesterId(Long testerId) {
+<span class="nc" id="L83">        Query query = new Query().addCriteria(Criteria.where(&quot;testerId&quot;).is(testerId));</span>
+<span class="nc" id="L84">        return mongoTemplate.count(query, COLLECTION_NAME);</span>
+    }
+
+    @Override
+    public Boolean updateCustomerId(String entrustId, Long customerId) {
+<span class="nc" id="L89">        Update update = new Update().set(&quot;customerId&quot;, customerId);</span>
+<span class="nc" id="L90">        return updateFirstWithId(entrustId, update);</span>
+    }
+
+    @Override
+    public Boolean updateMarketerId(String entrustId, Long marketerId) {
+<span class="nc" id="L95">        Update update = new Update().set(&quot;marketerId&quot;, marketerId);</span>
+<span class="nc" id="L96">        return updateFirstWithId(entrustId, update);</span>
+    }
+
+    @Override
+    public Boolean updateTesterId(String entrustId, Long testerId) {
+<span class="nc" id="L101">        Update update = new Update().set(&quot;testerId&quot;, testerId);</span>
+<span class="nc" id="L102">        return updateFirstWithId(entrustId, update);</span>
+    }
+
+    @Override
+    public Boolean updateContractId(String entrustId, String contractId) {
+<span class="nc" id="L107">        Update update = new Update().set(&quot;contractId&quot;, contractId);</span>
+<span class="nc" id="L108">        return updateFirstWithId(entrustId, update);</span>
+    }
+
+    @Override
+    public Boolean updateProjectId(String entrustId, String projectId) {
+<span class="nc" id="L113">        Update update = new Update().set(&quot;projectId&quot;, projectId);</span>
+<span class="nc" id="L114">        return updateFirstWithId(entrustId, update);</span>
+    }
+
+    @Override
+    public Boolean updateContent(String entrustId, EntrustContent content) {
+<span class="nc" id="L119">        Update update = new Update().set(&quot;content&quot;, content);</span>
+<span class="nc" id="L120">        return updateFirstWithId(entrustId, update);</span>
+    }
+
+    @Override
+    public Boolean updateSoftwareDocReview(String entrustId, SoftwareDocReview softwareDocReview) {
+<span class="nc" id="L125">        Update update = new Update().set(&quot;softwareDocReview&quot;, softwareDocReview);</span>
+<span class="nc" id="L126">        return updateFirstWithId(entrustId, update);</span>
+    }
+
+    @Override
+    public Boolean updateReview(String entrustId, EntrustReview review) {
+<span class="nc" id="L131">        Update update = new Update().set(&quot;review&quot;, review);</span>
+<span class="nc" id="L132">        return updateFirstWithId(entrustId, update);</span>
+    }
+
+    @Override
+    public Boolean updateQuote(String entrustId, EntrustQuote quote) {
+<span class="nc" id="L137">        Update update = new Update().set(&quot;quote&quot;, quote);</span>
+<span class="nc" id="L138">        return updateFirstWithId(entrustId, update);</span>
+    }
+
+    @Override
+    public Boolean updateStatus(String entrustId, EntrustStatus status) {
+<span class="nc" id="L143">        Update update = new Update().set(&quot;status&quot;, status);</span>
+<span class="nc" id="L144">        return updateFirstWithId(entrustId, update);</span>
+    }
+
+    @Override
+    public Boolean deleteEntrust(String entrustId) {
+<span class="nc" id="L149">        Query query = new Query().addCriteria(Criteria.where(&quot;_id&quot;).is(new ObjectId(entrustId)));</span>
+<span class="nc" id="L150">        DeleteResult result = mongoTemplate.remove(query, COLLECTION_NAME);</span>
+<span class="nc bnc" id="L151" title="All 4 branches missed.">        return result.wasAcknowledged() &amp;&amp; result.getDeletedCount() == 1;</span>
+    }
+
+    private List&lt;EntrustOutline&gt; findWithProjection(Query query, Integer page, Integer pageSize) {
+        // 设置要取回的字段
+<span class="nc" id="L156">        query.fields().include(&quot;_id&quot;);</span>
+<span class="nc" id="L157">        query.fields().include(&quot;customerId&quot;);</span>
+<span class="nc" id="L158">        query.fields().include(&quot;marketerId&quot;);</span>
+<span class="nc" id="L159">        query.fields().include(&quot;testerId&quot;);</span>
+<span class="nc" id="L160">        query.fields().include(&quot;content.software.name&quot;);</span>
+<span class="nc" id="L161">        query.fields().include(&quot;content.software.version&quot;);</span>
+<span class="nc" id="L162">        query.fields().include(&quot;status&quot;);</span>
+<span class="nc" id="L163">        List&lt;Entrust&gt; result = findWithPagination(query, page, pageSize);</span>
+        // 转换为委托概要
+<span class="nc" id="L165">        return result.stream().map(EntrustOutline::new).collect(Collectors.toList());</span>
+    }
+
+    // 根据查询条件进行分页查询
+    private List&lt;Entrust&gt; findWithPagination(Query query, Integer page, Integer pageSize) {
+        // 计算起始位置，页码从1开始
+<span class="nc" id="L171">        int offset = (page - 1) * pageSize;</span>
+        // 先不优化分页查询
+<span class="nc" id="L173">        query.skip(offset).limit(pageSize);</span>
+<span class="nc" id="L174">        return mongoTemplate.find(query, Entrust.class, COLLECTION_NAME);</span>
+    }
+
+    // 根据委托ID更新委托，由传入的 Update 对象设置要更新的部分
+    private Boolean updateFirstWithId(String entrustId, Update update) {
+<span class="nc" id="L179">        Query query = new Query().addCriteria(Criteria.where(&quot;_id&quot;).is(new ObjectId(entrustId)));</span>
+<span class="nc" id="L180">        UpdateResult result = mongoTemplate.updateFirst(query, update, COLLECTION_NAME);</span>
+<span class="nc bnc" id="L181" title="All 4 branches missed.">        return result.wasAcknowledged() &amp;&amp; result.getMatchedCount() == 1;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

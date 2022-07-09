@@ -1,0 +1,512 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DocServiceJS002.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-document</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.doc.service</a> &gt; <span class="el_source">DocServiceJS002.java</span></div><h1>DocServiceJS002.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.doc.service;
+
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.njustc.onlinebiz.doc.dao.OSSProvider;
+import com.njustc.onlinebiz.doc.model.JS002;
+import com.njustc.onlinebiz.doc.util.HeaderFooter;
+import com.njustc.onlinebiz.doc.util.ItextUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+
+@Service
+public class DocServiceJS002 {
+    private final OSSProvider ossProvider;
+
+<span class="fc" id="L25">    public DocServiceJS002(OSSProvider ossProvider) {</span>
+<span class="fc" id="L26">        this.ossProvider = ossProvider;</span>
+<span class="fc" id="L27">    }</span>
+
+    /**
+     * 以下是文档生成部分
+     * */
+    //  基础页面设置
+    private static final float marginLeft;
+    private static final float marginRight;
+    private static final float marginTop;
+    private static final float marginBottom;
+
+    @Value(&quot;${document-dir}&quot;)
+    private String DOCUMENT_DIR;
+    static {
+        // 在 iText 中每一个单位大小默认近似于点（pt）
+        // 1mm = 72 ÷ 25.4 ≈ 2.834645...（pt）
+<span class="fc" id="L43">        marginLeft = 65f;</span>
+<span class="fc" id="L44">        marginRight = 65f;</span>
+<span class="fc" id="L45">        marginTop = 68f;</span>
+<span class="fc" id="L46">        marginBottom = 65f;</span>
+    }
+
+    private JS002 JS002Json;
+    /**
+     * 填充JS002文档
+     * @param newJson JS002对象
+     * @return 成功返回OSS链接，失败返回原因
+     * */
+    public String fill(String entrustId, JS002 newJson){
+<span class="fc" id="L56">        JS002Json = newJson;</span>
+<span class="fc" id="L57">        String pdfPath = DOCUMENT_DIR + &quot;JS002_&quot; + entrustId + &quot;.pdf&quot;;</span>
+//        System.out.println(DOCUMENT_DIR);
+        try {
+            // 1.新建document对象
+<span class="fc" id="L61">            Document document = new Document(PageSize.A4);// 建立一个Document对象</span>
+<span class="fc" id="L62">            document.setMargins(marginLeft, marginRight, marginTop, marginBottom);</span>
+            // 2.建立一个书写器(Writer)与document对象关联
+<span class="fc" id="L64">            File file = new File(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;));</span>
+<span class="fc" id="L65">            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(file));</span>
+            // 2.5 添加页眉/页脚
+<span class="fc" id="L67">            String header = &quot;NST－04－JS002－2011&quot;;</span>
+<span class="fc" id="L68">            String[] footer = new String[]{&quot;南京大学计算机软件新技术国家重点实验室       密级范围：内部                   第&quot;, &quot;页 共&quot;, &quot;页&quot;};</span>
+<span class="fc" id="L69">            int headerToPage = 100;</span>
+<span class="fc" id="L70">            int footerFromPage = 1;</span>
+<span class="fc" id="L71">            boolean isHeaderLine = true;</span>
+<span class="fc" id="L72">            boolean isFooterLine = true;</span>
+<span class="fc" id="L73">            float[] headerLoc = new float[]{document.right() - 5, document.top() + 15};</span>
+<span class="fc" id="L74">            float[] footerLoc = new float[]{document.left(), document.bottom() - 20};</span>
+<span class="fc" id="L75">            float headLineOff = -5f;</span>
+<span class="fc" id="L76">            float footLineOff = 12f;</span>
+<span class="fc" id="L77">            writer.setPageEvent(new HeaderFooter(header, footer, headerToPage, footerFromPage, isHeaderLine, isFooterLine,</span>
+                    headerLoc, footerLoc, headLineOff, footLineOff));
+            // 3.打开文档
+<span class="fc" id="L80">            document.open();</span>
+            // 4.向文档中添加内容
+<span class="fc" id="L82">            generatePageOne(document);</span>
+            // 5.关闭文档
+<span class="fc" id="L84">            document.close();</span>
+<span class="nc" id="L85">        } catch (Exception e) {</span>
+<span class="nc" id="L86">            e.printStackTrace();</span>
+<span class="nc" id="L87">            return &quot;unable to generate a pdf&quot;;</span>
+<span class="fc" id="L88">        }</span>
+        // 上传pdf
+        try {
+<span class="pc bpc" id="L91" title="1 of 2 branches missed.">            if(ossProvider.upload(</span>
+<span class="fc" id="L92">                    &quot;doc&quot;, &quot;JS002_&quot; + entrustId + &quot;.pdf&quot;, Files.readAllBytes(Path.of(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;))), &quot;application/pdf&quot;)) {</span>
+<span class="nc" id="L93">                deleteOutFile(pdfPath);</span>
+<span class="nc" id="L94">                return &quot;https://oss.syh1en.asia/doc/JS002_&quot; + entrustId + &quot;.pdf&quot;;</span>
+            } else {
+<span class="fc" id="L96">                deleteOutFile(pdfPath);</span>
+<span class="fc" id="L97">                return &quot;upload failed&quot;;</span>
+            }
+<span class="nc" id="L99">        } catch (Exception e) {</span>
+<span class="nc" id="L100">            e.printStackTrace();</span>
+<span class="nc" id="L101">            deleteOutFile(pdfPath);</span>
+<span class="nc" id="L102">            return &quot;minio error&quot;;</span>
+        }
+    }
+
+    /**
+     * 删除中间的out文件
+     * */
+    private void deleteOutFile(String pdfPath) {
+        try {
+<span class="fc" id="L111">            File file = new File(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;));</span>
+<span class="pc bpc" id="L112" title="1 of 2 branches missed.">            if (file.delete()) {</span>
+<span class="fc" id="L113">                System.out.println(file.getName() + &quot; is deleted!&quot;);</span>
+            } else {
+<span class="nc" id="L115">                System.out.println(&quot;Delete&quot; + file.getName() + &quot;is failed.&quot;);</span>
+            }
+<span class="nc" id="L117">        } catch(Exception e) {</span>
+<span class="nc" id="L118">            e.printStackTrace();</span>
+<span class="fc" id="L119">        }</span>
+<span class="fc" id="L120">    }</span>
+
+    private Font titlefont;
+    private Font titlefont2;
+    private  Font symbolfont;
+    private Font textfont;
+    private Font textfontBOLD;
+    private Font smallFourBoldFont;
+    private Font smallFourFont;
+
+    private static final String singleChoiceBlank = &quot;\u0049&quot;;
+    private static final String multiChoiceBlank = &quot;\u004E&quot;;
+    private static final String singleChoiceFilled = &quot;\u004C&quot;;
+    private static final String multiChoiceFilled = &quot;\u0051&quot;;
+
+<span class="fc" id="L135">    private static final String[] singleChoice = {&quot;\u0049&quot;, &quot;\u004C&quot;};      /* 0--Blank, 1--Ticked */</span>
+<span class="fc" id="L136">    private static final String[] multiChoice = {&quot;\u004E&quot;, &quot;\u0051&quot;};      /* 0--Blank, 1--Ticked */</span>
+
+<span class="fc" id="L138">    private static final String[] singleChoiceNoCircle = {&quot; &quot;, &quot;\u0050&quot;};        /* 0--Blank, 1--Ticked */</span>
+    private Font sixfont;
+
+    /**
+     * 生成JS002文档第一页
+     * */
+    public void generatePageOne(Document document) throws Exception {
+        // 加载字体
+        try {
+            // 定义全局的字体静态变量
+<span class="fc" id="L148">            BaseFont bfSimSun = BaseFont.createFont(DOCUMENT_DIR + &quot;font/simsun.ttf&quot;, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);</span>
+<span class="fc" id="L149">            BaseFont bfUnicode = BaseFont.createFont(DOCUMENT_DIR + &quot;font/check.ttf&quot;, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);</span>
+<span class="fc" id="L150">            titlefont = new Font(bfSimSun, 17f, Font.BOLD);</span>
+<span class="fc" id="L151">            titlefont2 = new Font(bfSimSun, 12f, Font.NORMAL);</span>
+<span class="fc" id="L152">            symbolfont = new Font(bfUnicode, 14, Font.NORMAL);</span>
+<span class="fc" id="L153">            textfont = new Font(bfSimSun, 11f, Font.NORMAL);</span>
+<span class="fc" id="L154">            textfontBOLD = new Font(bfSimSun, 11f, Font.BOLD);</span>
+<span class="fc" id="L155">            smallFourBoldFont = new Font(bfSimSun, 12f, Font.BOLD);</span>
+<span class="fc" id="L156">            smallFourFont = new Font(bfSimSun, 12f, Font.NORMAL);</span>
+<span class="fc" id="L157">            sixfont = new Font(bfSimSun, 8f, Font.NORMAL);</span>
+<span class="nc" id="L158">        } catch (Exception e) {</span>
+<span class="nc" id="L159">            e.printStackTrace();</span>
+<span class="fc" id="L160">        }</span>
+
+
+        // 标题
+<span class="fc" id="L164">        Paragraph title = new Paragraph(&quot;软件项目委托测试申请书&quot;, titlefont);</span>
+<span class="fc" id="L165">        title.setAlignment(1); //设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L166">        title.setSpacingBefore(-30f); //设置段落上空白</span>
+<span class="fc" id="L167">        title.setSpacingAfter(15f); //设置段落下空白</span>
+
+<span class="fc" id="L169">        Paragraph text = new Paragraph();</span>
+<span class="fc" id="L170">        text.add(new Phrase(&quot;请用&quot;, textfont));</span>
+<span class="fc" id="L171">        text.add(new Phrase(&quot;\u0050&quot;, symbolfont));</span>
+<span class="fc" id="L172">        text.add(new Phrase(&quot;选择：&quot;,  textfont));</span>
+<span class="fc" id="L173">        text.add(new Phrase(singleChoiceBlank,  symbolfont));</span>
+<span class="fc" id="L174">        text.add(new Phrase(&quot;——单选； &quot;,  textfont));</span>
+<span class="fc" id="L175">        text.add(new Phrase(multiChoiceBlank, symbolfont));</span>
+<span class="fc" id="L176">        text.add(new Phrase(&quot;——多选。&quot;, textfont));</span>
+<span class="fc" id="L177">        text.setSpacingAfter(5f); //设置段落下空白</span>
+
+<span class="fc" id="L179">        float tableWidth = 465;</span>
+<span class="fc" id="L180">        float[] widths = new float[33];</span>
+<span class="fc" id="L181">        Arrays.fill(widths, tableWidth/33);</span>
+<span class="fc" id="L182">        PdfPTable table = ItextUtils.createTable(widths, tableWidth);</span>
+
+<span class="fc" id="L184">        float[] paddings = new float[]{5f, 6.5f, 5.5f, 5.5f};</span>
+<span class="fc" id="L185">        float[] paddings2 = new float[]{10f, 10f, 5f, 5f};</span>
+<span class="fc" id="L186">        float[] paddings3 = new float[]{3.5f, 4.5f, 5.5f, 5.5f};</span>
+<span class="fc" id="L187">        float borderWidth = 0.5f;</span>
+<span class="fc" id="L188">        float fixedLeading = 14f;</span>
+        PdfPCell cell;
+        Phrase phrase;
+
+<span class="fc" id="L192">        table.addCell(ItextUtils.createCell(&quot;测试类型&quot;, titlefont2, Element.ALIGN_CENTER, 5, 4, paddings2, borderWidth));</span>
+<span class="fc" id="L193">        cell = ItextUtils.createCell(Element.ALIGN_LEFT, 28, 2, fixedLeading, paddings, borderWidth);</span>
+<span class="fc" id="L194">        phrase = ItextUtils.crossSetFont(new String[]{&quot;&quot;,</span>
+<span class="fc" id="L195">                multiChoice[isTicked(JS002Json.getMultiCeShiLeiXing01())], &quot;软件确认测试      &quot;,</span>
+<span class="fc" id="L196">                multiChoice[isTicked(JS002Json.getMultiCeShiLeiXing02())], &quot;其他：&quot;}, textfont, symbolfont);</span>
+<span class="fc" id="L197">        phrase.add(ItextUtils.leastUnderlineChunk(JS002Json.getInputCeShiLeiXing02(), textfont, 10, 0.7f, true));</span>
+<span class="fc" id="L198">        cell.setPhrase(phrase);</span>
+<span class="fc" id="L199">        table.addCell(cell);</span>
+<span class="fc" id="L200">        cell = ItextUtils.createCell(Element.ALIGN_LEFT, 28, 2, fixedLeading, paddings3, borderWidth);</span>
+<span class="fc" id="L201">        phrase = ItextUtils.crossSetFont(new String[]{&quot;&quot;,</span>
+<span class="fc" id="L202">                multiChoice[isTicked(JS002Json.getMultiCeShiLeiXing03())], &quot;成果/技术鉴定测试      &quot;,</span>
+<span class="fc" id="L203">                multiChoice[isTicked(JS002Json.getMultiCeShiLeiXing04())], &quot;专项资金验收测试&quot;}, textfont, symbolfont);</span>
+<span class="fc" id="L204">        cell.setPhrase(phrase);</span>
+<span class="fc" id="L205">        table.addCell(cell);</span>
+
+<span class="fc" id="L207">        table.addCell(ItextUtils.createCell(&quot;软件名称&quot;, titlefont2, Element.ALIGN_CENTER, 5, 2, paddings, borderWidth));</span>
+<span class="fc" id="L208">        table.addCell(ItextUtils.createCell(JS002Json.getInputRuanJianMingChen(), titlefont2, Element.ALIGN_LEFT, 17, 2, fixedLeading, paddings, borderWidth));</span>
+<span class="fc" id="L209">        table.addCell(ItextUtils.createCell(&quot;版本号&quot;, titlefont2, Element.ALIGN_CENTER, 5, 2, paddings, borderWidth));</span>
+<span class="fc" id="L210">        table.addCell(ItextUtils.createCell(JS002Json.getInputBanBenHao(), titlefont2, Element.ALIGN_LEFT, 6, 2, paddings, borderWidth));</span>
+
+<span class="fc" id="L212">        table.addCell(ItextUtils.createCell(&quot;委托单位（中文）&quot;, titlefont2, Element.ALIGN_CENTER, 5, 2, paddings, borderWidth));</span>
+<span class="fc" id="L213">        table.addCell(ItextUtils.createCell(JS002Json.getInputWeiTuoDanWeiZhongWen(), titlefont2, Element.ALIGN_LEFT, 28, 2, fixedLeading, paddings, borderWidth));</span>
+
+<span class="fc" id="L215">        table.addCell(ItextUtils.createCell(&quot;委托单位（英文）&quot;, titlefont2, Element.ALIGN_CENTER, 5, 2, paddings, borderWidth));</span>
+<span class="fc" id="L216">        table.addCell(ItextUtils.createCell(JS002Json.getInputWeiTuoDanWeiYingWen(), titlefont2, Element.ALIGN_LEFT, 28, 2, fixedLeading, paddings, borderWidth));</span>
+
+<span class="fc" id="L218">        table.addCell(ItextUtils.createCell(&quot;开发单位&quot;, titlefont2, Element.ALIGN_CENTER, 5, 2, paddings, borderWidth));</span>
+<span class="fc" id="L219">        table.addCell(ItextUtils.createCell(JS002Json.getInputKaiFaDanWei(), titlefont2, Element.ALIGN_LEFT, 28, 2, fixedLeading, paddings, borderWidth));</span>
+
+<span class="fc" id="L221">        table.addCell(ItextUtils.createCell(&quot;单位性质&quot;, titlefont2, Element.ALIGN_CENTER, 5, 2, paddings, borderWidth));</span>
+
+<span class="fc" id="L223">        cell = ItextUtils.createCell(Element.ALIGN_LEFT, 28, 2, fixedLeading, paddings3, borderWidth);</span>
+<span class="fc" id="L224">        phrase = ItextUtils.crossSetFont(new String[]{&quot;&quot;,</span>
+<span class="fc" id="L225">                singleChoice[isTicked(JS002Json.getSingleDanWeiXingZhi01())], &quot;内资企业     &quot;, singleChoice[isTicked(JS002Json.getSingleDanWeiXingZhi02())], &quot;外(合)资企业     &quot;, singleChoice[isTicked(JS002Json.getSingleDanWeiXingZhi03())], &quot;港澳台(合)资企业\n&quot;,</span>
+<span class="fc" id="L226">                singleChoice[isTicked(JS002Json.getSingleDanWeiXingZhi04())], &quot;科研院校     &quot;, singleChoice[isTicked(JS002Json.getSingleDanWeiXingZhi05())], &quot;政府事业团体     &quot;, singleChoice[isTicked(JS002Json.getSingleDanWeiXingZhi06())], &quot;其他&quot;}, textfont, symbolfont);</span>
+<span class="fc" id="L227">        cell.setPhrase(phrase);</span>
+<span class="fc" id="L228">        table.addCell(cell);</span>
+
+<span class="fc" id="L230">        cell = ItextUtils.createCell(Element.ALIGN_LEFT, 33, 2,fixedLeading,  paddings3, borderWidth);</span>
+<span class="fc" id="L231">        phrase = new Phrase();</span>
+<span class="fc" id="L232">        phrase.add(new Chunk(&quot;软件用户对象描述： &quot;, titlefont2));</span>
+<span class="fc" id="L233">        phrase.add(new Chunk(JS002Json.getInputRuanJianMiaoShu() + &quot;\n\n&quot;, titlefont2));</span>
+<span class="fc" id="L234">        cell.setFixedHeight(90f);</span>
+<span class="fc" id="L235">        cell.setVerticalAlignment(Element.ALIGN_TOP);</span>
+<span class="fc" id="L236">        cell.setPhrase(phrase);</span>
+<span class="fc" id="L237">        table.addCell(cell);</span>
+
+<span class="fc" id="L239">        cell = ItextUtils.createCell(Element.ALIGN_LEFT, 33, 2,fixedLeading,  paddings3, borderWidth);</span>
+<span class="fc" id="L240">        cell.setFixedHeight(170f);</span>
+<span class="fc" id="L241">        cell.setVerticalAlignment(Element.ALIGN_TOP);</span>
+<span class="fc" id="L242">        phrase = new Phrase();</span>
+<span class="fc" id="L243">        phrase.add(new Chunk(&quot;主要功能及用途简介（限200字）： &quot;, titlefont2));</span>
+<span class="fc" id="L244">        phrase.add(new Chunk(JS002Json.getInputZhuYaoGongNeng(), titlefont2));</span>
+<span class="fc" id="L245">        cell.setPhrase(phrase);</span>
+<span class="fc" id="L246">        table.addCell(cell);</span>
+
+<span class="fc" id="L248">        cell = ItextUtils.createCell(Element.ALIGN_LEFT, 33, 2, 18f,  paddings, borderWidth);</span>
+<span class="fc" id="L249">        phrase = new Phrase();</span>
+<span class="fc" id="L250">        phrase.add(new Chunk(&quot;测试依据： \n&quot;, titlefont2));</span>
+<span class="fc" id="L251">        phrase.add(ItextUtils.crossSetFont(new String[]{&quot;&quot;,</span>
+<span class="fc" id="L252">                multiChoice[isTicked(JS002Json.getMultiCeShiYiJu01())], &quot;GB/T 25000.51-2010     &quot;, multiChoice[isTicked(JS002Json.getMultiCeShiYiJu02())], &quot;GB/T 16260.1-2006\n&quot;,</span>
+<span class="fc" id="L253">                multiChoice[isTicked(JS002Json.getMultiCeShiYiJu03())], &quot;NST-03-WI12-2011       &quot;, multiChoice[isTicked(JS002Json.getMultiCeShiYiJu04())], &quot;NST-03-WI13-2011\n&quot;,</span>
+<span class="fc" id="L254">                multiChoice[isTicked(JS002Json.getMultiCeShiYiJu05())], &quot;其他&quot;}, titlefont2, symbolfont));</span>
+<span class="fc" id="L255">        phrase.add(ItextUtils.leastUnderlineChunk(JS002Json.getInputCeShiYiJu05(), textfont, 15, 0.7f, true));</span>
+<span class="fc" id="L256">        cell.setPhrase(phrase);</span>
+<span class="fc" id="L257">        table.addCell(cell);</span>
+
+<span class="fc" id="L259">        cell = ItextUtils.createCell(Element.ALIGN_LEFT, 33, 2, 18f,  paddings, borderWidth);</span>
+<span class="fc" id="L260">        phrase = new Phrase();</span>
+<span class="fc" id="L261">        phrase.add(new Chunk(&quot;需要测试的技术指标：\n&quot;, titlefont2));</span>
+<span class="fc" id="L262">        phrase.add(ItextUtils.crossSetFont(new String[]{&quot;&quot;,</span>
+<span class="fc" id="L263">                multiChoice[isTicked(JS002Json.getMultiJiShuZhiBiao01())], &quot;功能性   &quot;, multiChoice[isTicked(JS002Json.getMultiJiShuZhiBiao02())], &quot;可靠性   &quot;, multiChoice[isTicked(JS002Json.getMultiJiShuZhiBiao03())], &quot;易用性性   &quot;, multiChoice[isTicked(JS002Json.getMultiJiShuZhiBiao04())], &quot;效率   &quot;,</span>
+<span class="fc" id="L264">                multiChoice[isTicked(JS002Json.getMultiJiShuZhiBiao05())], &quot;可维护性   &quot;, multiChoice[isTicked(JS002Json.getMultiJiShuZhiBiao06())], &quot;可移植性\n&quot;,</span>
+<span class="fc" id="L265">                multiChoice[isTicked(JS002Json.getMultiJiShuZhiBiao07())], &quot;代码覆盖度   &quot;, multiChoice[isTicked(JS002Json.getMultiJiShuZhiBiao08())], &quot;缺陷检测率   &quot;, multiChoice[isTicked(JS002Json.getMultiJiShuZhiBiao09())], &quot;代码风格符合度   &quot;, multiChoice[isTicked(JS002Json.getMultiJiShuZhiBiao010())], &quot;代码不符合项检测率\n&quot;,</span>
+<span class="fc" id="L266">                multiChoice[isTicked(JS002Json.getMultiJiShuZhiBiao011())], &quot;产品说明要求   &quot;, multiChoice[isTicked(JS002Json.getMultiJiShuZhiBiao012())], &quot;用户文档集要求\n&quot;, multiChoice[isTicked(JS002Json.getMultiJiShuZhiBiao013())], &quot;其他&quot;}, titlefont2, symbolfont));</span>
+<span class="fc" id="L267">        phrase.add(ItextUtils.leastUnderlineChunk(JS002Json.getInputJiShuZhiBiao013(), textfont, 15, 0.7f, true));</span>
+<span class="fc" id="L268">        System.out.println(&quot;JiShuZhiBiao013 : : &quot; + JS002Json.getMultiJiShuZhiBiao013() + &quot;\n&quot;);</span>
+<span class="fc" id="L269">        System.out.println(&quot;JiShuZhiBiao013 : : &quot; + JS002Json.getInputJiShuZhiBiao013() + &quot;\n&quot;);</span>
+<span class="fc" id="L270">        cell.setPhrase(phrase);</span>
+<span class="fc" id="L271">        table.addCell(cell);</span>
+
+<span class="fc" id="L273">        cell = ItextUtils.createCell(Element.ALIGN_CENTER, 5, 6, 18f,  paddings3, borderWidth);</span>
+<span class="fc" id="L274">        phrase = new Phrase();</span>
+<span class="fc" id="L275">        phrase.add(new Chunk(&quot;软件规模&quot;, titlefont2));</span>
+<span class="fc" id="L276">        phrase.add(new Chunk(&quot;(至少一种)&quot;, textfont));</span>
+<span class="fc" id="L277">        cell.setPhrase(phrase);</span>
+<span class="fc" id="L278">        table.addCell(cell);</span>
+<span class="fc" id="L279">        table.addCell(ItextUtils.createCell(&quot;功能数（到最后一级菜单）&quot;, titlefont2, Element.ALIGN_LEFT, 19, 2, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L280">        table.addCell(ItextUtils.createCell(JS002Json.getInputRuanJianGuiMo01(), titlefont2, Element.ALIGN_LEFT, 9, 2, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L281">        table.addCell(ItextUtils.createCell(&quot;功能点数&quot;, titlefont2, Element.ALIGN_LEFT, 19, 2, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L282">        table.addCell(ItextUtils.createCell(JS002Json.getInputRuanJianGuiMo02(), titlefont2, Element.ALIGN_LEFT, 9, 2, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L283">        table.addCell(ItextUtils.createCell(&quot;代码行数（不包括注释行、空行）&quot;, titlefont2, Element.ALIGN_LEFT, 19, 2, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L284">        table.addCell(ItextUtils.createCell(JS002Json.getInputRuanJianGuiMo03(), titlefont2, Element.ALIGN_LEFT, 9, 2, fixedLeading, paddings3, borderWidth));</span>
+
+<span class="fc" id="L286">        cell = ItextUtils.createCell(Element.ALIGN_LEFT, 33, 2, 18f,  paddings3, borderWidth);</span>
+<span class="fc" id="L287">        phrase = new Phrase();</span>
+<span class="fc" id="L288">        phrase.add(new Chunk(&quot;软件类型&quot;, titlefont2));</span>
+<span class="fc" id="L289">        phrase.add(new Chunk(&quot;（单元）:\n&quot;, textfont));</span>
+<span class="fc" id="L290">        phrase.add(ItextUtils.crossSetFont(new String[]{</span>
+                &quot;系统软件：&quot;,
+<span class="fc" id="L292">                singleChoice[isTicked(JS002Json.getSingleRuanJianLeiXing0XiTong01())], &quot;操作系统       &quot;, singleChoice[isTicked(JS002Json.getSingleRuanJianLeiXing0XiTong02())], &quot;中文处理系统   &quot;, singleChoice[isTicked(JS002Json.getSingleRuanJianLeiXing0XiTong03())], &quot;网络系统  &quot;,</span>
+<span class="fc" id="L293">                singleChoice[isTicked(JS002Json.getSingleRuanJianLeiXing0XiTong04())], &quot;嵌入式操作系统 &quot;, singleChoice[isTicked(JS002Json.getSingleRuanJianLeiXing0XiTong05())], &quot;其他\n&quot; +</span>
+                &quot;支持软件：&quot;,
+<span class="fc" id="L295">                singleChoice[isTicked(JS002Json.getSingleRuanJianLeiXing0ZhiChi01())], &quot;程序设计语言   &quot;, singleChoice[isTicked(JS002Json.getSingleRuanJianLeiXing0ZhiChi02())], &quot;数据库系统设计 &quot;, singleChoice[isTicked(JS002Json.getSingleRuanJianLeiXing0ZhiChi03())], &quot;工具软件  &quot;,</span>
+<span class="fc" id="L296">                singleChoice[isTicked(JS002Json.getSingleRuanJianLeiXing0ZhiChi04())], &quot;网络通信软件\n          &quot;, singleChoice[isTicked(JS002Json.getSingleRuanJianLeiXing0ZhiChi05())], &quot;中间件         &quot;, singleChoice[isTicked(JS002Json.getSingleRuanJianLeiXing0ZhiChi06())], &quot;其他\n&quot; +</span>
+                &quot;应用软件：&quot;,
+<span class="fc" id="L298">                singleChoice[isTicked(JS002Json.getSingleRuanJianLeiXing0YingYong01())], &quot;行业管理软件   &quot;, singleChoice[isTicked(JS002Json.getSingleRuanJianLeiXing0YingYong02())], &quot;办公软件  &quot;, singleChoice[isTicked(JS002Json.getSingleRuanJianLeiXing0YingYong03())], &quot;模式识别软件 &quot;,</span>
+<span class="fc" id="L299">                singleChoice[isTicked(JS002Json.getSingleRuanJianLeiXing0YingYong04())], &quot;图形图像软件 &quot;, singleChoice[isTicked(JS002Json.getSingleRuanJianLeiXing0YingYong05())], &quot;控制软件\n          &quot;, singleChoice[isTicked(JS002Json.getSingleRuanJianLeiXing0YingYong06())], &quot;网络应用软件   &quot;,</span>
+<span class="fc" id="L300">                singleChoice[isTicked(JS002Json.getSingleRuanJianLeiXing0YingYong07())], &quot;信息管理软件 &quot;, singleChoice[isTicked(JS002Json.getSingleRuanJianLeiXing0YingYong08())], &quot;数据库管理应用软件  &quot;, singleChoice[isTicked(JS002Json.getSingleRuanJianLeiXing0YingYong09())], &quot;安全与保密软件\n          &quot;,</span>
+<span class="fc" id="L301">                singleChoice[isTicked(JS002Json.getSingleRuanJianLeiXing0YingYong010())], &quot;嵌入式应用软件 &quot;, singleChoice[isTicked(JS002Json.getSingleRuanJianLeiXing0YingYong011())], &quot;教育软件     &quot;, singleChoice[isTicked(JS002Json.getSingleRuanJianLeiXing0YingYong012())], &quot;游戏软件            &quot;,</span>
+<span class="fc" id="L302">                singleChoice[isTicked(JS002Json.getSingleRuanJianLeiXing0YingYong013())], &quot;其他\n&quot; +</span>
+                &quot;其他：    &quot;,
+<span class="fc" id="L304">                singleChoice[isTicked(JS002Json.getSingleRuanJianLeiXing0QiTa01())], &quot;其他&quot;}, textfont, symbolfont));</span>
+<span class="fc" id="L305">        cell.setPhrase(phrase);</span>
+<span class="fc" id="L306">        table.addCell(cell);</span>
+
+<span class="fc" id="L308">        table.addCell(ItextUtils.createCell(&quot;运行环境&quot;, titlefont2, Element.ALIGN_CENTER, 2, 14, 18f,  paddings3, borderWidth));</span>
+<span class="fc" id="L309">        table.addCell(ItextUtils.createCell(&quot;客户端&quot;, textfont, Element.ALIGN_CENTER, 2, 2, 18f,  paddings3, borderWidth));</span>
+<span class="fc" id="L310">        cell = ItextUtils.createCell(Element.ALIGN_LEFT, 29, 2, 18f,  paddings3, borderWidth);</span>
+<span class="fc" id="L311">        phrase = new Phrase();</span>
+<span class="fc" id="L312">        phrase.add(ItextUtils.crossSetFont(new String[]{&quot;操作系统：&quot;, multiChoice[isTicked(JS002Json.getMultiKeHuDuan0Windows())], &quot;Windows &quot;}, textfont, symbolfont));</span>
+<span class="fc" id="L313">        phrase.add(ItextUtils.leastUnderlineChunk(JS002Json.getInputKeHuDuan0Windows(), textfont, 3, 0.7f, false));</span>
+<span class="fc" id="L314">        phrase.add(ItextUtils.crossSetFont(new String[]{&quot;（版本) &quot;, multiChoice[isTicked(JS002Json.getInputKeHuDuan0Linux())], &quot;Linux &quot;}, textfont, symbolfont));</span>
+<span class="fc" id="L315">        phrase.add(ItextUtils.leastUnderlineChunk(JS002Json.getInputKeHuDuan0Linux(), textfont, 3, 0.7f, false));</span>
+<span class="fc" id="L316">        phrase.add(ItextUtils.crossSetFont(new String[]{&quot;(版本) &quot;, multiChoice[isTicked(JS002Json.getMultiKeHuDuan0QiTa())], &quot;其他 &quot;}, textfont, symbolfont));</span>
+<span class="fc" id="L317">        phrase.add(ItextUtils.leastUnderlineChunk(JS002Json.getInputKeHuDuan0QiTa(), textfont, 5, 0.7f, false));</span>
+<span class="fc" id="L318">        phrase.add(new Chunk(&quot;\n内存要求：&quot;, textfont));</span>
+<span class="fc" id="L319">        phrase.add(ItextUtils.leastUnderlineChunk(JS002Json.getInputKeHuDuan0NeiCunYaoQiu(), textfont, 6, 0.7f, true));</span>
+<span class="fc" id="L320">        phrase.add(new Chunk(&quot;MB\n其他要求：&quot;, textfont));</span>
+<span class="fc" id="L321">        phrase.add(new Chunk(JS002Json.getInputKeHuDuan0QiTaYaoQiu(), textfont));</span>
+<span class="fc" id="L322">        cell.setPhrase(phrase);</span>
+<span class="fc" id="L323">        table.addCell(cell);</span>
+
+<span class="fc" id="L325">        table.addCell(ItextUtils.createCell(&quot;服务器端&quot;, textfont, Element.ALIGN_CENTER, 2, 10, 18f,  paddings3, borderWidth));</span>
+<span class="fc" id="L326">        table.addCell(ItextUtils.createCell(&quot;硬件&quot;, textfont, Element.ALIGN_CENTER, 2, 2, 18f,  paddings3, borderWidth));</span>
+<span class="fc" id="L327">        cell = ItextUtils.createCell(Element.ALIGN_LEFT, 27, 2, 18f,  paddings3, borderWidth);</span>
+<span class="fc" id="L328">        phrase = new Phrase();</span>
+<span class="fc" id="L329">        phrase.add(ItextUtils.crossSetFont(new String[]{&quot;架构：&quot;, multiChoice[isTicked(JS002Json.getMultiFuWuQiYingJian0PC())], &quot;PC服务器   &quot;, multiChoice[isTicked(JS002Json.getMultiFuWuQiYingJian0Linux())], &quot;UNIX/Linux服务器   &quot;, multiChoice[isTicked(JS002Json.getMultiFuWuQiYingJian0QiTa())], &quot;其他&quot;}, textfont, symbolfont));</span>
+<span class="fc" id="L330">        System.out.println(&quot;Test :: &quot; + JS002Json.getInputFuWuQiYingJian0QiTa());</span>
+<span class="fc" id="L331">        phrase.add(ItextUtils.leastUnderlineChunk(JS002Json.getInputFuWuQiYingJian0QiTa(), textfont, 10, 0.7f, true));</span>
+<span class="fc" id="L332">        phrase.add(new Chunk(&quot;\n内存要求：&quot;, textfont));</span>
+<span class="fc" id="L333">        phrase.add(ItextUtils.leastUnderlineChunk(JS002Json.getInputFuWuQiYingJian0NeiCunYaoQiu(), textfont, 6, 0.7f, true));</span>
+<span class="fc" id="L334">        phrase.add(new Chunk(&quot;MB\n硬盘要求：&quot;, textfont));</span>
+<span class="fc" id="L335">        phrase.add(ItextUtils.leastUnderlineChunk(JS002Json.getInputFuWuQiYingJian0YingPanYaoQiu(), textfont, 6, 0.7f, true));</span>
+<span class="fc" id="L336">        phrase.add(new Chunk(&quot;MB\n其他要求：&quot;, textfont));</span>
+<span class="fc" id="L337">        phrase.add(new Chunk(JS002Json.getInputFuWuQiYingJian0QiTaYaoQiu(), textfont));</span>
+<span class="fc" id="L338">        cell.setPhrase(phrase);</span>
+<span class="fc" id="L339">        table.addCell(cell);</span>
+
+<span class="fc" id="L341">        table.addCell(ItextUtils.createCell(&quot;软件&quot;, textfont, Element.ALIGN_CENTER, 2, 8, 18f,  paddings3, borderWidth));</span>
+<span class="fc" id="L342">        table.addCell(ItextUtils.createCell(&quot;操作系统&quot;, textfont, Element.ALIGN_CENTER, 4, 2, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L343">        table.addCell(ItextUtils.createCell(JS002Json.getInputFuWuQiRuanJian0CaoZuoXiTong(), textfont, Element.ALIGN_CENTER, 11, 2, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L344">        table.addCell(ItextUtils.createCell(&quot;版本&quot;, textfont, Element.ALIGN_CENTER, 4, 2, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L345">        table.addCell(ItextUtils.createCell(JS002Json.getInputFuWuQiRuanJian0BanBen(), textfont, Element.ALIGN_CENTER, 8, 2, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L346">        table.addCell(ItextUtils.createCell(&quot;编程语言&quot;, textfont, Element.ALIGN_CENTER, 4, 2, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L347">        table.addCell(ItextUtils.createCell(JS002Json.getInputFuWuQiRuanJian0BianChengYuYan(), textfont, Element.ALIGN_CENTER, 11, 2, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L348">        table.addCell(ItextUtils.createCell(&quot;构架&quot;, textfont, Element.ALIGN_CENTER, 4, 2, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L349">        cell = ItextUtils.createCell(Element.ALIGN_LEFT, 11, 2, 12f,  new float[]{4f, 7f, 4f, 4f}, borderWidth);</span>
+<span class="fc" id="L350">        phrase = new Phrase();</span>
+<span class="fc" id="L351">        phrase.add(ItextUtils.crossSetFont(new String[]{&quot;&quot;, multiChoice[isTicked(JS002Json.getMultiFuWuQiRuanJian0GouJia0CS())], &quot;C/S   &quot;, multiChoice[isTicked(JS002Json.getMultiFuWuQiRuanJian0GouJia0BS())], &quot;B/S   &quot;, multiChoice[isTicked(JS002Json.getMultiFuWuQiRuanJian0GouJia0QiTa())], &quot;其他&quot;}, textfont, symbolfont));</span>
+<span class="fc" id="L352">        cell.setPhrase(phrase);</span>
+<span class="fc" id="L353">        table.addCell(cell);</span>
+<span class="fc" id="L354">        table.addCell(ItextUtils.createCell(&quot;数据库&quot;, textfont, Element.ALIGN_CENTER, 4, 2, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L355">        table.addCell(ItextUtils.createCell(JS002Json.getInputFuWuQiRuanJian0ShuJuKu(), textfont, Element.ALIGN_CENTER, 11, 2, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L356">        table.addCell(ItextUtils.createCell(&quot;中间件&quot;, textfont, Element.ALIGN_CENTER, 4, 2, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L357">        table.addCell(ItextUtils.createCell(JS002Json.getInputFuWuQiRuanJian0ZhongJianJian(), textfont, Element.ALIGN_CENTER, 8, 2, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L358">        table.addCell(ItextUtils.createCell(&quot;其他支撑软件&quot;, textfont, Element.ALIGN_CENTER, 4, 2, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L359">        table.addCell(ItextUtils.createCell(JS002Json.getInputFuWuQiRuanJian0QiTaZhiCheng(), textfont, Element.ALIGN_CENTER, 23, 2, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L360">        table.addCell(ItextUtils.createCell(&quot;网络环境&quot;, textfont, Element.ALIGN_CENTER, 4, 2, fixedLeading, paddings, borderWidth));</span>
+<span class="fc" id="L361">        table.addCell(ItextUtils.createCell(JS002Json.getInputWangLuoHuanJing(), textfont, Element.ALIGN_CENTER, 27, 2, fixedLeading, paddings, borderWidth));</span>
+
+<span class="fc" id="L363">        table.addCell(ItextUtils.createCell(&quot;样品和数量&quot;, titlefont2, Element.ALIGN_CENTER, 2, 8, 18f,  paddings3, borderWidth));</span>
+<span class="fc" id="L364">        table.addCell(ItextUtils.createCell(&quot;软件介质&quot;, textfont, Element.ALIGN_CENTER, 4, 2, 18f,  paddings3, borderWidth));</span>
+<span class="fc" id="L365">        cell = ItextUtils.createCell(Element.ALIGN_LEFT, 27, 2, 18f,  paddings, borderWidth);</span>
+<span class="fc" id="L366">        phrase = new Phrase();</span>
+<span class="fc" id="L367">        phrase.add(ItextUtils.crossSetFont(new String[]{</span>
+<span class="fc" id="L368">                &quot;光盘（&quot;, singleChoiceNoCircle[isTicked(JS002Json.getSingleRuanJianJieZhi0GuangPan())],</span>
+<span class="fc" id="L369">                &quot;）      U盘（&quot;, singleChoiceNoCircle[isTicked(JS002Json.getSingleRuanJianJieZhi0UPan())],</span>
+<span class="fc" id="L370">                &quot;）       其它（&quot;, singleChoiceNoCircle[isTicked(JS002Json.getSingleRuanJianJieZhi0QiTa())],</span>
+<span class="fc" id="L371">                &quot;）&quot;, singleChoiceNoCircle[isTicked(JS002Json.getSingleRuanJianLeiXing0QiTa01())], &quot;&quot;}, textfont, symbolfont));</span>
+<span class="fc" id="L372">        phrase.add(ItextUtils.leastUnderlineChunk(JS002Json.getInputRuanJianJieZhi0QiTa(), textfont, 10, 0.7f, true));</span>
+<span class="fc" id="L373">        cell.setPhrase(phrase);</span>
+<span class="fc" id="L374">        table.addCell(cell);</span>
+
+<span class="fc" id="L376">        table.addCell(ItextUtils.createCell(&quot;文档资料&quot;, textfont, Element.ALIGN_CENTER, 4, 4, 18f,  paddings3, borderWidth));</span>
+<span class="fc" id="L377">        PdfPCell tmpCell = ItextUtils.createCell(JS002Json.getInputWenDangZiLiao(), textfont, Element.ALIGN_LEFT, 27, 2, 18f, new float[]{3f, 3f, 5.5f, 5.5f}, borderWidth);</span>
+<span class="fc" id="L378">        tmpCell.setFixedHeight(90f);</span>
+<span class="fc" id="L379">        tmpCell.setVerticalAlignment(Element.ALIGN_TOP);</span>
+<span class="fc" id="L380">        table.addCell(tmpCell);</span>
+<span class="fc" id="L381">        table.addCell(ItextUtils.createCell(</span>
+                &quot;注：1、需求文档（例如：项目计划任务书、需求分析报告、合同等）（验收、鉴定测试必须）\n&quot; +
+                        &quot;    2、用户文档（例如：用户手册、用户指南等）（必须）\n&quot; +
+                        &quot;    3、操作文档（例如：操作员手册、安装手册、诊断手册、支持手册等）（验收项目必须）\n&quot;, sixfont, Element.ALIGN_LEFT, 27, 2, 12f,  paddings3, borderWidth));
+
+<span class="fc" id="L386">        table.addCell(ItextUtils.createCell(&quot;提交的样品（硬拷贝资料、硬件）\n&quot; +</span>
+                &quot;                五年保存期满：&quot;, textfont, Element.ALIGN_CENTER, 13, 2, 15f,  paddings3, borderWidth));
+<span class="fc" id="L388">        cell = ItextUtils.createCell(Element.ALIGN_LEFT, 18, 2, 12f,  new float[]{5f, 7f, 10f, 4f}, borderWidth);</span>
+<span class="fc" id="L389">        phrase = new Phrase();</span>
+<span class="fc" id="L390">        phrase.add(ItextUtils.crossSetFont(new String[]{&quot;&quot;, singleChoice[isTicked(JS002Json.getSingleYangPingChuLi01())], &quot;由本实验室销毁       &quot;, singleChoice[isTicked(JS002Json.getSingleYangPingChuLi02())], &quot;退还给我们&quot;}, textfont, symbolfont));</span>
+<span class="fc" id="L391">        cell.setPhrase(phrase);</span>
+<span class="fc" id="L392">        table.addCell(cell);</span>
+
+<span class="fc" id="L394">        table.addCell(ItextUtils.createCell(&quot;委托单位信息&quot;, smallFourBoldFont, Element.ALIGN_CENTER, 2, 2, 18f,  paddings3, borderWidth));</span>
+<span class="fc" id="L395">        cell = ItextUtils.createCell(Element.ALIGN_LEFT, 13, 2, 20f,  new float[]{3f, 7f, 2f, 2f}, borderWidth);</span>
+<span class="fc" id="L396">        phrase = new Phrase();</span>
+<span class="fc" id="L397">        phrase.add(new Chunk(&quot;电  话: &quot;, smallFourFont));</span>
+<span class="fc" id="L398">        phrase.add(ItextUtils.leastUnderlineChunk(JS002Json.getInputWeiTuoDanWei0DianHua(), smallFourFont, 10, 0.7f, true));</span>
+<span class="fc" id="L399">        phrase.add(new Chunk(&quot;\n传  真: &quot;, smallFourFont));</span>
+<span class="fc" id="L400">        phrase.add(ItextUtils.leastUnderlineChunk(JS002Json.getInputWeiTuoDanWei0ChuanZhen(), smallFourFont, 10, 0.7f, true));</span>
+<span class="fc" id="L401">        phrase.add(new Chunk(&quot;\n地  址: &quot;, smallFourFont));</span>
+<span class="fc" id="L402">        phrase.add(ItextUtils.leastUnderlineChunk(JS002Json.getInputWeiTuoDanWei0DiZhi(), smallFourFont, 10, 0.7f, true));</span>
+<span class="fc" id="L403">        phrase.add(new Chunk(&quot;\n邮  编: &quot;, smallFourFont));</span>
+<span class="fc" id="L404">        phrase.add(ItextUtils.leastUnderlineChunk(JS002Json.getInputWeiTuoDanWei0YouBian(), smallFourFont, 10, 0.7f, true));</span>
+<span class="fc" id="L405">        phrase.add(new Chunk(&quot;\n联系人: &quot;, smallFourFont));</span>
+<span class="fc" id="L406">        phrase.add(ItextUtils.leastUnderlineChunk(JS002Json.getInputWeiTuoDanWei0LianXiRen(), smallFourFont, 10, 0.7f, true));</span>
+<span class="fc" id="L407">        phrase.add(new Chunk(&quot;\n手  机: &quot;, smallFourFont));</span>
+<span class="fc" id="L408">        phrase.add(ItextUtils.leastUnderlineChunk(JS002Json.getInputWeiTuoDanWei0ShouJi(), smallFourFont, 10, 0.7f, true));</span>
+<span class="fc" id="L409">        phrase.add(new Chunk(&quot;\nE-mail: &quot;, smallFourFont));</span>
+<span class="fc" id="L410">        phrase.add(ItextUtils.leastUnderlineChunk(JS002Json.getInputWeiTuoDanWei0Email(), smallFourFont, 10, 0.7f, true));</span>
+<span class="fc" id="L411">        phrase.add(new Chunk(&quot;\n网  址: &quot;, smallFourFont));</span>
+<span class="fc" id="L412">        phrase.add(ItextUtils.leastUnderlineChunk(JS002Json.getInputWeiTuoDanWei0WangZhi(), smallFourFont, 10, 0.5f, true));</span>
+<span class="fc" id="L413">        cell.setPhrase(phrase);</span>
+<span class="fc" id="L414">        table.addCell(cell);</span>
+<span class="fc" id="L415">        table.addCell(ItextUtils.createCell(&quot;国家重点实验室联系方式&quot;, smallFourBoldFont, Element.ALIGN_CENTER, 2, 2, 14f,  paddings3, borderWidth));</span>
+<span class="fc" id="L416">        table.addCell(ItextUtils.createCell(</span>
+                &quot;单位地址: 南京市栖霞区仙林大道163号\n&quot; +
+                        &quot;邮政编码: 210023\n&quot; +
+                        &quot;电话: 86-25-89683467\n&quot; +
+                        &quot;传真: 86-25-89686596\n&quot; +
+                        &quot;网址: http://keysoftlab.nju.edu.cn \n&quot; +
+                        &quot;E-mail: keysoftlab@nju.edu.cn&quot;, smallFourFont, Element.ALIGN_LEFT, 16, 2, 18f,  paddings3, borderWidth));
+
+<span class="fc" id="L424">        table.addCell(ItextUtils.createCell(&quot;&quot;, smallFourBoldFont, Element.ALIGN_CENTER, 2, 14, 18f,  paddings3, borderWidth));</span>
+<span class="fc" id="L425">        float[] paddings4 = new float[]{2f, 6f, 6f, 6f};</span>
+<span class="fc" id="L426">        table.addCell(ItextUtils.createCell(&quot;密级&quot;, textfontBOLD, Element.ALIGN_LEFT, 6, 2, 14f,  paddings4, borderWidth));</span>
+<span class="fc" id="L427">        cell = ItextUtils.createCell(Element.ALIGN_LEFT, 25, 2, 14f,  new float[]{3f, 5f, 2f, 2f}, borderWidth);</span>
+<span class="fc" id="L428">        phrase = new Phrase();</span>
+<span class="fc" id="L429">        phrase.add(ItextUtils.crossSetFont(new String[]{&quot;&quot;,</span>
+<span class="fc" id="L430">                singleChoice[isTicked(JS002Json.getSingleMiJi01())], &quot;无密级  &quot;, singleChoice[isTicked(JS002Json.getSingleMiJi02())], &quot;秘密  &quot;, singleChoice[isTicked(JS002Json.getSingleMiJi03())], &quot;机密&quot;, }, textfont, symbolfont));</span>
+<span class="fc" id="L431">        cell.setPhrase(phrase);</span>
+<span class="fc" id="L432">        table.addCell(cell);</span>
+<span class="fc" id="L433">        table.addCell(ItextUtils.createCell(&quot;查杀病毒&quot;, textfontBOLD, Element.ALIGN_LEFT, 6, 2, 14f,  new float[]{3f, 7f, 6f, 6f}, borderWidth));</span>
+<span class="fc" id="L434">        cell = ItextUtils.createCell(Element.ALIGN_LEFT, 25, 2, 14f,  new float[]{3f, 7f, 2f, 2f}, borderWidth);</span>
+<span class="fc" id="L435">        phrase = new Phrase();</span>
+<span class="fc" id="L436">        phrase.add(ItextUtils.crossSetFont(new String[]{&quot;&quot;,</span>
+<span class="fc" id="L437">                singleChoice[isTicked(JS002Json.getSingleChaShaBingDu01())], &quot;已完成  &quot;, singleChoice[isTicked(JS002Json.getSingleChaShaBingDu02())], &quot;无法完成（所用查杀工具&quot;}, textfont, symbolfont));</span>
+<span class="fc" id="L438">        phrase.add(ItextUtils.leastUnderlineChunk(JS002Json.getInputChaShaBingDu02(), textfont, 8, 0.7f, false));</span>
+<span class="fc" id="L439">        phrase.add(new Chunk(&quot;）&quot;, textfont));</span>
+<span class="fc" id="L440">        cell.setPhrase(phrase);</span>
+<span class="fc" id="L441">        table.addCell(cell);</span>
+<span class="fc" id="L442">        table.addCell(ItextUtils.createCell(&quot;材料检查&quot;, textfontBOLD, Element.ALIGN_LEFT, 6, 2, 14f,  paddings4, borderWidth));</span>
+<span class="fc" id="L443">        cell = ItextUtils.createCell(Element.ALIGN_LEFT, 25, 2, 14f,  new float[]{3f, 5f, 2f, 2f}, borderWidth);</span>
+<span class="fc" id="L444">        phrase = new Phrase();</span>
+<span class="fc" id="L445">        phrase.add(ItextUtils.crossSetFont(new String[]{</span>
+                &quot;测试样品：&quot;,
+<span class="fc" id="L447">                multiChoice[isTicked(JS002Json.getMultiCaiLiaoJianCha0CeshiYangPing01())], &quot;源代码  &quot;, multiChoice[isTicked(JS002Json.getMultiCaiLiaoJianCha0CeshiYangPing02())], &quot;可执行文件\n&quot; +</span>
+                &quot;需求文档：&quot;,
+<span class="fc" id="L449">                multiChoice[isTicked(JS002Json.getMultiCaiLiaoJianCha0XuQiuWenDang01())], &quot;项目计划任务书 &quot;, multiChoice[isTicked(JS002Json.getMultiCaiLiaoJianCha0XuQiuWenDang02())], &quot;需求分析报告 &quot;, multiChoice[isTicked(JS002Json.getMultiCaiLiaoJianCha0XuQiuWenDang03())], &quot;合同\n&quot; +</span>
+                &quot;用户文档：&quot;,
+<span class="fc" id="L451">                multiChoice[isTicked(JS002Json.getMultiCaiLiaoJianCha0YongHuWenDang01())], &quot;用户手册  &quot;, multiChoice[isTicked(JS002Json.getMultiCaiLiaoJianCha0YongHuWenDang02())], &quot;用户指南\n&quot; +</span>
+                &quot;操作文档：&quot;,
+<span class="fc" id="L453">                multiChoice[isTicked(JS002Json.getMultiCaiLiaoJianCha0CaoZuoWenDang01())], &quot;操作员手册  &quot;, multiChoice[isTicked(JS002Json.getMultiCaiLiaoJianCha0CaoZuoWenDang02())], &quot;安装手册  &quot;, multiChoice[isTicked(JS002Json.getMultiCaiLiaoJianCha0CaoZuoWenDang03())], &quot;诊断手册  &quot;, multiChoice[isTicked(JS002Json.getMultiCaiLiaoJianCha0CaoZuoWenDang04())], &quot;支持手册\n&quot; +</span>
+                &quot;其他：&quot;}, textfont, symbolfont));
+<span class="fc" id="L455">        phrase.add(new Chunk(JS002Json.getInputCaiLiaoJianCha0QiTa(), textfont));</span>
+<span class="fc" id="L456">        cell.setPhrase(phrase);</span>
+<span class="fc" id="L457">        table.addCell(cell);</span>
+<span class="fc" id="L458">        table.addCell(ItextUtils.createCell(&quot;确认意见&quot;, textfontBOLD, Element.ALIGN_LEFT, 6, 2, 14f,  paddings4, borderWidth));</span>
+<span class="fc" id="L459">        cell = ItextUtils.createCell(Element.ALIGN_LEFT, 25, 2, 14f,  new float[]{3f, 5f, 2f, 2f}, borderWidth);</span>
+<span class="fc" id="L460">        phrase = new Phrase();</span>
+<span class="fc" id="L461">        phrase.add(ItextUtils.crossSetFont(new String[]{&quot;&quot;,</span>
+<span class="fc" id="L462">                singleChoice[isTicked(JS002Json.getSingleQueRenYiJian01())], &quot;测试所需材料不全，未达到受理条件。\n&quot;,</span>
+<span class="fc" id="L463">                singleChoice[isTicked(JS002Json.getSingleQueRenYiJian02())], &quot;属依据国家标准或自编非标规范进行的常规检测，有资质、能力和资源满足委托方要求。 \n&quot;,</span>
+<span class="fc" id="L464">                singleChoice[isTicked(JS002Json.getSingleQueRenYiJian03())], &quot;无国家标准和规范依据，或实验室缺乏检测设备和工具，无法完成检测。\n&quot;,</span>
+<span class="fc" id="L465">                singleChoice[isTicked(JS002Json.getSingleQueRenYiJian04())], &quot;超出实验室能力和资质范围，无法完成检测。&quot;}, textfont, symbolfont));</span>
+<span class="fc" id="L466">        cell.setPhrase(phrase);</span>
+<span class="fc" id="L467">        table.addCell(cell);</span>
+<span class="fc" id="L468">        table.addCell(ItextUtils.createCell(&quot;受理意见&quot;, textfontBOLD, Element.ALIGN_LEFT, 6, 2, 14f,  paddings4, borderWidth));</span>
+<span class="fc" id="L469">        cell = ItextUtils.createCell(Element.ALIGN_LEFT, 25, 2, 14f,  new float[]{3f, 5f, 2f, 2f}, borderWidth);</span>
+<span class="fc" id="L470">        phrase = new Phrase();</span>
+<span class="fc" id="L471">        phrase.add(ItextUtils.crossSetFont(new String[]{&quot;&quot;,</span>
+<span class="fc" id="L472">                singleChoice[isTicked(JS002Json.getSingleShouLiYiJian01())], &quot;受理-进入项目立项和合同评审流程  &quot;,</span>
+<span class="fc" id="L473">                singleChoice[isTicked(JS002Json.getSingleShouLiYiJian02())], &quot;不受理  &quot;,</span>
+<span class="fc" id="L474">                singleChoice[isTicked(JS002Json.getSingleShouLiYiJian03())], &quot;进一步联系&quot;}, textfont, symbolfont));</span>
+<span class="fc" id="L475">        cell.setPhrase(phrase);</span>
+<span class="fc" id="L476">        table.addCell(cell);</span>
+<span class="fc" id="L477">        table.addCell(ItextUtils.createCell(&quot;测试项目编号&quot;, textfontBOLD, Element.ALIGN_LEFT, 6, 2, 14f,  paddings4, borderWidth));</span>
+<span class="fc" id="L478">        table.addCell(ItextUtils.createCell(JS002Json.getInputCeShiXiangMuBianHao(), textfont, Element.ALIGN_LEFT, 25, 2, 18f,  paddings4, borderWidth));</span>
+<span class="fc" id="L479">        cell = ItextUtils.createCell(Element.ALIGN_LEFT, 31, 2, 14f,  paddings4, borderWidth);</span>
+<span class="fc" id="L480">        phrase = new Phrase();</span>
+<span class="fc" id="L481">        phrase.add(new Chunk(&quot;备注: &quot;, textfontBOLD));</span>
+<span class="fc" id="L482">        phrase.add(new Chunk(JS002Json.getInputBeiZhu() +</span>
+                &quot;\n\n\n\n\n\n&quot;, textfont));
+<span class="fc" id="L484">        phrase.add(new Chunk(&quot;受理人（签字）____________________      日期 ____________________&quot;, textfontBOLD));</span>
+<span class="fc" id="L485">        cell.setPhrase(phrase);</span>
+<span class="fc" id="L486">        table.addCell(cell);</span>
+
+<span class="fc" id="L488">        table.addCell(ItextUtils.createCell(&quot;委托人填写&quot;, textfontBOLD, Element.ALIGN_LEFT, 2, 2, 14f,  paddings4, borderWidth));</span>
+<span class="fc" id="L489">        cell = ItextUtils.createCell(Element.ALIGN_LEFT, 31, 2, 14f,  paddings4, borderWidth);</span>
+<span class="fc" id="L490">        phrase = new Phrase();</span>
+<span class="fc" id="L491">        phrase.add(new Chunk(&quot;\n\n\n\n&quot;, textfont));</span>
+<span class="fc" id="L492">        phrase.add(new Chunk(&quot;受理人（签字）____________________      日期 ____________________&quot;, textfontBOLD));</span>
+<span class="fc" id="L493">        cell.setPhrase(phrase);</span>
+<span class="fc" id="L494">        table.addCell(cell);</span>
+
+<span class="fc" id="L496">        document.add(new Paragraph(&quot;\n&quot;));</span>
+<span class="fc" id="L497">        document.add(title);</span>
+<span class="fc" id="L498">        document.add(text);</span>
+<span class="fc" id="L499">        document.add(table);</span>
+<span class="fc" id="L500">    }</span>
+
+    static int isTicked(String option) {
+        int i;
+        try {
+<span class="fc" id="L505">            i = Integer.parseInt(option);</span>
+<span class="fc" id="L506">        } catch (Exception e) { i = 0; }</span>
+<span class="pc bpc" id="L507" title="2 of 4 branches missed.">        if (i &gt; 1 || i &lt; 0) i = 0;</span>
+<span class="fc" id="L508">        return i;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DefaultSampleService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-sample</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.sample.service</a> &gt; <span class="el_source">DefaultSampleService.java</span></div><h1>DefaultSampleService.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.sample.service;
+
+import com.njustc.onlinebiz.common.model.PageResult;
+import com.njustc.onlinebiz.common.model.Role;
+import com.njustc.onlinebiz.common.model.entrust.Entrust;
+import com.njustc.onlinebiz.common.model.sample.SampleCollection;
+import com.njustc.onlinebiz.common.model.sample.SampleCollectionStage;
+import com.njustc.onlinebiz.sample.dao.SampleDAO;
+import com.njustc.onlinebiz.sample.exception.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
+
+<span class="fc" id="L17">@Slf4j</span>
+@Service
+public class DefaultSampleService implements SampleService {
+  private final SampleDAO sampleDAO;
+  private final RestTemplate restTemplate;
+<span class="fc" id="L22">  private final String ENTRUST_SERVICE = &quot;http://onlinebiz-entrust&quot;;</span>
+
+<span class="fc" id="L24">  public DefaultSampleService(SampleDAO sampleDAO, RestTemplate restTemplate) {</span>
+<span class="fc" id="L25">    this.sampleDAO = sampleDAO;</span>
+<span class="fc" id="L26">    this.restTemplate = restTemplate;</span>
+<span class="fc" id="L27">  }</span>
+
+  @Override
+  public String createSampleCollection(String entrustId, Long userId, Role userRole) {
+    // 权限确认
+<span class="pc bpc" id="L32" title="1 of 4 branches missed.">    if (userRole != Role.ADMIN &amp;&amp; userRole != Role.MARKETER) {</span>
+<span class="fc" id="L33">      throw new SamplePermissionDeniedException(&quot;只有负责此委托的市场部人员和管理员可以添加样品集信息&quot;);</span>
+    }
+    // 检查人员一致性
+<span class="fc" id="L36">    String params = &quot;?userId=&quot; + userId + &quot;&amp;userRole=&quot; + userRole;</span>
+<span class="fc" id="L37">    String url = ENTRUST_SERVICE + &quot;/api/entrust/&quot; + entrustId;</span>
+    Entrust entrust;
+    try{
+<span class="fc" id="L40">      entrust = restTemplate.getForObject(url + params, Entrust.class);</span>
+<span class="nc" id="L41">    } catch (HttpClientErrorException e) {</span>
+<span class="nc" id="L42">      throw new SampleDAOFailureException(e.getResponseBodyAsString());</span>
+<span class="fc" id="L43">    }</span>
+    // 判空
+<span class="fc bfc" id="L45" title="All 2 branches covered.">    if (entrust == null) {</span>
+<span class="fc" id="L46">      throw new SampleDAOFailureException(&quot;找不到对应委托申请&quot;);</span>
+    }
+<span class="fc bfc" id="L48" title="All 2 branches covered.">    if (!userId.equals(entrust.getMarketerId())) {</span>
+<span class="fc" id="L49">      throw new SampleDAOFailureException(&quot;委托还未分配市场部人员或操作人员ID与委托对应人员ID不匹配&quot;);</span>
+    }
+<span class="fc" id="L51">    SampleCollection sampleCollection = new SampleCollection();</span>
+<span class="fc" id="L52">    sampleCollection.setEntrustId(entrustId);</span>
+<span class="fc" id="L53">    sampleCollection.setMarketerId(entrust.getMarketerId());</span>
+<span class="fc" id="L54">    sampleCollection.setStage(SampleCollectionStage.RECEIVED);</span>
+<span class="fc" id="L55">    return sampleDAO.insertSampleCollection(sampleCollection).getId();</span>
+  }
+
+  @Override
+  public SampleCollection findSpecificCollection(String sampleCollectionId, Long userId, Role userRole) {
+    // 权限确认
+<span class="fc bfc" id="L61" title="All 2 branches covered.">    if (userRole == Role.CUSTOMER) {</span>
+<span class="fc" id="L62">      throw new SamplePermissionDeniedException(&quot;只有测试中心内部人员能够查看样品信息&quot;);</span>
+    }
+<span class="fc" id="L64">    SampleCollection sampleCollection = sampleDAO.findSampleCollectionById(sampleCollectionId);</span>
+<span class="fc bfc" id="L65" title="All 2 branches covered.">    if (sampleCollection == null) {</span>
+<span class="fc" id="L66">      throw new SampleNotFoundException(&quot;未找到该样品信息&quot;);</span>
+    }
+<span class="fc" id="L68">    return sampleCollection;</span>
+  }
+
+  @Override
+  public PageResult&lt;SampleCollection&gt; findAllCollections(Integer page, Integer pageSize, Long userId, Role userRole) {
+<span class="pc bpc" id="L73" title="1 of 4 branches missed.">    if (page &lt;= 0 || pageSize &lt;= 0) {</span>
+<span class="fc" id="L74">      throw new SampleInvalidArgumentException(&quot;页号或每页大小必须为正整数&quot;);</span>
+    }
+    long total;
+    List&lt;SampleCollection&gt; list;
+<span class="fc bfc" id="L78" title="All 2 branches covered.">    if  (userRole == Role.CUSTOMER) {</span>
+<span class="fc" id="L79">      throw new SamplePermissionDeniedException(&quot;只有测试中心内部人员可以查看样品信息&quot;);</span>
+    }
+    // 测试中心内部人员查看样品集信息，具有一致性视图
+<span class="fc" id="L82">    total = sampleDAO.countAll();</span>
+<span class="fc" id="L83">    list = sampleDAO.findAllCollections(page, pageSize);</span>
+
+<span class="fc" id="L85">    return new PageResult&lt;&gt;(page, pageSize, total, list);</span>
+  }
+
+  @Override
+  public void updateSampleCollection(String sampleCollectionId, SampleCollection sampleCollection, Long userId, Role userRole) {
+    // if (!sampleCollectionId.equals(sampleCollection.getId())) {
+    //    throw new SampleDAOFailureException(&quot;待更新的样品集ID与路径参数不一致&quot;);
+    // }
+<span class="fc" id="L93">    SampleCollection oldSampleCollection = sampleDAO.findSampleCollectionById(sampleCollectionId);</span>
+    // 判空
+<span class="fc bfc" id="L95" title="All 2 branches covered.">    if (oldSampleCollection == null) {</span>
+<span class="fc" id="L96">      throw new SampleNotFoundException(&quot;找不到该样品集信息&quot;);</span>
+    }
+    // 权限检查
+<span class="pc bpc" id="L99" title="2 of 4 branches missed.">    if (userRole != Role.ADMIN &amp;&amp; userRole != Role.MARKETING_SUPERVISOR ) {</span>
+<span class="fc bfc" id="L100" title="All 4 branches covered.">      if (userRole != Role.MARKETER || !userId.equals(oldSampleCollection.getMarketerId())) {</span>
+<span class="fc" id="L101">        throw new SamplePermissionDeniedException(&quot;无权更改样品信息&quot;);</span>
+      }
+      // 确认状态
+<span class="fc bfc" id="L104" title="All 2 branches covered.">      if (oldSampleCollection.getStage() != SampleCollectionStage.RECEIVED) {</span>
+<span class="fc" id="L105">        throw new SampleInvalidStageException(&quot;当前阶段不能修改样品信息&quot;);</span>
+      }
+    }
+    // DAO只更新name, stage, samples
+<span class="pc bpc" id="L109" title="1 of 2 branches missed.">    if (!sampleDAO.updateSampleCollection(sampleCollectionId, sampleCollection)) {</span>
+<span class="fc" id="L110">      throw new SampleDAOFailureException(&quot;更新内容失败&quot;);</span>
+    }
+<span class="nc" id="L112">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

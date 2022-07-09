@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TestRecordController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-test</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.test.controller.testrecord</a> &gt; <span class="el_source">TestRecordController.java</span></div><h1>TestRecordController.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.test.controller.testrecord;
+
+import com.njustc.onlinebiz.common.model.Role;
+import com.njustc.onlinebiz.common.model.test.testrecord.TestRecordList;
+import com.njustc.onlinebiz.test.service.testrecord.TestRecordService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+/**
+ * 测试记录控制器
+ *
+ */
+<span class="fc" id="L15">@Slf4j</span>
+@RestController
+@RequestMapping(&quot;/api&quot;)
+public class TestRecordController {
+    private final TestRecordService testRecordService;
+
+<span class="fc" id="L21">    public TestRecordController(TestRecordService testRecordService) {</span>
+<span class="fc" id="L22">        this.testRecordService = testRecordService;</span>
+<span class="fc" id="L23">    }</span>
+
+    /**
+     * 查看任意测试记录表的详细信息
+     *
+     * @param testRecordId 测试记录id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @return {@link TestRecordList}
+     */
+    @GetMapping(&quot;/test/testRecord/{testRecordId}&quot;)
+    public TestRecordList getTestRecord(
+            @PathVariable(&quot;testRecordId&quot;) String testRecordId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole) {
+<span class="nc" id="L38">        return testRecordService.findTestRecordList(testRecordId, userId, userRole);</span>
+    }
+
+    /**
+     * 修改测试记录表
+     *
+     * @param testRecordId 测试记录id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @param content 内容
+     */
+    @PostMapping(&quot;/test/testRecord/{testRecordId}/content&quot;)
+    public void updateContent(
+            @PathVariable(&quot;testRecordId&quot;) String testRecordId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole,
+            @RequestBody List&lt;TestRecordList.TestRecord&gt; content
+    ) {
+<span class="nc" id="L56">        testRecordService.updateTestRecordList(testRecordId, content, userId, userRole);</span>
+<span class="nc" id="L57">    }</span>
+
+    /**
+     * 删除一份测试记录表
+     *
+     * @param testRecordId 测试记录id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     */
+    @DeleteMapping(&quot;/test/testRecord/{testRecordId}&quot;)
+    public void removeTestRecord(
+            @PathVariable(&quot;testRecordId&quot;) String testRecordId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L72">        testRecordService.removeTestRecordList(testRecordId, userId, userRole);</span>
+<span class="nc" id="L73">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

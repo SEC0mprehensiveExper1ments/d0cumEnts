@@ -1,0 +1,12 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+onlinebiz-contract,com.njustc.onlinebiz.contract,ContractServiceApplication,8,0,0,0,3,0,2,0,2,0
+onlinebiz-contract,com.njustc.onlinebiz.contract.exception,ContractDAOFailureException,4,0,0,0,2,0,1,0,1,0
+onlinebiz-contract,com.njustc.onlinebiz.contract.exception,ContractInvalidStageException,0,4,0,0,0,2,0,1,0,1
+onlinebiz-contract,com.njustc.onlinebiz.contract.exception,ContractNotFoundException,0,4,0,0,0,2,0,1,0,1
+onlinebiz-contract,com.njustc.onlinebiz.contract.exception,ContractCreateFailureException,0,4,0,0,0,2,0,1,0,1
+onlinebiz-contract,com.njustc.onlinebiz.contract.exception,ContractPermissionDeniedException,0,4,0,0,0,2,0,1,0,1
+onlinebiz-contract,com.njustc.onlinebiz.contract.controller,ContractController,120,0,0,0,26,0,13,0,13,0
+onlinebiz-contract,com.njustc.onlinebiz.contract.controller,ContractControllerAdvice,67,0,0,0,18,0,9,0,9,0
+onlinebiz-contract,com.njustc.onlinebiz.contract.configuration,ContractServiceConfiguration,7,0,0,0,2,0,2,0,2,0
+onlinebiz-contract,com.njustc.onlinebiz.contract.service,DefaultContractService,274,663,83,97,49,138,69,38,1,16
+onlinebiz-contract,com.njustc.onlinebiz.contract.dao,MongoContractDAO,191,0,8,0,34,0,15,0,11,0

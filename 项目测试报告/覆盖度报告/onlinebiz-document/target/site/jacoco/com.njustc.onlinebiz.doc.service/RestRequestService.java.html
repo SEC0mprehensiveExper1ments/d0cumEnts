@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RestRequestService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-document</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.doc.service</a> &gt; <span class="el_source">RestRequestService.java</span></div><h1>RestRequestService.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.doc.service;
+
+
+import com.njustc.onlinebiz.common.model.Role;
+import com.njustc.onlinebiz.common.model.contract.Contract;
+import com.njustc.onlinebiz.common.model.entrust.Entrust;
+import com.njustc.onlinebiz.common.model.entrust.EntrustQuote;
+import com.njustc.onlinebiz.common.model.test.report.Report;
+import com.njustc.onlinebiz.common.model.test.review.EntrustTestReview;
+import com.njustc.onlinebiz.common.model.test.review.ReportReview;
+import com.njustc.onlinebiz.common.model.test.review.SchemeReview;
+import com.njustc.onlinebiz.common.model.test.scheme.Scheme;
+import com.njustc.onlinebiz.common.model.test.testcase.Testcase;
+import com.njustc.onlinebiz.common.model.test.testissue.TestIssueList;
+import com.njustc.onlinebiz.common.model.test.testrecord.TestRecordList;
+import com.njustc.onlinebiz.doc.exception.DownloadDAOFailureException;
+import com.njustc.onlinebiz.doc.exception.DownloadNotFoundException;
+import com.njustc.onlinebiz.doc.exception.DownloadPermissionDeniedException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+@Service
+public class RestRequestService {
+
+    private static final String ENTRUST_SERVICE = &quot;http://onlinebiz-entrust&quot;;
+    private static final String CONTRACT_SERVICE = &quot;http://onlinebiz-contract&quot;;
+    private static final String TEST_SERVICE = &quot;http://onlinebiz-test&quot;;
+    private final RestTemplate restTemplate;
+
+<span class="fc" id="L32">    public RestRequestService(RestTemplate restTemplate) {</span>
+<span class="fc" id="L33">        this.restTemplate = restTemplate;</span>
+<span class="fc" id="L34">    }</span>
+
+    /**
+     * 通过 entrustId 向entrust服务获取对象，以供后续生成文档并下载
+     * @param entrustId 待下载的委托 id
+     * @param userId 操作的用户 id
+     * @param userRole 操作的用户角色
+     * @return 若成功从entrust服务中获得对象，则返回；否则，返回异常信息
+     * */
+    public Entrust getEntrustById(String entrustId, Long userId, Role userRole) {
+        // 调用entrust服务的getEntrust的接口
+<span class="fc" id="L45">        String params = &quot;?userId=&quot; + userId + &quot;&amp;userRole=&quot; + userRole;</span>
+<span class="fc" id="L46">        String url = ENTRUST_SERVICE + &quot;/api/entrust/&quot; + entrustId;</span>
+<span class="fc" id="L47">        ResponseEntity&lt;Entrust&gt; responseEntity = restTemplate.getForEntity(url + params, Entrust.class);</span>
+        // 检查委托 id 及权限的有效性
+<span class="pc bpc" id="L49" title="1 of 4 branches missed.">        if (responseEntity.getStatusCode() == HttpStatus.FORBIDDEN || responseEntity.getStatusCode() == HttpStatus.BAD_REQUEST) {</span>
+<span class="fc" id="L50">            throw new DownloadPermissionDeniedException(&quot;无权下载该文件&quot;);</span>
+        }
+<span class="fc bfc" id="L52" title="All 2 branches covered.">        else if (responseEntity.getStatusCode() == HttpStatus.NOT_FOUND) {</span>
+<span class="fc" id="L53">            throw new DownloadNotFoundException(&quot;未找到该委托ID&quot;);</span>
+        }
+<span class="pc bpc" id="L55" title="1 of 4 branches missed.">        else if (responseEntity.getStatusCode() != HttpStatus.OK &amp;&amp; responseEntity.getStatusCode() != HttpStatus.ACCEPTED) {</span>
+<span class="fc" id="L56">            throw new DownloadDAOFailureException(&quot;其他问题&quot;);</span>
+        }
+<span class="fc" id="L58">        Entrust entrust = responseEntity.getBody();</span>
+
+<span class="fc" id="L60">        return entrust;</span>
+    }
+
+    /**
+     * 通过 contracId 向contract服务获取对象，以供后续生成文档并下载
+     * @param contracId 待下载的合同 id
+     * @param userId 操作的用户 id
+     * @param userRole 操作的用户角色
+     * @return 若成功从contract服务中获得对象，则返回；否则，返回异常信息
+     * */
+    public Contract getContractById(String contracId, Long userId, Role userRole) {
+        // 调用contract服务的getContract的接口
+<span class="fc" id="L72">        String params = &quot;?userId=&quot; + userId + &quot;&amp;userRole=&quot; + userRole;</span>
+<span class="fc" id="L73">        String url = CONTRACT_SERVICE + &quot;/api/contract/&quot; + contracId;</span>
+<span class="fc" id="L74">        ResponseEntity&lt;Contract&gt; responseEntity = restTemplate.getForEntity(url + params, Contract.class);</span>
+        // 检查委托 id 及权限的有效性
+<span class="pc bpc" id="L76" title="1 of 4 branches missed.">        if (responseEntity.getStatusCode() == HttpStatus.FORBIDDEN || responseEntity.getStatusCode() == HttpStatus.BAD_REQUEST) {</span>
+<span class="fc" id="L77">            throw new DownloadPermissionDeniedException(&quot;无权下载该文件&quot;);</span>
+        }
+<span class="fc bfc" id="L79" title="All 2 branches covered.">        else if (responseEntity.getStatusCode() == HttpStatus.NOT_FOUND) {</span>
+<span class="fc" id="L80">            throw new DownloadNotFoundException(&quot;未找到该委托ID&quot;);</span>
+        }
+<span class="pc bpc" id="L82" title="1 of 4 branches missed.">        else if (responseEntity.getStatusCode() != HttpStatus.OK &amp;&amp; responseEntity.getStatusCode() != HttpStatus.ACCEPTED) {</span>
+<span class="fc" id="L83">            throw new DownloadDAOFailureException(&quot;其他问题&quot;);</span>
+        }
+<span class="fc" id="L85">        Contract contract = responseEntity.getBody();</span>
+
+<span class="fc" id="L87">        return contract;</span>
+    }
+
+    public Scheme getScheme(String schemeId, Long userId, Role userRole) {
+<span class="nc" id="L91">        String params = &quot;?userId=&quot; + userId + &quot;&amp;userRole=&quot; + userRole;</span>
+<span class="nc" id="L92">        String url = TEST_SERVICE + &quot;/api/test/scheme/&quot; + schemeId;</span>
+<span class="nc" id="L93">        ResponseEntity&lt;Scheme&gt; responseEntity = restTemplate.getForEntity(url + params, Scheme.class);</span>
+        // 检查测试方案 id 及权限有效性
+<span class="nc bnc" id="L95" title="All 2 branches missed.">        if (responseEntity.getStatusCode() == HttpStatus.FORBIDDEN) {</span>
+<span class="nc" id="L96">            throw new DownloadPermissionDeniedException(&quot;无权下载该文件&quot;);</span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">        } else if (responseEntity.getStatusCode() == HttpStatus.NOT_FOUND) {</span>
+<span class="nc" id="L98">            throw new DownloadNotFoundException(&quot;未找到该测试方案ID&quot;);</span>
+<span class="nc bnc" id="L99" title="All 4 branches missed.">        } else if (responseEntity.getStatusCode() != HttpStatus.OK &amp;&amp; responseEntity.getStatusCode() != HttpStatus.ACCEPTED) {</span>
+<span class="nc" id="L100">            throw new DownloadDAOFailureException(&quot;其他问题&quot;);</span>
+        }
+<span class="nc" id="L102">        Scheme scheme = responseEntity.getBody();</span>
+<span class="nc" id="L103">        return scheme;</span>
+    }
+
+    public Report getReport(String reportId, Long userId, Role userRole) {
+<span class="nc" id="L107">        String params = &quot;?userId=&quot; + userId + &quot;&amp;userRole=&quot; + userRole;</span>
+<span class="nc" id="L108">        String url = TEST_SERVICE + &quot;/api/test/report/&quot; + reportId;</span>
+<span class="nc" id="L109">        ResponseEntity&lt;Report&gt; responseEntity = restTemplate.getForEntity(url + params, Report.class);</span>
+        // 检查测试报告 id 及权限有效性
+<span class="nc bnc" id="L111" title="All 2 branches missed.">        if (responseEntity.getStatusCode() == HttpStatus.FORBIDDEN) {</span>
+<span class="nc" id="L112">            throw new DownloadPermissionDeniedException(&quot;无权下载该文件&quot;);</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">        } else if (responseEntity.getStatusCode() == HttpStatus.NOT_FOUND) {</span>
+<span class="nc" id="L114">            throw new DownloadNotFoundException(&quot;未找到该测试报告ID&quot;);</span>
+<span class="nc bnc" id="L115" title="All 4 branches missed.">        } else if (responseEntity.getStatusCode() != HttpStatus.OK &amp;&amp; responseEntity.getStatusCode() != HttpStatus.ACCEPTED) {</span>
+<span class="nc" id="L116">            throw new DownloadDAOFailureException(&quot;其他问题&quot;);</span>
+        }
+<span class="nc" id="L118">        Report report = responseEntity.getBody();</span>
+<span class="nc" id="L119">        return report;</span>
+    }
+
+    /**
+     * 通过 testcaseId 向test服务获取对象，以供后续生成文档并下载
+     * @param testcaseId 待下载的测试用例表 id
+     * @param userId 操作的用户 id
+     * @param userRole 操作的用户角色
+     * @return 若成功从test服务中获得对象，则返回；否则，返回异常信息
+     * */
+    public Testcase getTestcaseById(String testcaseId, Long userId, Role userRole) {
+        // 调用test服务的getTestCase接口
+<span class="fc" id="L131">        String params = &quot;?userId=&quot; + userId + &quot;&amp;userRole=&quot; + userRole;</span>
+<span class="fc" id="L132">        String url = TEST_SERVICE + &quot;/api/test/testcase/&quot; + testcaseId;</span>
+<span class="fc" id="L133">        ResponseEntity&lt;Testcase&gt; responseEntity = restTemplate.getForEntity(url + params, Testcase.class);</span>
+        // 检查测试用例表 id 及权限有效性
+<span class="pc bpc" id="L135" title="1 of 4 branches missed.">        if (responseEntity.getStatusCode() == HttpStatus.FORBIDDEN || responseEntity.getStatusCode() == HttpStatus.BAD_REQUEST) {</span>
+<span class="fc" id="L136">            throw new DownloadPermissionDeniedException(&quot;无权下载该文件&quot;);</span>
+        }
+<span class="fc bfc" id="L138" title="All 2 branches covered.">        else if (responseEntity.getStatusCode() == HttpStatus.NOT_FOUND) {</span>
+<span class="fc" id="L139">            throw new DownloadNotFoundException(&quot;未找到该测试用例表ID&quot;);</span>
+        }
+<span class="pc bpc" id="L141" title="1 of 4 branches missed.">        else if (responseEntity.getStatusCode() != HttpStatus.OK &amp;&amp; responseEntity.getStatusCode() != HttpStatus.ACCEPTED) {</span>
+<span class="fc" id="L142">            throw new DownloadDAOFailureException(&quot;其他问题&quot;);</span>
+        }
+<span class="fc" id="L144">        Testcase testcase = responseEntity.getBody();</span>
+
+<span class="fc" id="L146">        return testcase;</span>
+    }
+
+    /**
+     * 通过 testRecordId 向test服务获取对象，以供后续生成文档并下载
+     * @param testRecordId 待下载的测试记录表 id
+     * @param userId 操作的用户 id
+     * @param userRole 操作的用户角色
+     * @return 若成功从test服务中获得对象，则返回；否则，返回异常信息
+     * */
+    public TestRecordList getTestRecordListById(String testRecordId, Long userId, Role userRole) {
+        // 调用test服务的getTestRecord接口
+<span class="fc" id="L158">        String params = &quot;?userId=&quot; + userId + &quot;&amp;userRole=&quot; + userRole;</span>
+<span class="fc" id="L159">        String url = TEST_SERVICE + &quot;/api/test/testRecord/&quot; + testRecordId;</span>
+<span class="fc" id="L160">        ResponseEntity&lt;TestRecordList&gt; responseEntity = restTemplate.getForEntity(url + params, TestRecordList.class);</span>
+        // 检查测试记录表 id 及权限有效性
+<span class="pc bpc" id="L162" title="1 of 4 branches missed.">        if (responseEntity.getStatusCode() == HttpStatus.FORBIDDEN || responseEntity.getStatusCode() == HttpStatus.BAD_REQUEST) {</span>
+<span class="fc" id="L163">            throw new DownloadPermissionDeniedException(&quot;无权下载该文件&quot;);</span>
+        }
+<span class="fc bfc" id="L165" title="All 2 branches covered.">        else if (responseEntity.getStatusCode() == HttpStatus.NOT_FOUND) {</span>
+<span class="fc" id="L166">            throw new DownloadNotFoundException(&quot;未找到该测试记录表ID&quot;);</span>
+        }
+<span class="pc bpc" id="L168" title="1 of 4 branches missed.">        else if (responseEntity.getStatusCode() != HttpStatus.OK &amp;&amp; responseEntity.getStatusCode() != HttpStatus.ACCEPTED) {</span>
+<span class="fc" id="L169">            throw new DownloadDAOFailureException(&quot;其他问题&quot;);</span>
+        }
+<span class="fc" id="L171">        TestRecordList testRecordList = responseEntity.getBody();</span>
+
+<span class="fc" id="L173">        return testRecordList;</span>
+    }
+
+    /**
+     * 通过 testRecordId 向test服务获取对象，以供后续生成文档并下载
+     * @param testIssueId 待下载的测试问题表 id
+     * @param userId 操作的用户 id
+     * @param userRole 操作的用户角色
+     * @return 若成功从test服务中获得对象，则返回；否则，返回异常信息
+     * */
+    public TestIssueList getTestIssueListById(String testIssueId, Long userId, Role userRole) {
+        // 调用test服务的getTestIssue接口
+<span class="fc" id="L185">        String params = &quot;?userId=&quot; + userId + &quot;&amp;userRole=&quot; + userRole;</span>
+<span class="fc" id="L186">        String url = TEST_SERVICE + &quot;/api/test/testIssue/&quot; + testIssueId;</span>
+<span class="fc" id="L187">        ResponseEntity&lt;TestIssueList&gt; responseEntity = restTemplate.getForEntity(url + params, TestIssueList.class);</span>
+        // 检查测试问题表 id 及权限有效性
+<span class="pc bpc" id="L189" title="1 of 4 branches missed.">        if (responseEntity.getStatusCode() == HttpStatus.FORBIDDEN || responseEntity.getStatusCode() == HttpStatus.BAD_REQUEST) {</span>
+<span class="fc" id="L190">            throw new DownloadPermissionDeniedException(&quot;无权下载该文件&quot;);</span>
+        }
+<span class="fc bfc" id="L192" title="All 2 branches covered.">        else if (responseEntity.getStatusCode() == HttpStatus.NOT_FOUND) {</span>
+<span class="fc" id="L193">            throw new DownloadNotFoundException(&quot;未找到该测试问题表ID&quot;);</span>
+        }
+<span class="pc bpc" id="L195" title="1 of 4 branches missed.">        else if (responseEntity.getStatusCode() != HttpStatus.OK &amp;&amp; responseEntity.getStatusCode() != HttpStatus.ACCEPTED) {</span>
+<span class="fc" id="L196">            throw new DownloadDAOFailureException(&quot;其他问题&quot;);</span>
+        }
+<span class="fc" id="L198">        TestIssueList testIssueList = responseEntity.getBody();</span>
+
+<span class="fc" id="L200">        return testIssueList;</span>
+    }
+
+    /**
+     * 通过 entrustTestReviewId 向test服务获取对象，以供后续生成文档并下载
+     * @param entrustTestReviewId 待下载的工作检查表 id
+     * @param userId 操作的用户 id
+     * @param userRole 操作的用户角色
+     * @return 若成功从test服务中获得对象，则返回；否则，返回异常信息
+     * */
+    public EntrustTestReview getEntrustTestReviewById(String entrustTestReviewId, Long userId, Role userRole) {
+        // 调用test服务的getEntrustReview接口
+<span class="fc" id="L212">        String params = &quot;?userId=&quot; + userId + &quot;&amp;userRole=&quot; + userRole;</span>
+<span class="fc" id="L213">        String url = TEST_SERVICE + &quot;/api/review/entrustTest/&quot; + entrustTestReviewId;</span>
+<span class="fc" id="L214">        ResponseEntity&lt;EntrustTestReview&gt; responseEntity = restTemplate.getForEntity(url + params, EntrustTestReview.class);</span>
+        // 检查测试工作检查表 id 及权限有效性
+<span class="pc bpc" id="L216" title="1 of 4 branches missed.">        if (responseEntity.getStatusCode() == HttpStatus.FORBIDDEN || responseEntity.getStatusCode() == HttpStatus.BAD_REQUEST) {</span>
+<span class="fc" id="L217">            throw new DownloadPermissionDeniedException(&quot;无权下载该文件&quot;);</span>
+        }
+<span class="fc bfc" id="L219" title="All 2 branches covered.">        else if (responseEntity.getStatusCode() == HttpStatus.NOT_FOUND) {</span>
+<span class="fc" id="L220">            throw new DownloadNotFoundException(&quot;未找到该工作检查表ID&quot;);</span>
+        }
+<span class="pc bpc" id="L222" title="1 of 4 branches missed.">        else if (responseEntity.getStatusCode() != HttpStatus.OK &amp;&amp; responseEntity.getStatusCode() != HttpStatus.ACCEPTED) {</span>
+<span class="fc" id="L223">            throw new DownloadDAOFailureException(&quot;其他问题&quot;);</span>
+        }
+<span class="fc" id="L225">        EntrustTestReview entrustTestReview = responseEntity.getBody();</span>
+
+<span class="fc" id="L227">        return entrustTestReview;</span>
+    }
+
+    /**
+     * 通过 schemeReviewId 向test服务获取对象，以供后续生成文档并下载
+     * @param schemeReviewId 待下载的方案评审表 id
+     * @param userId 操作的用户 id
+     * @param userRole 操作的用户角色
+     * @return 若成功从test服务中获得对象，则返回；否则，返回异常信息
+     * */
+    public SchemeReview getSchemeReviewById(String schemeReviewId, Long userId, Role userRole) {
+        // 调用test服务的getSchemeReview接口
+<span class="fc" id="L239">        String params = &quot;?userId=&quot; + userId + &quot;&amp;userRole=&quot; + userRole;</span>
+<span class="fc" id="L240">        String url = TEST_SERVICE + &quot;/api/review/scheme/&quot; + schemeReviewId;</span>
+<span class="fc" id="L241">        ResponseEntity&lt;SchemeReview&gt; responseEntity = restTemplate.getForEntity(url + params, SchemeReview.class);</span>
+        // 检查方案评审表 id 及权限有效性
+<span class="pc bpc" id="L243" title="1 of 4 branches missed.">        if (responseEntity.getStatusCode() == HttpStatus.FORBIDDEN || responseEntity.getStatusCode() == HttpStatus.BAD_REQUEST) {</span>
+<span class="fc" id="L244">            throw new DownloadPermissionDeniedException(&quot;无权下载该文件&quot;);</span>
+        }
+<span class="fc bfc" id="L246" title="All 2 branches covered.">        else if (responseEntity.getStatusCode() == HttpStatus.NOT_FOUND) {</span>
+<span class="fc" id="L247">            throw new DownloadNotFoundException(&quot;未找到该测试方案评审表ID&quot;);</span>
+        }
+<span class="pc bpc" id="L249" title="1 of 4 branches missed.">        else if (responseEntity.getStatusCode() != HttpStatus.OK &amp;&amp; responseEntity.getStatusCode() != HttpStatus.ACCEPTED) {</span>
+<span class="fc" id="L250">            throw new DownloadDAOFailureException(&quot;其他问题&quot;);</span>
+        }
+<span class="fc" id="L252">        SchemeReview schemeReview = responseEntity.getBody();</span>
+
+<span class="fc" id="L254">        return schemeReview;</span>
+    }
+
+    /**
+     * 通过 schemeReviewId 向test服务获取对象，以供后续生成文档并下载
+     * @param reportReviewId 测试报告表 id
+     * @param userId 操作的用户 id
+     * @param userRole 操作的用户角色
+     * @return 若成功从test服务中获得对象，则返回；否则，返回异常信息
+     * */
+    public ReportReview getReportReviewById(String reportReviewId, Long userId, Role userRole) {
+        // 调用test服务的getSchemeReview接口
+<span class="fc" id="L266">        String params = &quot;?userId=&quot; + userId + &quot;&amp;userRole=&quot; + userRole;</span>
+<span class="fc" id="L267">        String url = TEST_SERVICE + &quot;/api/review/report/&quot; + reportReviewId;</span>
+<span class="fc" id="L268">        ResponseEntity&lt;ReportReview&gt; responseEntity = restTemplate.getForEntity(url + params, ReportReview.class);</span>
+        // 检查测试报告检查表 id 及权限有效性
+<span class="pc bpc" id="L270" title="1 of 4 branches missed.">        if (responseEntity.getStatusCode() == HttpStatus.FORBIDDEN || responseEntity.getStatusCode() == HttpStatus.BAD_REQUEST) {</span>
+<span class="fc" id="L271">            throw new DownloadPermissionDeniedException(&quot;无权下载该文件&quot;);</span>
+        }
+<span class="fc bfc" id="L273" title="All 2 branches covered.">        else if (responseEntity.getStatusCode() == HttpStatus.NOT_FOUND) {</span>
+<span class="fc" id="L274">            throw new DownloadNotFoundException(&quot;未找到该测试方案评审表ID&quot;);</span>
+        }
+<span class="pc bpc" id="L276" title="1 of 4 branches missed.">        else if (responseEntity.getStatusCode() != HttpStatus.OK &amp;&amp; responseEntity.getStatusCode() != HttpStatus.ACCEPTED) {</span>
+<span class="fc" id="L277">            throw new DownloadDAOFailureException(&quot;其他问题&quot;);</span>
+        }
+<span class="fc" id="L279">        ReportReview reportReview = responseEntity.getBody();</span>
+
+<span class="fc" id="L281">        return reportReview;</span>
+    }
+
+    public EntrustQuote getEntrustQuoteById(String entrustId, Long userId, Role userRole) {
+        // 调用entrust服务的getEntrust的接口
+<span class="nc" id="L286">        String params = &quot;?userId=&quot; + userId + &quot;&amp;userRole=&quot; + userRole;</span>
+<span class="nc" id="L287">        String url = ENTRUST_SERVICE + &quot;/api/entrust/&quot; + entrustId;</span>
+<span class="nc" id="L288">        ResponseEntity&lt;Entrust&gt; responseEntity = restTemplate.getForEntity(url + params, Entrust.class);</span>
+<span class="nc bnc" id="L289" title="All 4 branches missed.">        if (responseEntity.getStatusCode() == HttpStatus.FORBIDDEN || responseEntity.getStatusCode() == HttpStatus.BAD_REQUEST) {</span>
+<span class="nc" id="L290">            throw new DownloadPermissionDeniedException(&quot;无权下载该文件&quot;);</span>
+        }
+<span class="nc bnc" id="L292" title="All 2 branches missed.">        else if (responseEntity.getStatusCode() == HttpStatus.NOT_FOUND) {</span>
+<span class="nc" id="L293">            throw new DownloadNotFoundException(&quot;未找到该委托报价单ID&quot;);</span>
+        }
+<span class="nc bnc" id="L295" title="All 4 branches missed.">        else if (responseEntity.getStatusCode() != HttpStatus.OK &amp;&amp; responseEntity.getStatusCode() != HttpStatus.ACCEPTED) {</span>
+<span class="nc" id="L296">            throw new DownloadDAOFailureException(&quot;其他问题&quot;);</span>
+        }
+<span class="nc" id="L298">        Entrust entrust = responseEntity.getBody();</span>
+<span class="nc bnc" id="L299" title="All 2 branches missed.">        if (entrust == null) {</span>
+<span class="nc" id="L300">            throw new DownloadNotFoundException(&quot;未找到报价单对应的委托&quot;);</span>
+        }
+<span class="nc" id="L302">        EntrustQuote entrustQuote = entrust.getQuote();</span>
+
+<span class="nc" id="L304">        return entrustQuote;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReportController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-test</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.test.controller.report</a> &gt; <span class="el_source">ReportController.java</span></div><h1>ReportController.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.test.controller.report;
+
+import com.njustc.onlinebiz.common.model.Role;
+import com.njustc.onlinebiz.common.model.test.report.Report;
+import com.njustc.onlinebiz.test.service.report.ReportService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
+
+/**
+ * 报告控制器
+ *
+ */
+<span class="fc" id="L13">@Slf4j</span>
+@RestController
+@RequestMapping(&quot;/api&quot;)
+public class ReportController {
+    private final ReportService reportService;
+
+<span class="fc" id="L19">    public ReportController(ReportService reportService) {</span>
+<span class="fc" id="L20">        this.reportService = reportService;</span>
+<span class="fc" id="L21">    }</span>
+
+    /**
+     * 查看任意测试报告的详细信息
+     *
+     * @param reportId 报告id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @return {@link Report}
+     */
+    @GetMapping(&quot;/test/report/{reportId}&quot;)
+    public Report getReport(
+            @PathVariable(&quot;reportId&quot;) String reportId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole) {
+<span class="nc" id="L36">        return reportService.findReport(reportId, userId, userRole);</span>
+    }
+
+    /**
+     * 修改测试报告
+     *
+     * @param reportId 报告id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @param report 报告
+     */
+    @PostMapping(&quot;/test/report/{reportId}/content&quot;)
+    public void updateReport(
+            @PathVariable(&quot;reportId&quot;) String reportId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole,
+            @RequestBody Report.ReportContent report) {
+<span class="nc" id="L53">        reportService.updateReport(reportId, report, userId, userRole);</span>
+<span class="nc" id="L54">    }</span>
+
+    /**
+     * 删除测试报告
+     *
+     * @param reportId 报告id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     */
+    @DeleteMapping(&quot;/test/report/{reportId}&quot;)
+    public void deleteReport(
+            @PathVariable(&quot;reportId&quot;) String reportId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole) {
+<span class="nc" id="L68">        reportService.deleteReport(reportId, userId, userRole);</span>
+<span class="nc" id="L69">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

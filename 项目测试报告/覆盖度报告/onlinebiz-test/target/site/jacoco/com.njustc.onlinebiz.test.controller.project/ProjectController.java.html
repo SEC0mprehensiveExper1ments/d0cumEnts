@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProjectController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-test</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.test.controller.project</a> &gt; <span class="el_source">ProjectController.java</span></div><h1>ProjectController.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.test.controller.project;
+
+import com.njustc.onlinebiz.common.model.PageResult;
+import com.njustc.onlinebiz.common.model.Role;
+import com.njustc.onlinebiz.common.model.test.project.Project;
+import com.njustc.onlinebiz.common.model.test.project.ProjectOutline;
+import com.njustc.onlinebiz.common.model.test.project.ProjectStatus;
+import com.njustc.onlinebiz.test.service.project.ProjectService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
+
+/**
+ * 项目控制器
+ *
+ */
+<span class="fc" id="L16">@Slf4j</span>
+@RestController
+@RequestMapping(&quot;/api&quot;)
+public class ProjectController {
+
+    private final ProjectService projectService;
+
+<span class="fc" id="L23">    public ProjectController(ProjectService projectService) {</span>
+<span class="fc" id="L24">        this.projectService = projectService;</span>
+<span class="fc" id="L25">    }</span>
+
+    /**
+     * 创建测试项目，返回测试项目ID
+     *
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @param entrustId 委托id
+     * @return {@link String}
+     */
+    @PostMapping(&quot;/test&quot;)
+    public String createTestProject(
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole,
+            @RequestParam(&quot;entrustId&quot;) String entrustId
+            ) {
+<span class="nc" id="L41">        return projectService.createTestProject(userId, userRole, entrustId);</span>
+    }
+
+    /**
+     * 获取测试项目的基本信息列表
+     *
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @param page 页面
+     * @param pageSize 页面大小
+     * @return {@link PageResult&lt;ProjectOutline&gt;}
+     */
+    @GetMapping(&quot;/test&quot;)
+    public PageResult&lt;ProjectOutline&gt; getProjects(
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole,
+            @RequestParam(&quot;page&quot;) Integer page,
+            @RequestParam(&quot;pageSize&quot;) Integer pageSize
+    ) {
+<span class="nc" id="L60">        return projectService.findProjectOutlines(page, pageSize, userId, userRole);</span>
+    }
+
+    /**
+     * 获取项目的完整信息
+     *
+     * @param projectId 项目id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @return {@link Project}
+     */
+    @GetMapping(&quot;/test/{projectId}&quot;)
+    public Project getProject(
+            @PathVariable(&quot;projectId&quot;) String projectId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L77">        return projectService.findProject(projectId, userId, userRole);</span>
+    }
+
+    /**
+     * 分配质量部人员 (成功分配质量部人员后，项目会进入到 进行中 状态)
+     *
+     * @param projectId 项目id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @param qaId qa id
+     */
+    @PostMapping(&quot;/test/{projectId}/qa&quot;)
+    public void allocateQa(
+            @PathVariable(&quot;projectId&quot;) String projectId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole,
+            @RequestParam(&quot;qaId&quot;) Long qaId
+    ) {
+<span class="nc" id="L95">        projectService.updateQa(projectId, qaId, userId, userRole);</span>
+<span class="nc" id="L96">    }</span>
+
+
+    /**
+     * 更新项目状态，后端会检查状态更新的合法性
+     *
+     * @param projectId 项目id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @param status 状态
+     */
+    @PostMapping(&quot;/test/{projectId}/status&quot;)
+    public void updateStatus(
+            @PathVariable(&quot;projectId&quot;) String projectId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole,
+            @RequestBody ProjectStatus status
+    ) {
+<span class="nc" id="L114">        projectService.updateStatus(projectId, status, userId, userRole);</span>
+<span class="nc" id="L115">    }</span>
+
+    /**
+     * 删除一份项目 (一般情况不需要)
+     *
+     * @param projectId 项目id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     */
+    @DeleteMapping(&quot;/test/{projectId}&quot;)
+    public void removeProject(
+            @PathVariable(&quot;projectId&quot;) String projectId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L130">        projectService.removeProject(projectId, userId, userRole);</span>
+<span class="nc" id="L131">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

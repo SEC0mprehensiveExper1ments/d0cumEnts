@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OSSProvider.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-document</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.doc.dao</a> &gt; <span class="el_source">OSSProvider.java</span></div><h1>OSSProvider.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.doc.dao;
+
+import io.minio.BucketExistsArgs;
+import io.minio.MakeBucketArgs;
+import io.minio.MinioClient;
+import io.minio.PutObjectArgs;
+import io.minio.errors.*;
+import org.springframework.stereotype.Component;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+
+/**
+ * ossprovider
+ *
+ */
+@Component
+public class OSSProvider {
+  MinioClient minioClient;
+
+  public OSSProvider()
+      throws ServerException, InsufficientDataException, ErrorResponseException, IOException,
+          NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException,
+<span class="fc" id="L27">          XmlParserException, InternalException {</span>
+<span class="fc" id="L28">    minioClient =</span>
+<span class="fc" id="L29">        MinioClient.builder()</span>
+<span class="fc" id="L30">            .endpoint(&quot;https://oss.syh1en.asia&quot;)</span>
+<span class="fc" id="L31">            .credentials(&quot;spring&quot;, &quot;123456Spr1ng&quot;)</span>
+<span class="fc" id="L32">            .build();</span>
+<span class="fc" id="L33">    boolean docFound = minioClient.bucketExists(BucketExistsArgs.builder().bucket(&quot;doc&quot;).build());</span>
+<span class="pc bpc" id="L34" title="1 of 2 branches missed.">    if (!docFound) {</span>
+<span class="nc" id="L35">      minioClient.makeBucket(MakeBucketArgs.builder().bucket(&quot;doc&quot;).build());</span>
+    }
+<span class="fc" id="L37">  }</span>
+
+  /**
+   * 上传
+   *
+   * @param bucketName bucket名称
+   * @param objectName 对象名称
+   * @param data 数据
+   * @param contentType 内容类型
+   * @return boolean
+   */
+  public boolean upload(String bucketName, String objectName, byte[] data, String contentType) {
+    try {
+      // 判断桶是否存在，不存在则先创建桶
+<span class="fc bfc" id="L51" title="All 2 branches covered.">      if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build())) {</span>
+<span class="fc" id="L52">        minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());</span>
+      }
+      // 产生输入流
+<span class="fc" id="L55">      InputStream inputStream = new ByteArrayInputStream(data);</span>
+      // 上传文件
+<span class="fc" id="L57">      minioClient.putObject(PutObjectArgs.builder().bucket(bucketName).object(objectName).stream(inputStream, data.length, -1).contentType(contentType).build());</span>
+<span class="fc" id="L58">      return true;</span>
+<span class="nc" id="L59">    } catch (Exception e) { e.printStackTrace(); return false; }</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

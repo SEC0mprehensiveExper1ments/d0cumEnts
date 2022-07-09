@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JS006.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-document</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.doc.model</a> &gt; <span class="el_source">JS006.java</span></div><h1>JS006.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.doc.model;
+
+import com.njustc.onlinebiz.common.model.test.scheme.Modification;
+import com.njustc.onlinebiz.common.model.test.scheme.Schedule;
+import com.njustc.onlinebiz.common.model.test.scheme.Scheme;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+import java.util.ArrayList;
+import java.util.List;
+
+<span class="pc bnc" id="L14" title="All 182 branches missed.">@Data</span>
+<span class="fc" id="L15">@NoArgsConstructor</span>
+<span class="nc" id="L16">@AllArgsConstructor</span>
+@Accessors(chain = true)
+public class JS006 {
+<span class="pc" id="L19">    private String inputBanBenHao = &quot;&quot;;</span>
+<span class="pc" id="L20">    private List&lt;Modification&gt; wenDangXiuGaiJiLu = new ArrayList&lt;&gt;();</span>
+<span class="pc" id="L21">    private String inputBiaoShi = &quot;&quot;;</span>
+<span class="pc" id="L22">    private String inputXiTongGaiShu = &quot;&quot;;</span>
+<span class="pc" id="L23">    private String inputWenDangGaiShu = &quot;&quot;;</span>
+<span class="pc" id="L24">    private String inputJiXian = &quot;&quot;;</span>
+<span class="pc" id="L25">    private String inputYingJian = &quot;&quot;;</span>
+<span class="pc" id="L26">    private String inputRuanJian = &quot;&quot;;</span>
+<span class="pc" id="L27">    private String inputQiTa = &quot;&quot;;</span>
+<span class="pc" id="L28">    private String inputCanYuZuZhi = &quot;&quot;;</span>
+<span class="pc" id="L29">    private String inputRenYuan = &quot;&quot;;</span>
+<span class="pc" id="L30">    private String inputCeShiJiBie = &quot;&quot;;</span>
+<span class="pc" id="L31">    private String inputCeShiLeiBie = &quot;&quot;;</span>
+<span class="pc" id="L32">    private String inputYiBanCeShiTiaoJian = &quot;&quot;;</span>
+<span class="pc" id="L33">    private String inputJiHuaZhiXingDeCeShi = &quot;&quot;;</span>
+<span class="pc" id="L34">    private String inputCeShiYongLi = &quot;&quot;;</span>
+<span class="pc" id="L35">    private String inputYuJiGongZuoRi = &quot;&quot;;</span>
+<span class="pc" id="L36">    private Schedule zhiDingJiHua = new Schedule();</span>
+<span class="pc" id="L37">    private Schedule sheJiCeShi = new Schedule();</span>
+<span class="pc" id="L38">    private Schedule zhiXingCeShi = new Schedule();</span>
+<span class="pc" id="L39">    private Schedule pingGuCeShi = new Schedule();</span>
+<span class="pc" id="L40">    private String inputXuQiuKeZhuiZongXing = &quot;&quot;;</span>
+
+<span class="nc" id="L42">    public JS006(Scheme scheme) {</span>
+<span class="nc bnc" id="L43" title="All 4 branches missed.">        if (scheme == null || scheme.getContent() == null) {</span>
+<span class="nc" id="L44">            throw new IllegalArgumentException(&quot;scheme is null&quot;);</span>
+        }
+<span class="nc" id="L46">        this.inputBanBenHao = scheme.getContent().getVersion();</span>
+<span class="nc" id="L47">        this.wenDangXiuGaiJiLu = scheme.getContent().getModificationList();</span>
+<span class="nc" id="L48">        this.inputBiaoShi = scheme.getContent().getLogo();</span>
+<span class="nc" id="L49">        this.inputXiTongGaiShu = scheme.getContent().getSystemSummary();</span>
+<span class="nc" id="L50">        this.inputWenDangGaiShu = scheme.getContent().getDocumentSummary();</span>
+<span class="nc" id="L51">        this.inputJiXian = scheme.getContent().getBaseline();</span>
+<span class="nc" id="L52">        this.inputYingJian = scheme.getContent().getHardware();</span>
+<span class="nc" id="L53">        this.inputRuanJian = scheme.getContent().getSoftware();</span>
+<span class="nc" id="L54">        this.inputQiTa = scheme.getContent().getOtherEnvironment();</span>
+<span class="nc" id="L55">        this.inputCanYuZuZhi = scheme.getContent().getOrganization();</span>
+<span class="nc" id="L56">        this.inputRenYuan = scheme.getContent().getParticipant();</span>
+<span class="nc" id="L57">        this.inputCeShiJiBie = scheme.getContent().getTestLevel();</span>
+<span class="nc" id="L58">        this.inputCeShiLeiBie = scheme.getContent().getTestType();</span>
+<span class="nc" id="L59">        this.inputYiBanCeShiTiaoJian = scheme.getContent().getTestCondition();</span>
+<span class="nc" id="L60">        this.inputJiHuaZhiXingDeCeShi = scheme.getContent().getTestToBeExecuted();</span>
+<span class="nc" id="L61">        this.inputCeShiYongLi = scheme.getContent().getTestSample();</span>
+<span class="nc" id="L62">        this.inputYuJiGongZuoRi = scheme.getContent().getExpectedTime();</span>
+<span class="nc" id="L63">        this.inputXuQiuKeZhuiZongXing = scheme.getContent().getTraceability();</span>
+<span class="nc" id="L64">        this.zhiDingJiHua = scheme.getContent().getPlanSchedule();</span>
+<span class="nc" id="L65">        this.sheJiCeShi = scheme.getContent().getDesignSchedule();</span>
+<span class="nc" id="L66">        this.zhiXingCeShi = scheme.getContent().getExecuteSchedule();</span>
+<span class="nc" id="L67">        this.pingGuCeShi = scheme.getContent().getEvaluateSchedule();</span>
+        //非空性检查
+<span class="nc bnc" id="L69" title="All 2 branches missed.">        if (this.inputBanBenHao == null) {</span>
+<span class="nc" id="L70">            this.inputBanBenHao = &quot;&quot;;</span>
+        }
+<span class="nc bnc" id="L72" title="All 2 branches missed.">        if (this.wenDangXiuGaiJiLu == null) {</span>
+<span class="nc" id="L73">            this.wenDangXiuGaiJiLu = new ArrayList&lt;&gt;();</span>
+        }
+<span class="nc bnc" id="L75" title="All 2 branches missed.">        if (this.inputBiaoShi == null) {</span>
+<span class="nc" id="L76">            this.inputBiaoShi = &quot;&quot;;</span>
+        }
+<span class="nc bnc" id="L78" title="All 2 branches missed.">        if (this.inputXiTongGaiShu == null) {</span>
+<span class="nc" id="L79">            this.inputXiTongGaiShu = &quot;&quot;;</span>
+        }
+<span class="nc bnc" id="L81" title="All 2 branches missed.">        if (this.inputWenDangGaiShu == null) {</span>
+<span class="nc" id="L82">            this.inputWenDangGaiShu = &quot;&quot;;</span>
+        }
+<span class="nc bnc" id="L84" title="All 2 branches missed.">        if (this.inputJiXian == null) {</span>
+<span class="nc" id="L85">            this.inputJiXian = &quot;&quot;;</span>
+        }
+<span class="nc bnc" id="L87" title="All 2 branches missed.">        if (this.inputYingJian == null) {</span>
+<span class="nc" id="L88">            this.inputYingJian = &quot;&quot;;</span>
+        }
+<span class="nc bnc" id="L90" title="All 2 branches missed.">        if (this.inputRuanJian == null) {</span>
+<span class="nc" id="L91">            this.inputRuanJian = &quot;&quot;;</span>
+        }
+<span class="nc bnc" id="L93" title="All 2 branches missed.">        if (this.inputQiTa == null) {</span>
+<span class="nc" id="L94">            this.inputQiTa = &quot;&quot;;</span>
+        }
+<span class="nc bnc" id="L96" title="All 2 branches missed.">        if (this.inputCanYuZuZhi == null) {</span>
+<span class="nc" id="L97">            this.inputCanYuZuZhi = &quot;&quot;;</span>
+        }
+<span class="nc bnc" id="L99" title="All 2 branches missed.">        if (this.inputRenYuan == null) {</span>
+<span class="nc" id="L100">            this.inputRenYuan = &quot;&quot;;</span>
+        }
+<span class="nc bnc" id="L102" title="All 2 branches missed.">        if (this.inputCeShiJiBie == null) {</span>
+<span class="nc" id="L103">            this.inputCeShiJiBie = &quot;&quot;;</span>
+        }
+<span class="nc bnc" id="L105" title="All 2 branches missed.">        if (this.inputCeShiLeiBie == null) {</span>
+<span class="nc" id="L106">            this.inputCeShiLeiBie = &quot;&quot;;</span>
+        }
+<span class="nc bnc" id="L108" title="All 2 branches missed.">        if (this.inputYiBanCeShiTiaoJian == null) {</span>
+<span class="nc" id="L109">            this.inputYiBanCeShiTiaoJian = &quot;&quot;;</span>
+        }
+<span class="nc bnc" id="L111" title="All 2 branches missed.">        if (this.inputJiHuaZhiXingDeCeShi == null) {</span>
+<span class="nc" id="L112">            this.inputJiHuaZhiXingDeCeShi = &quot;&quot;;</span>
+        }
+<span class="nc bnc" id="L114" title="All 2 branches missed.">        if (this.inputCeShiYongLi == null) {</span>
+<span class="nc" id="L115">            this.inputCeShiYongLi = &quot;&quot;;</span>
+        }
+<span class="nc bnc" id="L117" title="All 2 branches missed.">        if (this.inputYuJiGongZuoRi == null) {</span>
+<span class="nc" id="L118">            this.inputYuJiGongZuoRi = &quot;&quot;;</span>
+        }
+<span class="nc bnc" id="L120" title="All 2 branches missed.">        if (this.zhiDingJiHua == null) {</span>
+<span class="nc" id="L121">            this.zhiDingJiHua = new Schedule();</span>
+        }
+<span class="nc bnc" id="L123" title="All 2 branches missed.">        if (this.sheJiCeShi == null) {</span>
+<span class="nc" id="L124">            this.sheJiCeShi = new Schedule();</span>
+        }
+<span class="nc bnc" id="L126" title="All 2 branches missed.">        if (this.zhiXingCeShi == null) {</span>
+<span class="nc" id="L127">            this.zhiXingCeShi = new Schedule();</span>
+        }
+<span class="nc bnc" id="L129" title="All 2 branches missed.">        if (this.pingGuCeShi == null) {</span>
+<span class="nc" id="L130">            this.pingGuCeShi = new Schedule();</span>
+        }
+<span class="nc bnc" id="L132" title="All 2 branches missed.">        if (this.inputXuQiuKeZhuiZongXing == null) {</span>
+<span class="nc" id="L133">            this.inputXuQiuKeZhuiZongXing = &quot;&quot;;</span>
+        }
+<span class="nc" id="L135">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

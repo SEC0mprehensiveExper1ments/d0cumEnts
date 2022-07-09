@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DownloadControllerAdvice.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-document</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.doc.controller</a> &gt; <span class="el_source">DownloadControllerAdvice.java</span></div><h1>DownloadControllerAdvice.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.doc.controller;
+
+
+import com.njustc.onlinebiz.doc.exception.DownloadDAOFailureException;
+import com.njustc.onlinebiz.doc.exception.DownloadNotFoundException;
+import com.njustc.onlinebiz.doc.exception.DownloadPermissionDeniedException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+/**
+ * 下载控制器建议
+ *
+ */
+<span class="fc" id="L18">@Slf4j</span>
+@ControllerAdvice
+<span class="fc" id="L20">public class DownloadControllerAdvice {</span>
+
+    /**
+     * 处理没有发现异常
+     *
+     * @param e e
+     * @return {@link String}
+     */
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(DownloadNotFoundException.class)
+    public String handleNotFoundException(DownloadNotFoundException e) {
+<span class="nc" id="L32">        log.warn(&quot;Not Found Exception: &quot; + e.getMessage());</span>
+<span class="nc" id="L33">        return e.getMessage();</span>
+    }
+
+    /**
+     * 处理dao failure异常
+     *
+     * @param e e
+     * @return {@link String}
+     */
+    @ResponseBody
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(DownloadDAOFailureException.class)
+    public String handleDAOFailureException(DownloadDAOFailureException e) {
+<span class="nc" id="L46">        log.warn(&quot;DAO Failure Detected: &quot; + e.getMessage());</span>
+<span class="nc" id="L47">        return e.getMessage();</span>
+    }
+
+    /**
+     * 处理拒绝访问异常
+     *
+     * @param e e
+     * @return {@link String}
+     */
+    @ResponseBody
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(DownloadPermissionDeniedException.class)
+    public String handlePermissionDeniedException(DownloadPermissionDeniedException e) {
+<span class="nc" id="L60">        log.warn(&quot;DAO Failure Detected: &quot; + e.getMessage());</span>
+<span class="nc" id="L61">        return e.getMessage();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

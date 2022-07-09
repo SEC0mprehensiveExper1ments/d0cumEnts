@@ -1,0 +1,736 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DocServiceJS004.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-document</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.doc.service</a> &gt; <span class="el_source">DocServiceJS004.java</span></div><h1>DocServiceJS004.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.doc.service;
+
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.njustc.onlinebiz.doc.model.JS004;
+import com.njustc.onlinebiz.doc.dao.OSSProvider;
+import com.njustc.onlinebiz.doc.util.HeaderFooter;
+import com.njustc.onlinebiz.doc.util.ItextUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+
+@Service
+public class DocServiceJS004 {
+  private final OSSProvider ossProvider;
+
+<span class="fc" id="L24">  public DocServiceJS004(OSSProvider ossProvider) {</span>
+<span class="fc" id="L25">    this.ossProvider = ossProvider;</span>
+<span class="fc" id="L26">  }</span>
+
+  /**
+   * 以下是文档生成部分
+   * */
+  private static final int marginLeft;
+  private static final int marginRight;
+  private static final int marginTop;
+  private static final int maxWidth = 430; // 最大宽度
+  private static final int marginBottom;
+
+  @Value(&quot;${document-dir}&quot;)
+  private String DOCUMENT_DIR;
+  private static JS004 JS004Json;
+  private static Font titlefont1;
+  private static Font titlefont2;
+  private static Font keyfont;
+  private static Font textfont;
+  private static BaseFont bfHeiTi;
+
+  static {
+    // 在 iText 中每一个单位大小默认近似于点（pt）
+    // 1mm = 72 ÷ 25.4 ≈ 2.834645...（pt）
+<span class="fc" id="L49">    marginLeft = 90; // 页边距：左</span>
+<span class="fc" id="L50">    marginRight = 90; // 页边距：右</span>
+<span class="fc" id="L51">    marginTop = 60; // 页边距：上</span>
+<span class="fc" id="L52">    marginBottom = 72; // 页边距：下</span>
+<span class="fc" id="L53">  }</span>
+
+
+  /**
+   * 填充
+   *
+   * @param contractId 委托id
+   * @param newJson 新json
+   * @return {@link String} OSS下载链接
+   */
+  public String fill(String contractId, JS004 newJson) {
+<span class="fc" id="L64">    JS004Json = newJson;</span>
+<span class="fc" id="L65">    String pdfPath = DOCUMENT_DIR + &quot;JS004_&quot; + contractId + &quot;.pdf&quot;;</span>
+    try {
+      // 1.新建document对象
+<span class="fc" id="L68">      Document document = new Document(PageSize.A4); // 建立一个Document对象</span>
+<span class="fc" id="L69">      document.setMargins(marginLeft, marginRight, marginTop, marginBottom);</span>
+      // 2.建立一个书写器(Writer)与document对象关联
+<span class="fc" id="L71">      File file = new File(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;));</span>
+<span class="fc" id="L72">      System.out.println(pdfPath);</span>
+<span class="fc" id="L73">      PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(file));</span>
+<span class="fc" id="L74">      System.out.println(1);</span>
+      // 2.5 添加页眉/页脚
+<span class="fc" id="L76">      String header = &quot;NST－04－JS004－2011&quot;;</span>
+<span class="fc" id="L77">      String[] footer = new String[] {&quot;第 &quot;, &quot; 页 共 &quot;, &quot; 页&quot;};</span>
+<span class="fc" id="L78">      int headerToPage = 1;</span>
+<span class="fc" id="L79">      int footerFromPage = 2;</span>
+<span class="fc" id="L80">      boolean isHaderLine = true;</span>
+<span class="fc" id="L81">      boolean isFooterLine = false;</span>
+<span class="fc" id="L82">      float[] headerLoc = new float[] {document.right() - 5, document.top() + 15};</span>
+<span class="fc" id="L83">      float[] footerLoc =</span>
+<span class="fc" id="L84">              new float[] {(document.left() + document.right()) / 2.0f - 35, document.bottom() - 20};</span>
+<span class="fc" id="L85">      float headLineOff = -5f;</span>
+<span class="fc" id="L86">      float footLineOff = 12f;</span>
+<span class="fc" id="L87">      writer.setPageEvent(</span>
+              new HeaderFooter(
+                      header,
+                      footer,
+                      headerToPage,
+                      footerFromPage,
+                      isHaderLine,
+                      isFooterLine,
+                      headerLoc,
+                      footerLoc,
+                      headLineOff,
+                      footLineOff));
+      // 3.打开文档
+<span class="fc" id="L100">      document.open();</span>
+      // 4.向文档中添加内容
+<span class="fc" id="L102">      generatePageOne(document);</span>
+<span class="fc" id="L103">      document.newPage();</span>
+<span class="fc" id="L104">      generatePageTwo(document);</span>
+      // document.newPage();
+<span class="fc" id="L106">      generatePageThree(document);</span>
+      // document.newPage();
+<span class="fc" id="L108">      generatePageFour(document);</span>
+<span class="fc" id="L109">      document.newPage();</span>
+<span class="fc" id="L110">      generatePageFive(document);</span>
+      // 5.关闭文档
+<span class="fc" id="L112">      document.close();</span>
+<span class="nc" id="L113">    } catch (Exception e) {</span>
+<span class="nc" id="L114">      e.printStackTrace();</span>
+<span class="nc" id="L115">      return &quot;unable to generate pdf&quot;;</span>
+<span class="fc" id="L116">    }</span>
+    // 上传pdf
+    try {
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">      if (ossProvider.upload(</span>
+<span class="fc" id="L120">              &quot;doc&quot;, &quot;JS004_&quot; + contractId + &quot;.pdf&quot;, Files.readAllBytes(Path.of(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;))), &quot;application/pdf&quot;)) {</span>
+<span class="fc" id="L121">        deleteOutFile(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;));</span>
+<span class="fc" id="L122">        return &quot;https://oss.syh1en.asia/doc/JS004_&quot; + contractId + &quot;.pdf&quot;;</span>
+      } else {
+<span class="nc" id="L124">        deleteOutFile(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;));</span>
+<span class="nc" id="L125">        return &quot;upload failed&quot;;</span>
+      }
+<span class="nc" id="L127">    } catch (Exception e) {</span>
+<span class="nc" id="L128">      e.printStackTrace();</span>
+<span class="nc" id="L129">      deleteOutFile(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;));</span>
+<span class="nc" id="L130">      return &quot;minio error&quot;;</span>
+    }
+  }
+
+  /**
+   * 删除中间的out文件
+   * */
+  private void deleteOutFile(String pdfPath) {
+    try {
+<span class="fc" id="L139">      File file = new File(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;));</span>
+<span class="pc bpc" id="L140" title="1 of 2 branches missed.">      if (file.delete()) {</span>
+<span class="fc" id="L141">        System.out.println(file.getName() + &quot; is deleted!&quot;);</span>
+      } else {
+<span class="nc" id="L143">        System.out.println(&quot;Delete&quot; + file.getName() + &quot;is failed.&quot;);</span>
+      }
+<span class="nc" id="L145">    } catch(Exception e) {</span>
+<span class="nc" id="L146">      e.printStackTrace();</span>
+<span class="fc" id="L147">    }</span>
+<span class="fc" id="L148">  }</span>
+
+
+
+  /** 生成JS004文档第一页 */
+  public void generatePageOne(Document document) throws Exception {
+    // 加载字体
+    try{
+<span class="fc" id="L156">      BaseFont bfChinese = BaseFont.createFont(</span>
+              DOCUMENT_DIR + &quot;font/simsun.ttf&quot;, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+<span class="fc" id="L158">      bfHeiTi =</span>
+<span class="fc" id="L159">              BaseFont.createFont(</span>
+                      DOCUMENT_DIR + &quot;font/simhei.ttf&quot;, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+<span class="fc" id="L161">      titlefont1 = new Font(bfHeiTi, 29, Font.BOLD);</span>
+<span class="fc" id="L162">      titlefont2 = new Font(bfHeiTi, 16, Font.BOLD);</span>
+<span class="fc" id="L163">      keyfont = new Font(bfChinese, 12.5f, Font.BOLD);</span>
+<span class="fc" id="L164">      textfont = new Font(bfChinese, 12f, Font.NORMAL);</span>
+<span class="nc" id="L165">    } catch (Exception e) {</span>
+<span class="nc" id="L166">      e.printStackTrace();</span>
+<span class="fc" id="L167">    }</span>
+
+
+    // 标题
+<span class="fc" id="L171">    Paragraph title = new Paragraph(&quot;软件委托测试合同&quot;, titlefont1);</span>
+<span class="fc" id="L172">    title.setAlignment(1); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L173">    title.setSpacingBefore(20f); // 设置段落上空白</span>
+<span class="fc" id="L174">    title.setSpacingAfter(90f); // 设置段落下空白</span>
+
+<span class="fc" id="L176">    float tableWidth = document.right() - document.left() - 150;</span>
+<span class="fc" id="L177">    PdfPTable table =</span>
+<span class="fc" id="L178">        ItextUtils.createTable(new float[] {tableWidth / 2 - 45, tableWidth / 2 + 45}, maxWidth);</span>
+<span class="fc" id="L179">    table.addCell(</span>
+<span class="fc" id="L180">        ItextUtils.createCell(</span>
+            &quot;项目名称 ：&quot;,
+            titlefont2,
+            Element.ALIGN_RIGHT,
+            ItextUtils.NO_BORDER,
+            new float[] {40f + 5f, 40f, 0f, 0f}));
+<span class="fc" id="L186">    table.addCell(</span>
+<span class="fc" id="L187">        ItextUtils.createCell(</span>
+<span class="fc" id="L188">            JS004Json.getInputXiangMuMingChen(),</span>
+            new Font(bfHeiTi, 16, Font.NORMAL),
+            Element.ALIGN_LEFT,
+            Element.ALIGN_TOP,
+            ItextUtils.NO_BORDER,
+            new float[] {40f, 0f, 0f, 0f},
+            0.3f,
+            20f));
+<span class="fc" id="L196">    table.addCell(</span>
+<span class="fc" id="L197">        ItextUtils.createCell(</span>
+            &quot;委托方（甲方）：&quot;,
+            titlefont2,
+            Element.ALIGN_RIGHT,
+            ItextUtils.NO_BORDER,
+            new float[] {40f + 5f, 40f, 0f, 0f}));
+<span class="fc" id="L203">    table.addCell(</span>
+<span class="fc" id="L204">        ItextUtils.createCell(</span>
+<span class="fc" id="L205">            JS004Json.getInputJiaFang(),</span>
+            new Font(bfHeiTi, 16, Font.NORMAL),
+            Element.ALIGN_LEFT,
+            Element.ALIGN_TOP,
+            ItextUtils.NO_BORDER,
+            new float[] {40f, 0f, 0f, 0f},
+            0.3f,
+            20f));
+<span class="fc" id="L213">    table.addCell(</span>
+<span class="fc" id="L214">        ItextUtils.createCell(</span>
+            &quot;委托方（乙方）：&quot;,
+            titlefont2,
+            Element.ALIGN_RIGHT,
+            ItextUtils.NO_BORDER,
+            new float[] {40f + 5f, 40f, 0f, 0f}));
+<span class="fc" id="L220">    table.addCell(</span>
+<span class="fc" id="L221">        ItextUtils.createCell(</span>
+<span class="fc" id="L222">            JS004Json.getInputYiFang(),</span>
+            new Font(bfHeiTi, 16, Font.NORMAL),
+            Element.ALIGN_LEFT,
+            Element.ALIGN_TOP,
+            ItextUtils.NO_BORDER,
+            new float[] {40f, 0f, 0f, 0f},
+            0.3f,
+            20f));
+
+<span class="fc" id="L231">    PdfPTable table2 =</span>
+<span class="fc" id="L232">        ItextUtils.createTable(new float[] {tableWidth / 2 - 40, tableWidth / 2 + 40}, maxWidth);</span>
+<span class="fc" id="L233">    table2.addCell(</span>
+<span class="fc" id="L234">        ItextUtils.createCell(</span>
+            &quot;签订地点 ：&quot;,
+            titlefont2,
+            Element.ALIGN_RIGHT,
+            ItextUtils.NO_BORDER,
+            new float[] {20f + 5f, 20f, 0f, 0f}));
+<span class="fc" id="L240">    table2.addCell(</span>
+<span class="fc" id="L241">        ItextUtils.createCell(</span>
+<span class="fc" id="L242">            JS004Json.getInputQianDingDiDian(),</span>
+            new Font(bfHeiTi, 16, Font.NORMAL),
+            Element.ALIGN_LEFT,
+            Element.ALIGN_TOP,
+            ItextUtils.NO_BORDER,
+            new float[] {20f, 0f, 0f, 0f},
+            0.3f,
+            20f));
+<span class="fc" id="L250">    table2.addCell(</span>
+<span class="fc" id="L251">        ItextUtils.createCell(</span>
+            &quot;签订日期 ：&quot;,
+            titlefont2,
+            Element.ALIGN_RIGHT,
+            ItextUtils.NO_BORDER,
+            new float[] {20f, 20f, 0f, 0f}));
+<span class="fc" id="L257">    String nian = &quot;  &quot; + JS004Json.getInputQianDingRiQi0Nian() + &quot;  \u0232&quot;;</span>
+<span class="fc" id="L258">    String yue = &quot;  &quot; + JS004Json.getInputQianDingRiQi0Yue() + &quot;  \u0232&quot;;</span>
+<span class="fc" id="L259">    String ri = &quot;  &quot; + JS004Json.getInputQianDingRiQi0Ri() + &quot;  \u0232&quot;;</span>
+<span class="fc" id="L260">    table2.addCell(</span>
+<span class="fc" id="L261">        ItextUtils.createCell(</span>
+            new String[] {&quot;&quot;, &quot;  \u0232&quot;, nian, &quot;年&quot;, yue, &quot;月&quot;, ri, &quot;日&quot;},
+            new Font(bfHeiTi, 16, Font.NORMAL),
+            new Font(bfHeiTi, 16, Font.BOLD),
+            Element.ALIGN_LEFT,
+            Element.ALIGN_MIDDLE,
+            ItextUtils.NO_BORDER,
+            1,
+            1,
+            new float[] {20f, 20f, 0f, 0f},
+            0.3f));
+
+<span class="fc" id="L273">    document.add(new Paragraph(&quot;\n\n&quot;));</span>
+<span class="fc" id="L274">    document.add(title);</span>
+<span class="fc" id="L275">    document.add(table);</span>
+<span class="fc" id="L276">    document.add(new Paragraph((&quot;\n\n\n\n&quot;)));</span>
+<span class="fc" id="L277">    document.add(table2);</span>
+<span class="fc" id="L278">  }</span>
+
+  /** 生成JS004文档第二页 */
+  public void generatePageTwo(Document document) throws Exception {
+<span class="fc" id="L282">    Paragraph text1 = new Paragraph();</span>
+<span class="fc" id="L283">    text1.setLeading(24f);</span>
+<span class="fc" id="L284">    Chunk chunk1 = new Chunk(JS004Json.getInputJiaFang(), textfont);</span>
+<span class="fc" id="L285">    chunk1.setUnderline(0.3f, -3f);</span>
+<span class="fc" id="L286">    Chunk chunk2 = new Chunk(JS004Json.getInputYiFang(), textfont);</span>
+<span class="fc" id="L287">    chunk2.setUnderline(0.3f, -3f);</span>
+
+<span class="fc" id="L289">    text1.add(new Chunk(&quot;本合同由作为委托方的&quot;, textfont));</span>
+<span class="fc" id="L290">    text1.add(chunk1);</span>
+<span class="fc" id="L291">    text1.add(new Chunk(&quot;（以下简称“甲方”）与作为受托方的&quot;, textfont));</span>
+<span class="fc" id="L292">    text1.add(chunk2);</span>
+<span class="fc" id="L293">    text1.add(new Chunk(&quot;本合同由作为委托方的&quot;, textfont));</span>
+<span class="fc" id="L294">    text1.add(new Chunk(&quot;（以下简称“乙方”）在平等自愿的基础上，依据《中华人民共和国合同法》有关规定就项目的执行，经友好协商后订立。&quot;, textfont));</span>
+<span class="fc" id="L295">    text1.setSpacingAfter(0f); // 设置段落下空白</span>
+
+<span class="fc" id="L297">    Paragraph text2 = new Paragraph();</span>
+<span class="fc" id="L298">    text2.setLeading(24f);</span>
+<span class="fc" id="L299">    Chunk chunk3 = new Chunk(JS004Json.getInputShouCeRuanJian(), textfont);</span>
+<span class="fc" id="L300">    chunk3.setUnderline(0.3f, -3f);</span>
+
+<span class="fc" id="L302">    text2.add(new Chunk(&quot;一、任务表述\n&quot;, keyfont));</span>
+<span class="fc" id="L303">    text2.add(new Chunk(&quot;    乙方按照国家软件质量测试标准和测试规范，完成甲方委托的软件&quot;, textfont));</span>
+<span class="fc" id="L304">    text2.add(chunk3);</span>
+<span class="fc" id="L305">    text2.add(new Chunk(&quot;(下称受测软件)的质量特性&quot;, textfont));</span>
+<span class="fc" id="L306">    text2.add(new Chunk(&quot;，进行测试，并出具相应的测试报告。&quot;, textfont));</span>
+<span class="fc" id="L307">    text2.setSpacingAfter(30f); // 设置段落下空白</span>
+
+<span class="fc" id="L309">    Paragraph text3 = new Paragraph();</span>
+<span class="fc" id="L310">    text3.setLeading(24f);</span>
+<span class="fc" id="L311">    text3.add(new Phrase(&quot;二、双方的主要义务\n&quot;, keyfont));</span>
+<span class="fc" id="L312">    text3.add(</span>
+        new Phrase(
+            &quot;&quot;
+                + &quot;    1. 甲方的主要义务：\n&quot;
+                + &quot;      （1）按照合同约定支付所有费用。\n&quot;
+                + &quot;      （2）按照乙方要求以书面形式出具测试需求，包括测试子特性、测试软\n&quot;
+                + &quot;           硬件环境等。\n&quot;
+                + &quot;      （3）提供符合交付要求的受测软件产品及相关文档，包括软件功能列\n&quot;
+                + &quot;           表、需求分析、设计文档、用户文档至乙方。\n&quot;
+                + &quot;      （4）指派专人配合乙方测试工作，并提供必要的技术培训和技术协助。\n&quot;
+                + &quot;    2. 乙方的主要义务：\n&quot;
+                + &quot;      （1）设计测试用例，制定和实施产品测试方案。\n&quot;
+                + &quot;      （2）在测试过程中，定期知会甲方受测软件在测试过程中出现的问题。\n&quot;
+                + &quot;      （3）按期完成甲方委托的软件测试工作。\n&quot;
+                + &quot;      （4）出具正式的测试报告。&quot;,
+            textfont));
+<span class="fc" id="L328">    text3.setSpacingAfter(30f); // 设置段落下空白</span>
+
+<span class="fc" id="L330">    Paragraph text4 = new Paragraph();</span>
+<span class="fc" id="L331">    text4.setLeading(24f);</span>
+<span class="fc" id="L332">    text4.add(new Phrase(&quot;三、履约地点\n&quot;, keyfont));</span>
+<span class="fc" id="L333">    text4.add(</span>
+        new Phrase(
+            &quot;    由甲方将受测软件产品送到乙方实施测试。如果由于被测软件本身特点或其&quot;
+                + &quot;它乙方认可的原因，需要在甲方所在地进行测试时，甲方应负担乙方现场测试人&quot;
+                + &quot;员的差旅和食宿费用。&quot;,
+            textfont));
+<span class="fc" id="L339">    text4.setSpacingAfter(30f); // 设置段落下空白</span>
+
+<span class="fc" id="L341">    document.add(text1);</span>
+<span class="fc" id="L342">    document.add(text2);</span>
+<span class="fc" id="L343">    document.add(text3);</span>
+<span class="fc" id="L344">    document.add(text4);</span>
+<span class="fc" id="L345">  }</span>
+
+  /** 生成JS004文档第三页 */
+  public void generatePageThree(Document document) throws Exception {
+<span class="fc" id="L349">    Paragraph text1 = new Paragraph();</span>
+<span class="fc" id="L350">    text1.setLeading(24f);</span>
+<span class="fc" id="L351">    Chunk chunk1 = new Chunk(JS004Json.getInputCeShiFeiYong(), textfont);</span>
+<span class="fc" id="L352">    chunk1.setUnderline(0.3f, -3f);</span>
+    //Chunk chunk2 = new Chunk(JS004Json.getInputCeShiFeiYong0Yuan(), textfont);
+    //        chunk2.setUnderline(0.3f, -3f);
+
+<span class="fc" id="L356">    text1.add(new Chunk(&quot;四、合同价款\n&quot;, keyfont));</span>
+<span class="fc" id="L357">    text1.add(new Chunk(&quot;    本合同软件测试费用为人民币&quot;, textfont));</span>
+<span class="fc" id="L358">    text1.add(chunk1);</span>
+<span class="fc" id="L359">    text1.add(new Chunk(&quot;（¥ &quot;, textfont));</span>
+    //text1.add(chunk2);
+<span class="fc" id="L361">    text1.add(new Chunk(&quot; 元）。&quot;, textfont));</span>
+<span class="fc" id="L362">    text1.setSpacingAfter(30f); // 设置段落下空白</span>
+
+<span class="fc" id="L364">    Paragraph text2 = new Paragraph();</span>
+<span class="fc" id="L365">    text2.setLeading(24f);</span>
+<span class="fc" id="L366">    text2.add(new Chunk(&quot;五、测试费用支付方式\n&quot;, keyfont));</span>
+<span class="fc" id="L367">    text2.add(new Chunk(&quot;    本合同签定后，十个工作日内甲方合同价款至乙方帐户。&quot;, textfont));</span>
+<span class="fc" id="L368">    text2.setSpacingAfter(30f); // 设置段落下空白</span>
+
+<span class="fc" id="L370">    Paragraph text3 = new Paragraph();</span>
+<span class="fc" id="L371">    text3.setLeading(24f);</span>
+<span class="fc" id="L372">    Chunk chunk3 = new Chunk(JS004Json.getInputLvXingQiXian(), textfont);</span>
+    //        chunk3.setUnderline(0.3f, -3f);
+<span class="fc" id="L374">    Chunk chunk4 = new Chunk(JS004Json.getInputZhengGaiCishu(), textfont);</span>
+    //        chunk4.setUnderline(0.3f, -3f);
+<span class="fc" id="L376">    Chunk chunk5 = new Chunk(JS004Json.getInputZhengGaiTianShu(), textfont);</span>
+    //        chunk5.setUnderline(0.3f, -3f);
+
+<span class="fc" id="L379">    text3.add(new Phrase(&quot;六、履行的期限\n&quot;, keyfont));</span>
+<span class="fc" id="L380">    text3.add(new Chunk(&quot;    1. 本次测试的履行期限为合同生效之日起 &quot;, textfont));</span>
+<span class="fc" id="L381">    text3.add(chunk3);</span>
+<span class="fc" id="L382">    text3.add(new Chunk(&quot; 个自然日内完成。\n&quot;, textfont));</span>
+<span class="fc" id="L383">    text3.add(new Chunk(&quot;    2. 经甲乙双方同意，可对测试进度作适当修改，并以修改后的测试进度作\n&quot;, textfont));</span>
+<span class="fc" id="L384">    text3.add(new Chunk(&quot;       为本合同执行的期限。\n&quot;, textfont));</span>
+<span class="fc" id="L385">    text3.add(new Chunk(&quot;    3. 如受测软件在测试过程中出现的问题，导致继续进行测试会影响整体测\n&quot;, textfont));</span>
+<span class="fc" id="L386">    text3.add(new Chunk(&quot;       试进度，则乙方暂停测试并以书面形式通知甲方进行整改。在整个测试\n&quot;, textfont));</span>
+<span class="fc" id="L387">    text3.add(new Chunk(&quot;       过程中，整改次数限于 &quot;, textfont));</span>
+<span class="fc" id="L388">    text3.add(chunk4);</span>
+<span class="fc" id="L389">    text3.add(new Chunk(&quot; 次，每次不超过 &quot;, textfont));</span>
+<span class="fc" id="L390">    text3.add(chunk5);</span>
+<span class="fc" id="L391">    text3.add(new Chunk(&quot; 天。\n&quot;, textfont));</span>
+<span class="fc" id="L392">    text3.add(new Chunk(&quot;    4. 如因甲方原因，导致测试进度延迟、应由甲方负责,乙方不承担责任。 \n&quot;, textfont));</span>
+<span class="fc" id="L393">    text3.add(new Chunk(&quot;    5. 如因乙方原因，导致测试进度延迟，则甲方可酌情提出赔偿要求，赔偿\n&quot;, textfont));</span>
+<span class="fc" id="L394">    text3.add(new Chunk(&quot;       作为本合同的补充。\n&quot;, textfont));</span>
+<span class="fc" id="L395">    text3.setSpacingAfter(30f); // 设置段落下空白</span>
+
+<span class="fc" id="L397">    Paragraph text4 = new Paragraph();</span>
+<span class="fc" id="L398">    text4.setLeading(24f);</span>
+<span class="fc" id="L399">    text4.add(new Phrase(&quot;七、资料的保密\n&quot;, keyfont));</span>
+<span class="fc" id="L400">    text4.add(</span>
+        new Phrase(
+            &quot;    对于一方向另一方提供使用的秘密信息，另一方负有保密的责任，不得向&quot;
+                + &quot;任何第三方透露。为明确双方的保密义务，双方应签署《软件项目委托测试保密&quot;
+                + &quot;协议》，并保证切实遵守其中条款。&quot;,
+            textfont));
+<span class="fc" id="L406">    text4.setSpacingAfter(30f); // 设置段落下空白</span>
+
+<span class="fc" id="L408">    Paragraph text5 = new Paragraph();</span>
+<span class="fc" id="L409">    text5.setLeading(24f);</span>
+<span class="fc" id="L410">    text5.add(new Phrase(&quot;八、风险责任的承担\n&quot;, keyfont));</span>
+<span class="fc" id="L411">    text5.add(</span>
+        new Phrase(
+            &quot;    乙方人员在本协议有效期间（包括可能的到甲方出差）发生人身意外或&quot;
+                + &quot;罹患疾病时由乙方负责处理。甲方人员在本协议有效期间（包括可能的到乙方出差）&quot;
+                + &quot;发生人身意外或罹患疾病时由甲方负责处理。&quot;,
+            textfont));
+<span class="fc" id="L417">    text5.setSpacingAfter(40f); // 设置段落下空白</span>
+
+<span class="fc" id="L419">    document.add(text1);</span>
+<span class="fc" id="L420">    document.add(text2);</span>
+<span class="fc" id="L421">    document.add(text3);</span>
+<span class="fc" id="L422">    document.add(text4);</span>
+<span class="fc" id="L423">    document.add(text5);</span>
+<span class="fc" id="L424">  }</span>
+
+  /** 生成JS004文档第四页 */
+  public void generatePageFour(Document document) throws Exception {
+<span class="fc" id="L428">    Paragraph text1 = new Paragraph();</span>
+<span class="fc" id="L429">    text1.setLeading(24f);</span>
+<span class="fc" id="L430">    text1.add(new Chunk(&quot;九、验收方法\n&quot;, keyfont));</span>
+<span class="fc" id="L431">    text1.add(new Chunk(&quot;    由乙方向甲方提交软件产品鉴定测试报告正本一份，甲方签收鉴定测试报告后，完成验收。\n&quot;, textfont));</span>
+<span class="fc" id="L432">    text1.setSpacingAfter(30f); // 设置段落下空白</span>
+
+<span class="fc" id="L434">    Paragraph text2 = new Paragraph();</span>
+<span class="fc" id="L435">    text2.setLeading(24f);</span>
+<span class="fc" id="L436">    text2.add(new Phrase(&quot;十、争议解决\n&quot;, keyfont));</span>
+<span class="fc" id="L437">    text2.add(</span>
+        new Phrase(
+            &quot;    双方因履行本合同所发生的一切争议，应通过友好协商解决；如协商解决不成，&quot; + &quot;就提交市级仲裁委员会进行仲裁。裁决对双方当事人具有同等约束力。\n&quot;,
+            textfont));
+<span class="fc" id="L441">    text2.setSpacingAfter(30f); // 设置段落下空白</span>
+
+<span class="fc" id="L443">    Paragraph text3 = new Paragraph();</span>
+<span class="fc" id="L444">    text3.setLeading(24f);</span>
+<span class="fc" id="L445">    text3.add(new Phrase(&quot;十一、其他\n&quot;, keyfont));</span>
+<span class="fc" id="L446">    text3.add(</span>
+        new Phrase(
+            &quot;    本合同自双方授权代表签字盖章之日起生效，自受托方的主要义务履行完毕之日起终止。\n&quot;
+                + &quot;    本合同未尽事宜由双方协商解决。\n&quot;
+                + &quot;    本合同的正本一式肆份，双方各执两份，具有同等法律效力。\n&quot;,
+            textfont));
+<span class="fc" id="L452">    text3.setSpacingAfter(30f); // 设置段落下空白</span>
+
+<span class="fc" id="L454">    document.add(text1);</span>
+<span class="fc" id="L455">    document.add(text2);</span>
+<span class="fc" id="L456">    document.add(text3);</span>
+<span class="fc" id="L457">  }</span>
+
+  /** 生成JS004文档第五页 */
+  public void generatePageFive(Document document) throws Exception {
+<span class="fc" id="L461">    Paragraph text1 = new Paragraph();</span>
+<span class="fc" id="L462">    text1.setLeading(24f);</span>
+<span class="fc" id="L463">    text1.add(new Chunk(&quot;十二、签章\n&quot;, keyfont));</span>
+<span class="fc" id="L464">    text1.setSpacingAfter(30f); // 设置段落下空白</span>
+
+<span class="fc" id="L466">    float tableWidth = 430;</span>
+<span class="fc" id="L467">    float[] widths = new float[30];</span>
+<span class="fc" id="L468">    Arrays.fill(widths, tableWidth / 30);</span>
+    // 行列每个基础单元格为 5mm x 5mm
+<span class="fc" id="L470">    PdfPTable table = ItextUtils.createTable(widths, tableWidth);</span>
+
+<span class="fc" id="L472">    float[] paddings = new float[] {10f, 10f, 5f, 5f};</span>
+<span class="fc" id="L473">    float borderWidth = 1f;</span>
+
+<span class="fc" id="L475">    table.addCell(</span>
+<span class="fc" id="L476">        ItextUtils.createCell(</span>
+            &quot;委\n\n\n\n托\n\n\n\n方&quot;, textfont, Element.ALIGN_CENTER, 2, 18, paddings, borderWidth));
+
+<span class="fc" id="L479">    table.addCell(</span>
+<span class="fc" id="L480">        ItextUtils.createCell(</span>
+            &quot;单位全称\n\n\n\n&quot;, textfont, Element.ALIGN_CENTER, 5, 5, paddings, borderWidth));
+<span class="fc" id="L482">    table.addCell(</span>
+<span class="fc" id="L483">        ItextUtils.createCell(</span>
+<span class="fc" id="L484">            JS004Json.getInputJiaFang() + &quot;\n\n\n（签章）\n&quot;,</span>
+            textfont,
+            Element.ALIGN_CENTER,
+            23,
+            5,
+            paddings,
+            borderWidth));
+
+<span class="fc" id="L492">    table.addCell(</span>
+<span class="fc" id="L493">        ItextUtils.createCell(&quot;授权代表&quot;, textfont, Element.ALIGN_CENTER, 5, 3, paddings, borderWidth));</span>
+<span class="fc" id="L494">    table.addCell(</span>
+<span class="fc" id="L495">        ItextUtils.createCell(</span>
+<span class="fc" id="L496">            JS004Json.getInputJiaFang0ShouQuanDaiBiao(),</span>
+            textfont,
+            Element.ALIGN_CENTER,
+            9,
+            3,
+            paddings,
+            borderWidth));
+<span class="fc" id="L503">    table.addCell(</span>
+<span class="fc" id="L504">        ItextUtils.createCell(&quot;签章日期&quot;, textfont, Element.ALIGN_CENTER, 3, 3, paddings, borderWidth));</span>
+<span class="fc" id="L505">    table.addCell(</span>
+<span class="fc" id="L506">        ItextUtils.createCell(</span>
+<span class="fc" id="L507">            JS004Json.getInputJiaFang0QianZhangRiQi(),</span>
+            textfont,
+            Element.ALIGN_CENTER,
+            11,
+            3,
+            paddings,
+            borderWidth));
+
+<span class="fc" id="L515">    table.addCell(</span>
+<span class="fc" id="L516">        ItextUtils.createCell(&quot;联系人&quot;, textfont, Element.ALIGN_CENTER, 5, 2, paddings, borderWidth));</span>
+<span class="fc" id="L517">    table.addCell(</span>
+<span class="fc" id="L518">        ItextUtils.createCell(</span>
+<span class="fc" id="L519">            JS004Json.getInputJiaFang0LianXiRen(),</span>
+            textfont,
+            Element.ALIGN_CENTER,
+            23,
+            2,
+            paddings,
+            borderWidth));
+
+<span class="fc" id="L527">    table.addCell(</span>
+<span class="fc" id="L528">        ItextUtils.createCell(&quot;通讯地址&quot;, textfont, Element.ALIGN_CENTER, 5, 2, paddings, borderWidth));</span>
+<span class="fc" id="L529">    table.addCell(</span>
+<span class="fc" id="L530">        ItextUtils.createCell(</span>
+<span class="fc" id="L531">            JS004Json.getInputJiaFang0TongXunDiZhi(),</span>
+            textfont,
+            Element.ALIGN_CENTER,
+            23,
+            2,
+            paddings,
+            borderWidth));
+
+<span class="fc" id="L539">    table.addCell(</span>
+<span class="fc" id="L540">        ItextUtils.createCell(&quot;电话&quot;, textfont, Element.ALIGN_CENTER, 5, 2, paddings, borderWidth));</span>
+<span class="fc" id="L541">    table.addCell(</span>
+<span class="fc" id="L542">        ItextUtils.createCell(</span>
+<span class="fc" id="L543">            JS004Json.getInputJiaFang0DianHua(),</span>
+            textfont,
+            Element.ALIGN_CENTER,
+            9,
+            2,
+            paddings,
+            borderWidth));
+<span class="fc" id="L550">    table.addCell(</span>
+<span class="fc" id="L551">        ItextUtils.createCell(&quot;传真&quot;, textfont, Element.ALIGN_CENTER, 3, 2, paddings, borderWidth));</span>
+<span class="fc" id="L552">    table.addCell(</span>
+<span class="fc" id="L553">        ItextUtils.createCell(</span>
+<span class="fc" id="L554">            JS004Json.getInputJiaFang0ChuanZhen(),</span>
+            textfont,
+            Element.ALIGN_CENTER,
+            11,
+            2,
+            paddings,
+            borderWidth));
+
+<span class="fc" id="L562">    table.addCell(</span>
+<span class="fc" id="L563">        ItextUtils.createCell(&quot;开户银行&quot;, textfont, Element.ALIGN_CENTER, 5, 2, paddings, borderWidth));</span>
+<span class="fc" id="L564">    table.addCell(</span>
+<span class="fc" id="L565">        ItextUtils.createCell(</span>
+<span class="fc" id="L566">            JS004Json.getInputJiaFang0KaiHuYinHang(),</span>
+            textfont,
+            Element.ALIGN_CENTER,
+            23,
+            2,
+            paddings,
+            borderWidth));
+
+<span class="fc" id="L574">    table.addCell(</span>
+<span class="fc" id="L575">        ItextUtils.createCell(&quot;账号&quot;, textfont, Element.ALIGN_CENTER, 5, 2, paddings, borderWidth));</span>
+<span class="fc" id="L576">    table.addCell(</span>
+<span class="fc" id="L577">        ItextUtils.createCell(</span>
+<span class="fc" id="L578">            JS004Json.getInputJiaFang0ZhangHao(),</span>
+            textfont,
+            Element.ALIGN_CENTER,
+            9,
+            2,
+            paddings,
+            borderWidth));
+<span class="fc" id="L585">    table.addCell(</span>
+<span class="fc" id="L586">        ItextUtils.createCell(&quot;邮编&quot;, textfont, Element.ALIGN_CENTER, 3, 2, paddings, borderWidth));</span>
+<span class="fc" id="L587">    table.addCell(</span>
+<span class="fc" id="L588">        ItextUtils.createCell(</span>
+<span class="fc" id="L589">            JS004Json.getInputJiaFang0YouBian(),</span>
+            textfont,
+            Element.ALIGN_CENTER,
+            11,
+            2,
+            paddings,
+            borderWidth));
+
+<span class="fc" id="L597">    table.addCell(</span>
+<span class="fc" id="L598">        ItextUtils.createCell(</span>
+            &quot;受\n\n\n\n托\n\n\n\n方&quot;, textfont, Element.ALIGN_CENTER, 2, 20, paddings, borderWidth));
+
+<span class="fc" id="L601">    table.addCell(</span>
+<span class="fc" id="L602">        ItextUtils.createCell(</span>
+            &quot;单位全称\n\n\n\n&quot;, textfont, Element.ALIGN_CENTER, 5, 5, paddings, borderWidth));
+<span class="fc" id="L604">    table.addCell(</span>
+<span class="fc" id="L605">        ItextUtils.createCell(</span>
+<span class="fc" id="L606">            JS004Json.getInputYiFang() + &quot;\n\n\n（签章）\n&quot;,</span>
+            textfont,
+            Element.ALIGN_CENTER,
+            23,
+            5,
+            paddings,
+            borderWidth));
+
+<span class="fc" id="L614">    table.addCell(</span>
+<span class="fc" id="L615">        ItextUtils.createCell(&quot;授权代表&quot;, textfont, Element.ALIGN_CENTER, 5, 3, paddings, borderWidth));</span>
+<span class="fc" id="L616">    table.addCell(</span>
+<span class="fc" id="L617">        ItextUtils.createCell(</span>
+<span class="fc" id="L618">            JS004Json.getInputYiFang0ShouQuanDaiBiao(),</span>
+            textfont,
+            Element.ALIGN_CENTER,
+            9,
+            3,
+            paddings,
+            borderWidth));
+<span class="fc" id="L625">    table.addCell(</span>
+<span class="fc" id="L626">        ItextUtils.createCell(&quot;签章日期&quot;, textfont, Element.ALIGN_CENTER, 3, 3, paddings, borderWidth));</span>
+<span class="fc" id="L627">    table.addCell(</span>
+<span class="fc" id="L628">        ItextUtils.createCell(</span>
+<span class="fc" id="L629">            JS004Json.getInputYiFang0QianZhangRiQi(),</span>
+            textfont,
+            Element.ALIGN_CENTER,
+            11,
+            3,
+            paddings,
+            borderWidth));
+
+<span class="fc" id="L637">    table.addCell(</span>
+<span class="fc" id="L638">        ItextUtils.createCell(&quot;联系人&quot;, textfont, Element.ALIGN_CENTER, 5, 2, paddings, borderWidth));</span>
+<span class="fc" id="L639">    table.addCell(</span>
+<span class="fc" id="L640">        ItextUtils.createCell(</span>
+<span class="fc" id="L641">            JS004Json.getInputYiFang0LianXiRen(),</span>
+            textfont,
+            Element.ALIGN_CENTER,
+            23,
+            2,
+            paddings,
+            borderWidth));
+
+<span class="fc" id="L649">    table.addCell(</span>
+<span class="fc" id="L650">        ItextUtils.createCell(&quot;通讯地址&quot;, textfont, Element.ALIGN_CENTER, 5, 2, paddings, borderWidth));</span>
+<span class="fc" id="L651">    table.addCell(</span>
+<span class="fc" id="L652">        ItextUtils.createCell(</span>
+<span class="fc" id="L653">            JS004Json.getInputYiFang0TongXunDiZhi(),</span>
+            textfont,
+            Element.ALIGN_CENTER,
+            23,
+            2,
+            paddings,
+            borderWidth));
+
+<span class="fc" id="L661">    table.addCell(</span>
+<span class="fc" id="L662">        ItextUtils.createCell(&quot;电话&quot;, textfont, Element.ALIGN_CENTER, 5, 2, paddings, borderWidth));</span>
+<span class="fc" id="L663">    table.addCell(</span>
+<span class="fc" id="L664">        ItextUtils.createCell(</span>
+<span class="fc" id="L665">            JS004Json.getInputYiFang0DianHua(),</span>
+            textfont,
+            Element.ALIGN_CENTER,
+            9,
+            2,
+            paddings,
+            borderWidth));
+<span class="fc" id="L672">    table.addCell(</span>
+<span class="fc" id="L673">        ItextUtils.createCell(&quot;传真&quot;, textfont, Element.ALIGN_CENTER, 3, 2, paddings, borderWidth));</span>
+<span class="fc" id="L674">    table.addCell(</span>
+<span class="fc" id="L675">        ItextUtils.createCell(</span>
+<span class="fc" id="L676">            JS004Json.getInputYiFang0ChuanZhen(),</span>
+            textfont,
+            Element.ALIGN_CENTER,
+            11,
+            2,
+            paddings,
+            borderWidth));
+
+<span class="fc" id="L684">    table.addCell(</span>
+<span class="fc" id="L685">        ItextUtils.createCell(&quot;户名&quot;, textfont, Element.ALIGN_CENTER, 5, 2, paddings, borderWidth));</span>
+<span class="fc" id="L686">    table.addCell(</span>
+<span class="fc" id="L687">        ItextUtils.createCell(</span>
+<span class="fc" id="L688">            JS004Json.getInputYiFang0HuMing(),</span>
+            textfont,
+            Element.ALIGN_CENTER,
+            23,
+            2,
+            paddings,
+            borderWidth));
+
+<span class="fc" id="L696">    table.addCell(</span>
+<span class="fc" id="L697">        ItextUtils.createCell(&quot;开户银行&quot;, textfont, Element.ALIGN_CENTER, 5, 2, paddings, borderWidth));</span>
+<span class="fc" id="L698">    table.addCell(</span>
+<span class="fc" id="L699">        ItextUtils.createCell(</span>
+<span class="fc" id="L700">            JS004Json.getInputYiFang0KaiHuYinHang(),</span>
+            textfont,
+            Element.ALIGN_CENTER,
+            23,
+            2,
+            paddings,
+            borderWidth));
+
+<span class="fc" id="L708">    table.addCell(</span>
+<span class="fc" id="L709">        ItextUtils.createCell(&quot;账号&quot;, textfont, Element.ALIGN_CENTER, 5, 2, paddings, borderWidth));</span>
+<span class="fc" id="L710">    table.addCell(</span>
+<span class="fc" id="L711">        ItextUtils.createCell(</span>
+<span class="fc" id="L712">            JS004Json.getInputYiFang0ZhangHao(),</span>
+            textfont,
+            Element.ALIGN_CENTER,
+            9,
+            2,
+            paddings,
+            borderWidth));
+<span class="fc" id="L719">    table.addCell(</span>
+<span class="fc" id="L720">        ItextUtils.createCell(&quot;邮编&quot;, textfont, Element.ALIGN_CENTER, 3, 2, paddings, borderWidth));</span>
+<span class="fc" id="L721">    table.addCell(</span>
+<span class="fc" id="L722">        ItextUtils.createCell(</span>
+<span class="fc" id="L723">            JS004Json.getInputYiFang0YouBian(),</span>
+            textfont,
+            Element.ALIGN_CENTER,
+            11,
+            2,
+            paddings,
+            borderWidth));
+
+<span class="fc" id="L731">    document.add(text1);</span>
+<span class="fc" id="L732">    document.add(table);</span>
+<span class="fc" id="L733">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

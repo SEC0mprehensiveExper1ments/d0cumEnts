@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DownloadController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-document</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.doc.controller</a> &gt; <span class="el_source">DownloadController.java</span></div><h1>DownloadController.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.doc.controller;
+
+import com.njustc.onlinebiz.common.model.Role;
+import com.njustc.onlinebiz.common.model.contract.Contract;
+import com.njustc.onlinebiz.common.model.entrust.Entrust;
+import com.njustc.onlinebiz.common.model.entrust.EntrustQuote;
+import com.njustc.onlinebiz.common.model.test.report.Report;
+import com.njustc.onlinebiz.common.model.test.review.EntrustTestReview;
+import com.njustc.onlinebiz.common.model.test.review.ReportReview;
+import com.njustc.onlinebiz.common.model.test.review.SchemeReview;
+import com.njustc.onlinebiz.common.model.test.scheme.Scheme;
+import com.njustc.onlinebiz.common.model.test.testcase.Testcase;
+import com.njustc.onlinebiz.common.model.test.testissue.TestIssueList;
+import com.njustc.onlinebiz.common.model.test.testrecord.TestRecordList;
+import com.njustc.onlinebiz.doc.model.*;
+import com.njustc.onlinebiz.doc.model.JS003.JS003;
+import com.njustc.onlinebiz.doc.service.*;
+import org.springframework.web.bind.annotation.*;
+
+/**
+ * 下载控制器，收到请求后，文档服务向对应服务发出字段获取请求，通过DTO对象转换成文档内定义个的类对象
+ *
+ */
+@RestController
+@RequestMapping(&quot;/api&quot;)
+public class DownloadController {
+
+    private final DocServiceJS001 docServiceJS001;
+    private final DocServiceJS002 docServiceJS002;
+    private final DocServiceJS003 docServiceJS003;
+    private final DocServiceJS004 docServiceJS004;
+    private final DocServiceJS005 docServiceJS005;
+    private final DocServiceJS006 docServiceJS006;
+    private final DocServiceJS007 docServiceJS007;
+    private final DocServiceJS008 docServiceJS008;
+    private final DocServiceJS009 docServiceJS009;
+    private final DocServiceJS010 docServiceJS010;
+    private final DocServiceJS011 docServiceJS011;
+    private final DocServiceJS012 docServiceJS012;
+    private final DocServiceJS013 docServiceJS013;
+    private final DocServiceJS014 docServiceJS014;
+    private final DocServiceEntrustQuote docServiceEntrustQuote;
+    private final RestRequestService restRequestService;
+
+    public DownloadController(DocServiceJS001 docServiceJS001,
+                              DocServiceJS002 docServiceJS002,
+                              DocServiceJS003 docServiceJS003,
+                              DocServiceJS004 docServiceJS004,
+                              DocServiceJS005 docServiceJS005,
+                              DocServiceJS006 docServiceJS006,
+                              DocServiceJS007 docServiceJS007,
+                              DocServiceJS008 docServiceJS008,
+                              DocServiceJS009 docServiceJS009,
+                              DocServiceJS010 docServiceJS010,
+                              DocServiceJS011 docServiceJS011,
+                              DocServiceJS012 docServiceJS012,
+                              DocServiceJS013 docServiceJS013,
+                              DocServiceJS014 docServiceJS014,
+                              DocServiceEntrustQuote docServiceEntrustQuote,
+<span class="fc" id="L60">                              RestRequestService restRequestService) {</span>
+<span class="fc" id="L61">        this.docServiceJS001 = docServiceJS001;</span>
+<span class="fc" id="L62">        this.docServiceJS002 = docServiceJS002;</span>
+<span class="fc" id="L63">        this.docServiceJS003 = docServiceJS003;</span>
+<span class="fc" id="L64">        this.docServiceJS004 = docServiceJS004;</span>
+<span class="fc" id="L65">        this.docServiceJS005 = docServiceJS005;</span>
+<span class="fc" id="L66">        this.docServiceJS006 = docServiceJS006;</span>
+<span class="fc" id="L67">        this.docServiceJS007 = docServiceJS007;</span>
+<span class="fc" id="L68">        this.docServiceJS008 = docServiceJS008;</span>
+<span class="fc" id="L69">        this.docServiceJS009 = docServiceJS009;</span>
+<span class="fc" id="L70">        this.docServiceJS010 = docServiceJS010;</span>
+<span class="fc" id="L71">        this.docServiceJS011 = docServiceJS011;</span>
+<span class="fc" id="L72">        this.docServiceJS012 = docServiceJS012;</span>
+<span class="fc" id="L73">        this.docServiceJS013 = docServiceJS013;</span>
+<span class="fc" id="L74">        this.docServiceJS014 = docServiceJS014;</span>
+<span class="fc" id="L75">        this.docServiceEntrustQuote = docServiceEntrustQuote;</span>
+<span class="fc" id="L76">        this.restRequestService = restRequestService;</span>
+<span class="fc" id="L77">    }</span>
+
+    /**
+     * JS001 文档下载接口
+     *
+     * @return {@link String}
+     */
+    @GetMapping(&quot;/doc/JS001&quot;)
+    public String downloadJS001() {
+<span class="nc" id="L86">        return docServiceJS001.fill();</span>
+    }
+
+    /**
+     * JS002 文档下载接口
+     *
+     * @param entrustId 委托id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @return {@link String}
+     */
+    @GetMapping(&quot;/doc/JS002/{entrustId}&quot;)
+    public String downloadJS002(
+            @PathVariable(&quot;entrustId&quot;) String entrustId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+
+<span class="nc" id="L104">        Entrust entrust = restRequestService.getEntrustById(entrustId, userId, userRole);</span>
+<span class="nc" id="L105">        return docServiceJS002.fill(entrustId.replaceAll(&quot;////&quot;,&quot;&quot;), new JS002(entrust));</span>
+    }
+
+    /**
+     * JS003 文档下载接口
+     *
+     * @param entrustId 委托id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @return {@link String}
+     */
+    @GetMapping(&quot;/doc/JS003/{entrustId}&quot;)
+    public String downloadJS003(
+            @PathVariable(&quot;entrustId&quot;) String entrustId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L122">        Entrust entrust = restRequestService.getEntrustById(entrustId, userId, userRole);</span>
+<span class="nc" id="L123">        return docServiceJS003.fill(entrustId.replaceAll(&quot;////&quot;,&quot;&quot;), new JS003(entrust));</span>
+    }
+
+    /**
+     * JS004 文档下载接口
+     *
+     * @param contractId 合同标识
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @return {@link String}
+     */
+    @GetMapping(&quot;/doc/JS004/{contractId}&quot;)
+    public String downloadJS004(
+            @PathVariable(&quot;contractId&quot;) String contractId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L140">        Contract contract = restRequestService.getContractById(contractId, userId, userRole);</span>
+<span class="nc" id="L141">        return docServiceJS004.fill(contractId.replaceAll(&quot;////&quot;,&quot;&quot;), new JS004(contract));</span>
+    }
+
+    /**
+     * JS005 文档下载接口
+     *
+     * @param contractId 合同标识
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @return {@link String}
+     */
+    @GetMapping(&quot;/doc/JS005/{contractId}&quot;)
+    public String downloadJS005(
+            @PathVariable(&quot;contractId&quot;) String contractId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L158">        Contract contract = restRequestService.getContractById(contractId, userId, userRole);</span>
+<span class="nc" id="L159">        return docServiceJS005.fill(contractId.replaceAll(&quot;////&quot;,&quot;&quot;), new JS005(contract));</span>
+    }
+
+    /**
+     * JS006 文档下载接口
+     *
+     * @param schemeId 计划id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @return {@link String}
+     */
+    @GetMapping(&quot;/doc/JS006/{schemeId}&quot;)
+    public String downloadJS006(
+            @PathVariable(&quot;schemeId&quot;) String schemeId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L176">        Scheme scheme = restRequestService.getScheme(schemeId, userId, userRole);</span>
+<span class="nc" id="L177">        JS006 newJson = new JS006(scheme);</span>
+<span class="nc" id="L178">        return docServiceJS006.fill(schemeId.replaceAll(&quot;////&quot;,&quot;&quot;), newJson);</span>
+    }
+
+    /**
+     * JS007 文档下载接口
+     *
+     * @param reportId 报告id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @return {@link String}
+     */
+    @GetMapping(&quot;/doc/JS007/{reportId}&quot;)
+    public String downloadJS007(
+            @PathVariable(&quot;reportId&quot;) String reportId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L195">        Report report = restRequestService.getReport(reportId, userId, userRole);</span>
+<span class="nc" id="L196">        JS007 newJson = new JS007(report);</span>
+<span class="nc" id="L197">        return docServiceJS007.fill(reportId.replaceAll(&quot;////&quot;,&quot;&quot;), newJson);</span>
+    }
+
+    /**
+     * JS008 文档下载接口
+     *
+     * @param testcaseId testcase id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @return {@link String}
+     */
+    @GetMapping(&quot;/doc/JS008/{testcaseId}&quot;)
+    public String downloadJS008(
+            @PathVariable(&quot;testcaseId&quot;) String testcaseId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L214">        Testcase testcase = restRequestService.getTestcaseById(testcaseId, userId, userRole);</span>
+<span class="nc" id="L215">        return docServiceJS008.fill(testcaseId.replaceAll(&quot;////&quot;,&quot;&quot;), new JS008(testcase));</span>
+    }
+
+    /**
+     * JS009 文档下载接口
+     *
+     * @param testRecordId 测试记录id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @return {@link String}
+     */
+    @GetMapping(&quot;/doc/JS009/{testRecordId}&quot;)
+    public String downloadJS009(
+            @PathVariable(&quot;testRecordId&quot;) String testRecordId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L232">        TestRecordList testRecordList = restRequestService.getTestRecordListById(testRecordId, userId, userRole);</span>
+<span class="nc" id="L233">        return docServiceJS009.fill(testRecordId.replaceAll(&quot;////&quot;,&quot;&quot;), new JS009(testRecordList));</span>
+    }
+
+    /**
+     * JS010 文档下载接口
+     *
+     * @param reportReviewId 报告评论id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @return {@link String}
+     */
+    @GetMapping(&quot;/doc/JS010/{reportReviewId}&quot;)
+    public String downloadJS010(
+            @PathVariable(&quot;reportReviewId&quot;) String reportReviewId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L250">        ReportReview reportReview = restRequestService.getReportReviewById(reportReviewId, userId, userRole);</span>
+<span class="nc" id="L251">        return docServiceJS010.fill(reportReviewId.replaceAll(&quot;////&quot;,&quot;&quot;), new JS010(reportReview));</span>
+    }
+
+    /**
+     * JS011 文档下载接口
+     *
+     * @param testIssueId 测试问题id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @return {@link String}
+     */
+    @GetMapping(&quot;/doc/JS011/{testIssueId}&quot;)
+    public String downloadJS011(
+            @PathVariable(&quot;testIssueId&quot;) String testIssueId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L268">        TestIssueList testIssueList = restRequestService.getTestIssueListById(testIssueId, userId, userRole);</span>
+<span class="nc" id="L269">        return docServiceJS011.fill(testIssueId.replaceAll(&quot;////&quot;,&quot;&quot;), new JS011(testIssueList));</span>
+    }
+
+    /**
+     * JS012 文档下载接口
+     *
+     * @param entrustTestReviewId 委托测试评论id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @return {@link String}
+     */
+    @GetMapping(&quot;/doc/JS012/{entrustTestReviewId}&quot;)
+    public String downloadJS012(
+            @PathVariable(&quot;entrustTestReviewId&quot;) String entrustTestReviewId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L286">        EntrustTestReview entrustTestReview = restRequestService.getEntrustTestReviewById(entrustTestReviewId, userId, userRole);</span>
+<span class="nc" id="L287">        return docServiceJS012.fill(entrustTestReviewId.replaceAll(&quot;////&quot;,&quot;&quot;), new JS012(entrustTestReview));</span>
+    }
+
+    /**
+     * JS013 文档下载接口
+     *
+     * @param schemeReviewId 方案审查id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @return {@link String}
+     */
+    @GetMapping(&quot;/doc/JS013/{schemeReviewId}&quot;)
+    public String downloadJS013(
+            @PathVariable(&quot;schemeReviewId&quot;) String schemeReviewId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L304">        SchemeReview schemeReview = restRequestService.getSchemeReviewById(schemeReviewId, userId, userRole);</span>
+<span class="nc" id="L305">        return docServiceJS013.fill(schemeReviewId.replaceAll(&quot;////&quot;,&quot;&quot;), new JS013(schemeReview));</span>
+    }
+
+    /**
+     * JS014 文档下载接口
+     *
+     * @param entrustId 委托id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @return {@link String}
+     */
+    @GetMapping(&quot;/doc/JS014/{entrustId}&quot;)
+    public String downloadJS014(
+            @PathVariable(&quot;entrustId&quot;) String entrustId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L322">        Entrust entrust = restRequestService.getEntrustById(entrustId, userId, userRole);</span>
+<span class="nc" id="L323">        return docServiceJS014.fill(entrustId.replaceAll(&quot;////&quot;,&quot;&quot;), new JS014(entrust));</span>
+    }
+
+    /**
+     * 报价单 文档下载接口
+     *
+     * @param entrustId 委托id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @return {@link String}
+     */
+    @GetMapping(&quot;/doc/entrustQuote/{entrustId}&quot;)
+    public String downloadEntrustQuote(
+            @PathVariable(&quot;entrustId&quot;) String entrustId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L340">        EntrustQuote entrustQuote = restRequestService.getEntrustQuoteById(entrustId, userId, userRole);</span>
+<span class="nc" id="L341">        return docServiceEntrustQuote.fill(entrustId.replaceAll(&quot;////&quot;,&quot;&quot;), new EntrustQuoteDoc(entrustQuote));</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JS007.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-document</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.doc.model</a> &gt; <span class="el_source">JS007.java</span></div><h1>JS007.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.doc.model;
+
+import com.njustc.onlinebiz.common.model.test.report.Report;
+import com.njustc.onlinebiz.common.model.test.report.SoftwareEnvironment;
+import com.njustc.onlinebiz.common.model.test.report.TestContent;
+import com.njustc.onlinebiz.common.model.test.testrecord.TestRecordList;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+import java.util.ArrayList;
+import java.util.List;
+
+<span class="pc bnc" id="L15" title="All 478 branches missed.">@Data</span>
+<span class="fc" id="L16">@NoArgsConstructor</span>
+<span class="nc" id="L17">@AllArgsConstructor</span>
+@Accessors(chain = true)
+public class JS007 {
+<span class="pc" id="L20">    private String inputBaoGaoBianHao = &quot;&quot;;</span>
+<span class="pc" id="L21">    private String inputRuanJianMingCheng = &quot;&quot;;</span>
+<span class="pc" id="L22">    private String inputBanBenHao = &quot;&quot;;</span>
+<span class="pc" id="L23">    private String inputWeiTuoDanWei = &quot;&quot;;</span>
+<span class="pc" id="L24">    private String inputCeShiLeiBie = &quot;&quot;;</span>
+<span class="pc" id="L25">    private String inputBaoGaoRiQiNian = &quot;&quot;;</span>
+<span class="pc" id="L26">    private String inputBaoGaoRiQiYue = &quot;&quot;;</span>
+<span class="pc" id="L27">    private String inputBaoGaoRiQiRi = &quot;&quot;;</span>
+    /* 子项先从左往右，从上至下，递增 */
+<span class="pc" id="L29">    private String inputXiangMuBianHao = &quot;&quot;;</span>
+<span class="pc" id="L30">    private String inputYangPinMingCheng = &quot;&quot;;</span>
+<span class="pc" id="L31">    private String inputBanBenXingHao = &quot;&quot;;</span>
+<span class="pc" id="L32">    private String inputLaiYangRiQiNian = &quot;&quot;;</span>
+<span class="pc" id="L33">    private String inputLaiYangRiQiYue = &quot;&quot;;</span>
+<span class="pc" id="L34">    private String inputLaiYangRiQiRi = &quot;&quot;;</span>
+<span class="pc" id="L35">    private String inputCeShiKaiShiRiQiNian = &quot;&quot;;</span>
+<span class="pc" id="L36">    private String inputCeShiKaiShiRiQiYue = &quot;&quot;;</span>
+<span class="pc" id="L37">    private String inputCeShiKaiShiRiQiRi = &quot;&quot;;</span>
+<span class="pc" id="L38">    private String inputCeShiJieShuRiQiNian = &quot;&quot;;</span>
+<span class="pc" id="L39">    private String inputCeShiJieShuRiQiYue = &quot;&quot;;</span>
+<span class="pc" id="L40">    private String inputCeShiJieShuRiQiRi = &quot;&quot;;</span>
+
+<span class="pc" id="L42">    private String inputYangPinZhuangTai = &quot;&quot;;</span>
+<span class="pc" id="L43">    private String inputCeShiYiJu = &quot;&quot;;</span>
+<span class="pc" id="L44">    private String inputYangPinQingDan = &quot;&quot;;</span>
+<span class="pc" id="L45">    private String inputCeShiJieLun = &quot;&quot;;</span>
+<span class="pc" id="L46">    private String inputZhuCeRen = &quot;&quot;;</span>
+<span class="pc" id="L47">    private String inputZhuCeRiQiNian = &quot;&quot;;</span>
+<span class="pc" id="L48">    private String inputZhuCeRiQiYue = &quot;&quot;;</span>
+<span class="pc" id="L49">    private String inputZhuCeRiQiRi = &quot;&quot;;</span>
+<span class="pc" id="L50">    private String inputShenHeRen = &quot;&quot;;</span>
+<span class="pc" id="L51">    private String inputShenHeRiQiNian = &quot;&quot;;</span>
+<span class="pc" id="L52">    private String inputShenHeRiQiYue = &quot;&quot;;</span>
+<span class="pc" id="L53">    private String inputShenHeRiQiRi = &quot;&quot;;</span>
+<span class="pc" id="L54">    private String inputPiZhunRen = &quot;&quot;;</span>
+<span class="pc" id="L55">    private String inputPiZhunRiQiNian = &quot;&quot;;</span>
+<span class="pc" id="L56">    private String inputPiZhunRiQiYue = &quot;&quot;;</span>
+<span class="pc" id="L57">    private String inputPiZhunRiQiRi = &quot;&quot;;</span>
+
+<span class="pc" id="L59">    private String inputDianHua = &quot;&quot;;</span>
+<span class="pc" id="L60">    private String inputChuanZhen = &quot;&quot;;</span>
+<span class="pc" id="L61">    private String inputDiZhi = &quot;&quot;;</span>
+<span class="pc" id="L62">    private String inputYouBian = &quot;&quot;;</span>
+<span class="pc" id="L63">    private String inputLianXiRen = &quot;&quot;;</span>
+<span class="pc" id="L64">    private String inputEmail = &quot;&quot;;</span>
+
+<span class="pc" id="L66">    private String inputYingJianLeiBie = &quot;&quot;;</span>
+<span class="pc" id="L67">    private String inputYingJianMingCheng = &quot;&quot;;</span>
+<span class="pc" id="L68">    private String inputYingJianPeiZhi = &quot;&quot;;</span>
+<span class="pc" id="L69">    private String inputYingJianShuLiang = &quot;&quot;;</span>
+<span class="pc" id="L70">    private String inputCaoZuoXiTongMingCheng = &quot;&quot;;</span>
+<span class="pc" id="L71">    private String inputCaoZuoXiTongBanBen = &quot;&quot;;</span>
+<span class="pc" id="L72">    private List&lt;SoftwareEnvironment&gt; inputRuanJianHuanJing = new ArrayList&lt;&gt;();</span>
+<span class="pc" id="L73">    private String inputWangLuoHuanJing = &quot;&quot;;</span>
+<span class="pc" id="L74">    private List&lt;String&gt; inputTestBases = new ArrayList&lt;&gt;();</span>
+<span class="pc" id="L75">    private List&lt;String&gt; inputCanKaoZiLiao = new ArrayList&lt;&gt;();</span>
+<span class="pc" id="L76">    private List&lt;TestContent&gt; inputGongNengXingCeShi = new ArrayList&lt;&gt;();</span>
+<span class="pc" id="L77">    private List&lt;TestContent&gt; inputXiaoLvCeShi = new ArrayList&lt;&gt;();</span>
+<span class="pc" id="L78">    private List&lt;TestContent&gt; inputKeYiZhiXingCeShi = new ArrayList&lt;&gt;();</span>
+<span class="pc" id="L79">    private List&lt;TestContent&gt; inputYiYongXingCeShi = new ArrayList&lt;&gt;();</span>
+<span class="pc" id="L80">    private List&lt;TestContent&gt; inputKeKaoXingCeShi = new ArrayList&lt;&gt;();</span>
+<span class="pc" id="L81">    private List&lt;TestContent&gt; inputKeWeiHuXingCeShi = new ArrayList&lt;&gt;();</span>
+<span class="pc" id="L82">    private List&lt;TestRecordList.TestRecord&gt; inputCeShiZhiXingJiLu = new ArrayList&lt;&gt;();</span>
+
+<span class="nc" id="L84">    public JS007(Report report) {</span>
+<span class="nc bnc" id="L85" title="All 4 branches missed.">        if (report == null || report.getContent() == null) {</span>
+<span class="nc" id="L86">            throw new IllegalArgumentException(&quot;report is null&quot;);</span>
+        }
+<span class="nc" id="L88">        this.inputBaoGaoBianHao = report.getContent().getId();</span>
+<span class="nc" id="L89">        this.inputRuanJianMingCheng = report.getContent().getSoftwareName();</span>
+<span class="nc" id="L90">        this.inputBanBenHao = report.getContent().getVersion();</span>
+<span class="nc" id="L91">        this.inputWeiTuoDanWei = report.getContent().getClientContact().getCompanyCH();</span>
+<span class="nc" id="L92">        this.inputCeShiLeiBie = report.getContent().getTestType();</span>
+
+<span class="nc bnc" id="L94" title="All 2 branches missed.">        if (report.getContent().getReportDate() != null) {</span>
+<span class="nc" id="L95">            this.inputBaoGaoRiQiNian = report.getContent().getReportDate().substring(0, 4);</span>
+<span class="nc" id="L96">            this.inputBaoGaoRiQiYue = report.getContent().getReportDate().substring(5, 7);</span>
+<span class="nc" id="L97">            this.inputBaoGaoRiQiRi = report.getContent().getReportDate().substring(8, 10);</span>
+        }
+<span class="nc" id="L99">        this.inputXiangMuBianHao = report.getContent().getProjectSerialNumber();</span>
+<span class="nc" id="L100">        this.inputYangPinMingCheng = report.getContent().getSampleName();</span>
+<span class="nc" id="L101">        this.inputBanBenXingHao = report.getContent().getSampleVersion();</span>
+
+<span class="nc bnc" id="L103" title="All 2 branches missed.">        if (report.getContent().getSampleDate() != null) {</span>
+<span class="nc" id="L104">            this.inputLaiYangRiQiNian = report.getContent().getSampleDate().substring(0, 4);</span>
+<span class="nc" id="L105">            this.inputLaiYangRiQiYue = report.getContent().getSampleDate().substring(5, 7);</span>
+<span class="nc" id="L106">            this.inputLaiYangRiQiRi = report.getContent().getSampleDate().substring(8, 10);</span>
+        }
+<span class="nc bnc" id="L108" title="All 2 branches missed.">        if (report.getContent().getTestStartTime() != null) {</span>
+<span class="nc" id="L109">            this.inputCeShiKaiShiRiQiNian = report.getContent().getTestStartTime().substring(0, 4);</span>
+<span class="nc" id="L110">            this.inputCeShiKaiShiRiQiYue = report.getContent().getTestStartTime().substring(5, 7);</span>
+<span class="nc" id="L111">            this.inputCeShiKaiShiRiQiRi = report.getContent().getTestStartTime().substring(8, 10);</span>
+        }
+<span class="nc bnc" id="L113" title="All 2 branches missed.">        if (report.getContent().getTestEndTime() != null) {</span>
+<span class="nc" id="L114">            this.inputCeShiJieShuRiQiNian = report.getContent().getTestEndTime().substring(0, 4);</span>
+<span class="nc" id="L115">            this.inputCeShiJieShuRiQiYue = report.getContent().getTestEndTime().substring(5, 7);</span>
+<span class="nc" id="L116">            this.inputCeShiJieShuRiQiRi = report.getContent().getTestEndTime().substring(8, 10);</span>
+        }
+
+<span class="nc" id="L119">        this.inputYangPinZhuangTai = report.getContent().getSampleStatus();</span>
+<span class="nc" id="L120">        this.inputCeShiYiJu = report.getContent().getTestBasis();</span>
+<span class="nc" id="L121">        this.inputYangPinQingDan = report.getContent().getSampleList();</span>
+<span class="nc" id="L122">        this.inputCeShiJieLun = report.getContent().getTestConclusion();</span>
+<span class="nc" id="L123">        this.inputZhuCeRen = report.getContent().getMainTester();</span>
+        //example:&quot;2022-05-11T07:10:10.885Z&quot;
+<span class="nc" id="L125">        String zhuCeRiQi = report.getContent().getMainTesterDate();</span>
+<span class="nc bnc" id="L126" title="All 2 branches missed.">        if (zhuCeRiQi != null) {</span>
+<span class="nc" id="L127">            this.inputZhuCeRiQiNian = zhuCeRiQi.substring(0, 4);</span>
+<span class="nc" id="L128">            this.inputZhuCeRiQiYue = zhuCeRiQi.substring(5, 7);</span>
+<span class="nc" id="L129">            this.inputZhuCeRiQiRi = zhuCeRiQi.substring(8, 10);</span>
+        }
+
+<span class="nc" id="L132">        this.inputShenHeRen = report.getContent().getAuditor();</span>
+
+<span class="nc" id="L134">        String shenHeRiQi = report.getContent().getAuditorDate();</span>
+<span class="nc bnc" id="L135" title="All 2 branches missed.">        if (shenHeRiQi != null) {</span>
+<span class="nc" id="L136">            this.inputShenHeRiQiNian = shenHeRiQi.substring(0, 4);</span>
+<span class="nc" id="L137">            this.inputShenHeRiQiYue = shenHeRiQi.substring(5, 7);</span>
+<span class="nc" id="L138">            this.inputShenHeRiQiRi = shenHeRiQi.substring(8, 10);</span>
+        }
+
+<span class="nc" id="L141">        this.inputPiZhunRen = report.getContent().getApprover();</span>
+
+<span class="nc" id="L143">        String piZhunRiQi = report.getContent().getApproverDate();</span>
+<span class="nc bnc" id="L144" title="All 2 branches missed.">        if (piZhunRiQi != null) {</span>
+<span class="nc" id="L145">            this.inputPiZhunRiQiNian = piZhunRiQi.substring(0, 4);</span>
+<span class="nc" id="L146">            this.inputPiZhunRiQiYue = piZhunRiQi.substring(5, 7);</span>
+<span class="nc" id="L147">            this.inputPiZhunRiQiRi = piZhunRiQi.substring(8, 10);</span>
+        }
+
+<span class="nc bnc" id="L150" title="All 2 branches missed.">        if (report.getContent().getClientContact() != null) {</span>
+<span class="nc" id="L151">            this.inputDianHua = report.getContent().getClientContact().getContactPhone();</span>
+<span class="nc" id="L152">            this.inputChuanZhen = report.getContent().getClientContact().getFax();</span>
+<span class="nc" id="L153">            this.inputDiZhi = report.getContent().getClientContact().getCompanyAddress();</span>
+<span class="nc" id="L154">            this.inputYouBian = report.getContent().getClientContact().getZipCode();</span>
+<span class="nc" id="L155">            this.inputLianXiRen = report.getContent().getClientContact().getContact();</span>
+<span class="nc" id="L156">            this.inputEmail = report.getContent().getClientContact().getContactEmail();</span>
+        }
+
+<span class="nc" id="L159">        this.inputYingJianLeiBie = report.getContent().getHardwareType();</span>
+<span class="nc" id="L160">        this.inputYingJianMingCheng = report.getContent().getHardwareName();</span>
+<span class="nc" id="L161">        this.inputYingJianPeiZhi = report.getContent().getHardwareConfig();</span>
+<span class="nc" id="L162">        this.inputYingJianShuLiang = report.getContent().getHardwareNum();</span>
+<span class="nc" id="L163">        this.inputCaoZuoXiTongMingCheng = report.getContent().getOsSoftwareName();</span>
+<span class="nc" id="L164">        this.inputCaoZuoXiTongBanBen = report.getContent().getOsVersion();</span>
+<span class="nc" id="L165">        this.inputRuanJianHuanJing = report.getContent().getSoftwareEnvironments();</span>
+<span class="nc" id="L166">        this.inputWangLuoHuanJing = report.getContent().getNetworkEnvironment();</span>
+<span class="nc" id="L167">        this.inputTestBases = report.getContent().getTestBases();</span>
+<span class="nc" id="L168">        this.inputCanKaoZiLiao = report.getContent().getReferenceMaterials();</span>
+<span class="nc" id="L169">        this.inputGongNengXingCeShi = report.getContent().getFunctionalTests();</span>
+<span class="nc" id="L170">        this.inputXiaoLvCeShi = report.getContent().getEfficiencyTests();</span>
+<span class="nc" id="L171">        this.inputKeYiZhiXingCeShi = report.getContent().getPortableTests();</span>
+<span class="nc" id="L172">        this.inputYiYongXingCeShi = report.getContent().getUsabilityTests();</span>
+<span class="nc" id="L173">        this.inputKeKaoXingCeShi = report.getContent().getReliabilityTests();</span>
+<span class="nc" id="L174">        this.inputKeWeiHuXingCeShi = report.getContent().getMaintainabilityTests();</span>
+<span class="nc" id="L175">        this.inputCeShiZhiXingJiLu = report.getContent().getTestRecords();</span>
+
+        //添加字段非空性检查
+<span class="nc bnc" id="L178" title="All 2 branches missed.">        if (this.inputBaoGaoBianHao == null) this.inputBaoGaoBianHao = &quot;&quot;;</span>
+<span class="nc bnc" id="L179" title="All 2 branches missed.">        if (this.inputRuanJianMingCheng == null) this.inputRuanJianMingCheng = &quot;&quot;;</span>
+<span class="nc bnc" id="L180" title="All 2 branches missed.">        if (this.inputBanBenHao == null) this.inputBanBenHao = &quot;&quot;;</span>
+<span class="nc bnc" id="L181" title="All 2 branches missed.">        if (this.inputWeiTuoDanWei == null) this.inputWeiTuoDanWei = &quot;&quot;;</span>
+<span class="nc bnc" id="L182" title="All 2 branches missed.">        if (this.inputCeShiLeiBie == null) this.inputCeShiLeiBie = &quot;&quot;;</span>
+<span class="nc bnc" id="L183" title="All 2 branches missed.">        if (this.inputBaoGaoRiQiNian == null) this.inputBaoGaoRiQiNian = &quot;&quot;;</span>
+<span class="nc bnc" id="L184" title="All 2 branches missed.">        if (this.inputBaoGaoRiQiYue == null) this.inputBaoGaoRiQiYue = &quot;&quot;;</span>
+<span class="nc bnc" id="L185" title="All 2 branches missed.">        if (this.inputBaoGaoRiQiRi == null) this.inputBaoGaoRiQiRi = &quot;&quot;;</span>
+
+
+<span class="nc bnc" id="L188" title="All 2 branches missed.">        if (this.inputXiangMuBianHao == null) this.inputXiangMuBianHao = &quot;&quot;;</span>
+<span class="nc bnc" id="L189" title="All 2 branches missed.">        if (this.inputYangPinMingCheng == null) this.inputYangPinMingCheng = &quot;&quot;;</span>
+<span class="nc bnc" id="L190" title="All 2 branches missed.">        if (this.inputBanBenXingHao == null) this.inputBanBenXingHao = &quot;&quot;;</span>
+<span class="nc bnc" id="L191" title="All 2 branches missed.">        if (this.inputLaiYangRiQiNian == null) this.inputLaiYangRiQiNian = &quot;&quot;;</span>
+<span class="nc bnc" id="L192" title="All 2 branches missed.">        if (this.inputLaiYangRiQiYue == null) this.inputLaiYangRiQiYue = &quot;&quot;;</span>
+<span class="nc bnc" id="L193" title="All 2 branches missed.">        if (this.inputLaiYangRiQiRi == null) this.inputLaiYangRiQiRi = &quot;&quot;;</span>
+
+<span class="nc bnc" id="L195" title="All 2 branches missed.">        if (this.inputCeShiKaiShiRiQiNian == null) this.inputCeShiKaiShiRiQiNian = &quot;&quot;;</span>
+<span class="nc bnc" id="L196" title="All 2 branches missed.">        if (this.inputCeShiKaiShiRiQiYue == null) this.inputCeShiKaiShiRiQiYue = &quot;&quot;;</span>
+<span class="nc bnc" id="L197" title="All 2 branches missed.">        if (this.inputCeShiKaiShiRiQiRi == null) this.inputCeShiKaiShiRiQiRi = &quot;&quot;;</span>
+<span class="nc bnc" id="L198" title="All 2 branches missed.">        if (this.inputCeShiJieShuRiQiNian == null) this.inputCeShiJieShuRiQiNian = &quot;&quot;;</span>
+<span class="nc bnc" id="L199" title="All 2 branches missed.">        if (this.inputCeShiJieShuRiQiYue == null) this.inputCeShiJieShuRiQiYue = &quot;&quot;;</span>
+<span class="nc bnc" id="L200" title="All 2 branches missed.">        if (this.inputCeShiJieShuRiQiRi == null) this.inputCeShiJieShuRiQiRi = &quot;&quot;;</span>
+
+<span class="nc bnc" id="L202" title="All 2 branches missed.">        if (this.inputYangPinZhuangTai == null) this.inputYangPinZhuangTai = &quot;&quot;;</span>
+<span class="nc bnc" id="L203" title="All 2 branches missed.">        if (this.inputCeShiYiJu == null) this.inputCeShiYiJu = &quot;&quot;;</span>
+<span class="nc bnc" id="L204" title="All 2 branches missed.">        if (this.inputYangPinQingDan == null) this.inputYangPinQingDan = &quot;&quot;;</span>
+<span class="nc bnc" id="L205" title="All 2 branches missed.">        if (this.inputCeShiJieLun == null) this.inputCeShiJieLun = &quot;&quot;;</span>
+<span class="nc bnc" id="L206" title="All 2 branches missed.">        if (this.inputZhuCeRen == null) this.inputZhuCeRen = &quot;&quot;;</span>
+<span class="nc bnc" id="L207" title="All 2 branches missed.">        if (this.inputZhuCeRiQiNian == null) this.inputZhuCeRiQiNian = &quot;&quot;;</span>
+<span class="nc bnc" id="L208" title="All 2 branches missed.">        if (this.inputZhuCeRiQiYue == null) this.inputZhuCeRiQiYue = &quot;&quot;;</span>
+<span class="nc bnc" id="L209" title="All 2 branches missed.">        if (this.inputZhuCeRiQiRi == null) this.inputZhuCeRiQiRi = &quot;&quot;;</span>
+<span class="nc bnc" id="L210" title="All 2 branches missed.">        if (this.inputShenHeRen == null) this.inputShenHeRen = &quot;&quot;;</span>
+<span class="nc bnc" id="L211" title="All 2 branches missed.">        if (this.inputShenHeRiQiNian == null) this.inputShenHeRiQiNian = &quot;&quot;;</span>
+<span class="nc bnc" id="L212" title="All 2 branches missed.">        if (this.inputShenHeRiQiYue == null) this.inputShenHeRiQiYue = &quot;&quot;;</span>
+<span class="nc bnc" id="L213" title="All 2 branches missed.">        if (this.inputShenHeRiQiRi == null) this.inputShenHeRiQiRi = &quot;&quot;;</span>
+<span class="nc bnc" id="L214" title="All 2 branches missed.">        if (this.inputPiZhunRen == null) this.inputPiZhunRen = &quot;&quot;;</span>
+<span class="nc bnc" id="L215" title="All 2 branches missed.">        if (this.inputPiZhunRiQiNian == null) this.inputPiZhunRiQiNian = &quot;&quot;;</span>
+<span class="nc bnc" id="L216" title="All 2 branches missed.">        if (this.inputPiZhunRiQiYue == null) this.inputPiZhunRiQiYue = &quot;&quot;;</span>
+<span class="nc bnc" id="L217" title="All 2 branches missed.">        if (this.inputPiZhunRiQiRi == null) this.inputPiZhunRiQiRi = &quot;&quot;;</span>
+
+<span class="nc bnc" id="L219" title="All 2 branches missed.">        if (this.inputDianHua == null) this.inputDianHua = &quot;&quot;;</span>
+<span class="nc bnc" id="L220" title="All 2 branches missed.">        if (this.inputChuanZhen == null) this.inputChuanZhen = &quot;&quot;;</span>
+<span class="nc bnc" id="L221" title="All 2 branches missed.">        if (this.inputDiZhi == null) this.inputDiZhi = &quot;&quot;;</span>
+<span class="nc bnc" id="L222" title="All 2 branches missed.">        if (this.inputYouBian == null) this.inputYouBian = &quot;&quot;;</span>
+<span class="nc bnc" id="L223" title="All 2 branches missed.">        if (this.inputLianXiRen == null) this.inputLianXiRen = &quot;&quot;;</span>
+<span class="nc bnc" id="L224" title="All 2 branches missed.">        if (this.inputEmail == null) this.inputEmail = &quot;&quot;;</span>
+
+<span class="nc bnc" id="L226" title="All 2 branches missed.">        if (this.inputYingJianLeiBie == null) this.inputYingJianLeiBie = &quot;&quot;;</span>
+<span class="nc bnc" id="L227" title="All 2 branches missed.">        if (this.inputYingJianMingCheng == null) this.inputYingJianMingCheng = &quot;&quot;;</span>
+<span class="nc bnc" id="L228" title="All 2 branches missed.">        if (this.inputYingJianPeiZhi == null) this.inputYingJianPeiZhi = &quot;&quot;;</span>
+<span class="nc bnc" id="L229" title="All 2 branches missed.">        if (this.inputYingJianShuLiang == null) this.inputYingJianShuLiang = &quot;&quot;;</span>
+<span class="nc bnc" id="L230" title="All 2 branches missed.">        if (this.inputCaoZuoXiTongMingCheng == null) this.inputCaoZuoXiTongMingCheng = &quot;&quot;;</span>
+<span class="nc bnc" id="L231" title="All 2 branches missed.">        if (this.inputCaoZuoXiTongBanBen == null) this.inputCaoZuoXiTongBanBen = &quot;&quot;;</span>
+<span class="nc bnc" id="L232" title="All 2 branches missed.">        if (this.inputRuanJianHuanJing == null) this.inputRuanJianHuanJing = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L233" title="All 2 branches missed.">        if (this.inputWangLuoHuanJing == null) this.inputWangLuoHuanJing = &quot;&quot;;</span>
+
+<span class="nc bnc" id="L235" title="All 2 branches missed.">        if (this.inputTestBases == null) this.inputTestBases = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L236" title="All 2 branches missed.">        if (this.inputCanKaoZiLiao == null) this.inputCanKaoZiLiao = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L237" title="All 2 branches missed.">        if (this.inputGongNengXingCeShi == null) this.inputGongNengXingCeShi = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L238" title="All 2 branches missed.">        if (this.inputXiaoLvCeShi == null) this.inputXiaoLvCeShi = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L239" title="All 2 branches missed.">        if (this.inputKeYiZhiXingCeShi == null) this.inputKeYiZhiXingCeShi = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L240" title="All 2 branches missed.">        if (this.inputYiYongXingCeShi == null) this.inputYiYongXingCeShi = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L241" title="All 2 branches missed.">        if (this.inputKeKaoXingCeShi == null) this.inputKeKaoXingCeShi = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L242" title="All 2 branches missed.">        if (this.inputKeWeiHuXingCeShi == null) this.inputKeWeiHuXingCeShi = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L243" title="All 2 branches missed.">        if (this.inputCeShiZhiXingJiLu == null) this.inputCeShiZhiXingJiLu = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L244">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

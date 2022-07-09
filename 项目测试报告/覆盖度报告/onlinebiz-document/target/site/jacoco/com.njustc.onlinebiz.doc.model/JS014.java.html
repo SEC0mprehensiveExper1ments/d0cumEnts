@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JS014.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-document</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.doc.model</a> &gt; <span class="el_source">JS014.java</span></div><h1>JS014.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.doc.model;
+
+import com.njustc.onlinebiz.common.model.entrust.Entrust;
+import com.njustc.onlinebiz.common.model.entrust.EntrustContent;
+import com.njustc.onlinebiz.common.model.entrust.SoftwareDocReview;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+import java.util.List;
+
+<span class="pc bnc" id="L13" title="All 606 branches missed.">@Data</span>
+<span class="fc" id="L14">@NoArgsConstructor</span>
+<span class="nc" id="L15">@AllArgsConstructor</span>
+@Accessors(chain = true)
+public class JS014 {
+
+<span class="pc" id="L19">    private String inputRuanJianMingChen = &quot;&quot;;</span>
+<span class="pc" id="L20">    private String inputBanBenHao = &quot;&quot;;</span>
+<span class="pc" id="L21">    private String inputWeiTuoDanWei = &quot;&quot;;</span>
+<span class="pc" id="L22">    private String inputPingShenRen = &quot;&quot;;</span>
+<span class="pc" id="L23">    private String inputPingShenShiJian0Nian = &quot;&quot;;</span>
+<span class="pc" id="L24">    private String inputPingShenShiJian0Yue = &quot;&quot;;</span>
+<span class="pc" id="L25">    private String inputPingShenShiJian0Ri = &quot;&quot;;</span>
+<span class="pc" id="L26">    private String inputPingShenJieGuo011 = &quot;&quot;;</span>
+<span class="pc" id="L27">    private String inputPingShenJieGuo0121 = &quot;&quot;;</span>
+<span class="pc" id="L28">    private String inputPingShenJieGuo0122 = &quot;&quot;;</span>
+<span class="pc" id="L29">    private String inputPingShenJieGuo0123 = &quot;&quot;;</span>
+<span class="pc" id="L30">    private String inputPingShenJieGuo0131 = &quot;&quot;;</span>
+<span class="pc" id="L31">    private String inputPingShenJieGuo0132 = &quot;&quot;;</span>
+<span class="pc" id="L32">    private String inputPingShenJieGuo0133 = &quot;&quot;;</span>
+<span class="pc" id="L33">    private String inputPingShenJieGuo014 = &quot;&quot;;</span>
+<span class="pc" id="L34">    private String inputPingShenJieGuo015 = &quot;&quot;;</span>
+<span class="pc" id="L35">    private String inputPingShenJieGuo016 = &quot;&quot;;</span>
+<span class="pc" id="L36">    private String inputPingShenJieGuo017 = &quot;&quot;;</span>
+<span class="pc" id="L37">    private String inputPingShenJieGuo018 = &quot;&quot;;</span>
+<span class="pc" id="L38">    private String inputPingShenJieGuo019 = &quot;&quot;;</span>
+<span class="pc" id="L39">    private String inputPingShenJieGuo0110 = &quot;&quot;;</span>
+<span class="pc" id="L40">    private String inputPingShenShuoMing011 = &quot;&quot;;</span>
+<span class="pc" id="L41">    private String inputPingShenShuoMing0121 = &quot;&quot;;</span>
+<span class="pc" id="L42">    private String inputPingShenShuoMing0122 = &quot;&quot;;</span>
+<span class="pc" id="L43">    private String inputPingShenShuoMing0123 = &quot;&quot;;</span>
+<span class="pc" id="L44">    private String inputPingShenShuoMing0131 = &quot;&quot;;</span>
+<span class="pc" id="L45">    private String inputPingShenShuoMing0132 = &quot;&quot;;</span>
+<span class="pc" id="L46">    private String inputPingShenShuoMing0133 = &quot;&quot;;</span>
+<span class="pc" id="L47">    private String inputPingShenShuoMing014 = &quot;&quot;;</span>
+<span class="pc" id="L48">    private String inputPingShenShuoMing015 = &quot;&quot;;</span>
+<span class="pc" id="L49">    private String inputPingShenShuoMing016 = &quot;&quot;;</span>
+<span class="pc" id="L50">    private String inputPingShenShuoMing017 = &quot;&quot;;</span>
+<span class="pc" id="L51">    private String inputPingShenShuoMing018 = &quot;&quot;;</span>
+<span class="pc" id="L52">    private String inputPingShenShuoMing019 = &quot;&quot;;</span>
+<span class="pc" id="L53">    private String inputPingShenShuoMing0110 = &quot;&quot;;</span>
+<span class="pc" id="L54">    private String inputPingShenJieGuo0211 = &quot;&quot;;</span>
+<span class="pc" id="L55">    private String inputPingShenJieGuo0212 = &quot;&quot;;</span>
+<span class="pc" id="L56">    private String inputPingShenJieGuo0213 = &quot;&quot;;</span>
+<span class="pc" id="L57">    private String inputPingShenJieGuo0214 = &quot;&quot;;</span>
+<span class="pc" id="L58">    private String inputPingShenJieGuo0215 = &quot;&quot;;</span>
+<span class="pc" id="L59">    private String inputPingShenJieGuo0216 = &quot;&quot;;</span>
+<span class="pc" id="L60">    private String inputPingShenJieGuo0217 = &quot;&quot;;</span>
+<span class="pc" id="L61">    private String inputPingShenJieGuo0218 = &quot;&quot;;</span>
+<span class="pc" id="L62">    private String inputPingShenJieGuo0219 = &quot;&quot;;</span>
+<span class="pc" id="L63">    private String inputPingShenJieGuo02110 = &quot;&quot;;</span>
+<span class="pc" id="L64">    private String inputPingShenJieGuo02111 = &quot;&quot;;</span>
+<span class="pc" id="L65">    private String inputPingShenJieGuo0221 = &quot;&quot;;</span>
+<span class="pc" id="L66">    private String inputPingShenJieGuo0222 = &quot;&quot;;</span>
+<span class="pc" id="L67">    private String inputPingShenJieGuo0231 = &quot;&quot;;</span>
+<span class="pc" id="L68">    private String inputPingShenJieGuo0241 = &quot;&quot;;</span>
+<span class="pc" id="L69">    private String inputPingShenJieGuo0242 = &quot;&quot;;</span>
+<span class="pc" id="L70">    private String inputPingShenJieGuo0251 = &quot;&quot;;</span>
+<span class="pc" id="L71">    private String inputPingShenJieGuo0261 = &quot;&quot;;</span>
+<span class="pc" id="L72">    private String inputPingShenJieGuo0262 = &quot;&quot;;</span>
+<span class="pc" id="L73">    private String inputPingShenJieGuo0263 = &quot;&quot;;</span>
+<span class="pc" id="L74">    private String inputPingShenShuoMing0211 = &quot;&quot;;</span>
+<span class="pc" id="L75">    private String inputPingShenShuoMing0212 = &quot;&quot;;</span>
+<span class="pc" id="L76">    private String inputPingShenShuoMing0213 = &quot;&quot;;</span>
+<span class="pc" id="L77">    private String inputPingShenShuoMing0214 = &quot;&quot;;</span>
+<span class="pc" id="L78">    private String inputPingShenShuoMing0215 = &quot;&quot;;</span>
+<span class="pc" id="L79">    private String inputPingShenShuoMing0216 = &quot;&quot;;</span>
+<span class="pc" id="L80">    private String inputPingShenShuoMing0217 = &quot;&quot;;</span>
+<span class="pc" id="L81">    private String inputPingShenShuoMing0218 = &quot;&quot;;</span>
+<span class="pc" id="L82">    private String inputPingShenShuoMing0219 = &quot;&quot;;</span>
+<span class="pc" id="L83">    private String inputPingShenShuoMing02110 = &quot;&quot;;</span>
+<span class="pc" id="L84">    private String inputPingShenShuoMing02111 = &quot;&quot;;</span>
+<span class="pc" id="L85">    private String inputPingShenShuoMing0221 = &quot;&quot;;</span>
+<span class="pc" id="L86">    private String inputPingShenShuoMing0222 = &quot;&quot;;</span>
+<span class="pc" id="L87">    private String inputPingShenShuoMing0231 = &quot;&quot;;</span>
+<span class="pc" id="L88">    private String inputPingShenShuoMing0241 = &quot;&quot;;</span>
+<span class="pc" id="L89">    private String inputPingShenShuoMing0242 = &quot;&quot;;</span>
+<span class="pc" id="L90">    private String inputPingShenShuoMing0251 = &quot;&quot;;</span>
+<span class="pc" id="L91">    private String inputPingShenShuoMing0261 = &quot;&quot;;</span>
+<span class="pc" id="L92">    private String inputPingShenShuoMing0262 = &quot;&quot;;</span>
+<span class="pc" id="L93">    private String inputPingShenShuoMing0263 = &quot;&quot;;</span>
+
+    public String safe(String s) {
+<span class="nc bnc" id="L96" title="All 2 branches missed.">        return s == null ? &quot;&quot; : s;</span>
+    }
+
+<span class="nc" id="L99">    public JS014(Entrust entrust) {</span>
+<span class="nc" id="L100">        SoftwareDocReview softwareDocReview = entrust.getSoftwareDocReview();</span>
+        //检查各个字段的非空性
+<span class="nc bnc" id="L102" title="All 2 branches missed.">        if (softwareDocReview == null) {</span>
+<span class="nc" id="L103">            throw new IllegalArgumentException(&quot;SoftwareDocReview is null&quot;);</span>
+        }
+<span class="nc" id="L105">        EntrustContent entrustContent = entrust.getContent();</span>
+<span class="nc bnc" id="L106" title="All 2 branches missed.">        if (entrustContent != null) {</span>
+<span class="nc" id="L107">            this.inputRuanJianMingChen = safe(entrustContent.getSoftware().getName());</span>
+<span class="nc" id="L108">            this.inputBanBenHao = safe(entrustContent.getSoftware().getVersion());</span>
+        }
+<span class="nc" id="L110">        this.inputWeiTuoDanWei = &quot;高校评审组&quot;;</span>
+<span class="nc" id="L111">        this.inputPingShenRen = safe(softwareDocReview.getReviewer());</span>
+<span class="nc" id="L112">        this.inputPingShenShiJian0Nian = Integer.toString(entrust.getSoftwareDocReview().getYear());</span>
+<span class="nc" id="L113">        this.inputPingShenShiJian0Yue = Integer.toString(entrust.getSoftwareDocReview().getMonth());</span>
+<span class="nc" id="L114">        this.inputPingShenShiJian0Ri = Integer.toString(entrust.getSoftwareDocReview().getDay());</span>
+
+<span class="nc" id="L116">        List&lt;SoftwareDocReview.ReviewRow&gt; reviewRows = entrust.getSoftwareDocReview().getComments();</span>
+<span class="nc bnc" id="L117" title="All 4 branches missed.">        if (reviewRows != null &amp;&amp; reviewRows.size() == 34) {</span>
+            //检查各个字段的非空性
+<span class="nc" id="L119">            this.inputPingShenJieGuo011 = safe(reviewRows.get(0).getResult());</span>
+<span class="nc" id="L120">            this.inputPingShenJieGuo0121 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L121">            this.inputPingShenJieGuo0122 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L122">            this.inputPingShenJieGuo0123 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L123">            this.inputPingShenJieGuo0131 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L124">            this.inputPingShenJieGuo0132 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L125">            this.inputPingShenJieGuo0133 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L126">            this.inputPingShenJieGuo014 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L127">            this.inputPingShenJieGuo015 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L128">            this.inputPingShenJieGuo016 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L129">            this.inputPingShenJieGuo017 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L130">            this.inputPingShenJieGuo018 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L131">            this.inputPingShenJieGuo019 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L132">            this.inputPingShenJieGuo0110 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L133">            this.inputPingShenJieGuo0211 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L134">            this.inputPingShenJieGuo0212 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L135">            this.inputPingShenJieGuo0213 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L136">            this.inputPingShenJieGuo0214 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L137">            this.inputPingShenJieGuo0215 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L138">            this.inputPingShenJieGuo0216 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L139">            this.inputPingShenJieGuo0217 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L140">            this.inputPingShenJieGuo0218 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L141">            this.inputPingShenJieGuo0219 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L142">            this.inputPingShenJieGuo02110 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L143">            this.inputPingShenJieGuo02111 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L144">            this.inputPingShenJieGuo0221 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L145">            this.inputPingShenJieGuo0222 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L146">            this.inputPingShenJieGuo0231 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L147">            this.inputPingShenJieGuo0241 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L148">            this.inputPingShenJieGuo0242 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L149">            this.inputPingShenJieGuo0251 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L150">            this.inputPingShenJieGuo0261 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L151">            this.inputPingShenJieGuo0262 = safe(reviewRows.get(1).getResult());</span>
+<span class="nc" id="L152">            this.inputPingShenJieGuo0263 = safe(reviewRows.get(1).getResult());</span>
+
+
+<span class="nc" id="L155">            this.inputPingShenShuoMing011 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L156">            this.inputPingShenShuoMing0121 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L157">            this.inputPingShenShuoMing0122 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L158">            this.inputPingShenShuoMing0123 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L159">            this.inputPingShenShuoMing0131 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L160">            this.inputPingShenShuoMing0132 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L161">            this.inputPingShenShuoMing0133 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L162">            this.inputPingShenShuoMing014 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L163">            this.inputPingShenShuoMing015 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L164">            this.inputPingShenShuoMing016 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L165">            this.inputPingShenShuoMing017 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L166">            this.inputPingShenShuoMing018 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L167">            this.inputPingShenShuoMing019 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L168">            this.inputPingShenShuoMing0110 = safe(reviewRows.get(0).getDescription());</span>
+
+<span class="nc" id="L170">            this.inputPingShenShuoMing0211 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L171">            this.inputPingShenShuoMing0212 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L172">            this.inputPingShenShuoMing0213 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L173">            this.inputPingShenShuoMing0214 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L174">            this.inputPingShenShuoMing0215 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L175">            this.inputPingShenShuoMing0216 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L176">            this.inputPingShenShuoMing0217 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L177">            this.inputPingShenShuoMing0218 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L178">            this.inputPingShenShuoMing0219 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L179">            this.inputPingShenShuoMing02110 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L180">            this.inputPingShenShuoMing02111 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L181">            this.inputPingShenShuoMing0221 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L182">            this.inputPingShenShuoMing0222 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L183">            this.inputPingShenShuoMing0231 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L184">            this.inputPingShenShuoMing0241 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L185">            this.inputPingShenShuoMing0242 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L186">            this.inputPingShenShuoMing0251 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L187">            this.inputPingShenShuoMing0261 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L188">            this.inputPingShenShuoMing0262 = safe(reviewRows.get(0).getDescription());</span>
+<span class="nc" id="L189">            this.inputPingShenShuoMing0263 = safe(reviewRows.get(0).getDescription());</span>
+
+        }
+<span class="nc" id="L192">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

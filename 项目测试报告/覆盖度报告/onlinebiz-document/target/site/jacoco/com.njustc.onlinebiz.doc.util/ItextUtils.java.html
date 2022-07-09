@@ -1,0 +1,615 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ItextUtils.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-document</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.doc.util</a> &gt; <span class="el_source">ItextUtils.java</span></div><h1>ItextUtils.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.doc.util;
+
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
+
+import java.io.FileOutputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+<span class="nc" id="L10">public class ItextUtils {</span>
+
+    public static final int NO_BORDER = 0;
+    public static final int BOX = Rectangle.BOX;
+
+/**------------------------创建表格单元格的方法start----------------------------*/
+    /**
+     * 创建单元格(指定字体)
+     * @param value
+     * @param font
+     * @return
+     */
+    public static PdfPCell createCell(String value, Font font) {
+<span class="nc" id="L23">        PdfPCell cell = new PdfPCell();</span>
+<span class="nc" id="L24">        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);</span>
+<span class="nc" id="L25">        cell.setHorizontalAlignment(Element.ALIGN_CENTER);</span>
+<span class="nc" id="L26">        cell.setPhrase(new Phrase(value, font));</span>
+<span class="nc" id="L27">        return cell;</span>
+    }
+    /**
+     * 创建单元格（指定字体、水平..）
+     * @param value
+     * @param font
+     * @param align
+     * @return
+     */
+    public static PdfPCell createCell(String value, Font font, int align) {
+<span class="nc" id="L37">        PdfPCell cell = new PdfPCell();</span>
+<span class="nc" id="L38">        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);</span>
+<span class="nc" id="L39">        cell.setHorizontalAlignment(align);</span>
+<span class="nc" id="L40">        cell.setPhrase(new Phrase(value, font));</span>
+<span class="nc" id="L41">        return cell;</span>
+    }
+    /**
+     * 创建单元格（指定字体、水平..）
+     * @param value
+     * @param font
+     * @param align
+     * @return
+     */
+    public static PdfPCell createCell(String value, Font font, int align, int haveBorder, float[] paddings) {
+<span class="fc" id="L51">        PdfPCell cell = new PdfPCell();</span>
+<span class="fc" id="L52">        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);</span>
+<span class="fc" id="L53">        cell.setHorizontalAlignment(align);</span>
+<span class="fc" id="L54">        cell.setPhrase(new Phrase(value, font));</span>
+<span class="fc" id="L55">        cell.setBorder(haveBorder);</span>
+<span class="fc" id="L56">        cell.setPaddingTop(paddings[0]);</span>
+<span class="fc" id="L57">        cell.setPaddingBottom(paddings[1]);</span>
+<span class="fc" id="L58">        cell.setPaddingLeft(paddings[2]);</span>
+<span class="fc" id="L59">        cell.setPaddingRight(paddings[3]);</span>
+<span class="fc" id="L60">        return cell;</span>
+    }
+    /**
+     * 创建单元格（指定字体、水平..）
+     * @param value
+     * @param font
+     * @param alignH
+     * @return
+     */
+    public static PdfPCell createCell(String value, Font font, int alignH, int alignV, int haveBorder, float[] paddings, float thickness, float leading) {
+<span class="fc" id="L70">        PdfPCell cell = new PdfPCell();</span>
+<span class="fc" id="L71">        cell.setVerticalAlignment(alignV);</span>
+<span class="fc" id="L72">        cell.setHorizontalAlignment(alignH);</span>
+<span class="fc" id="L73">        Chunk chunk = ItextUtils.fixedUnderlineChunk(value, font, 16, thickness);</span>
+//        Chunk chunk = new Chunk(value, font);
+//        chunk.setUnderline(thickness, -3f);
+<span class="fc" id="L76">        cell.setPhrase(new Phrase(chunk));</span>
+<span class="fc" id="L77">        cell.setBorder(haveBorder);</span>
+<span class="fc" id="L78">        cell.setPaddingTop(paddings[0]);</span>
+<span class="fc" id="L79">        cell.setPaddingBottom(paddings[1]);</span>
+<span class="fc" id="L80">        cell.setPaddingLeft(paddings[2]);</span>
+<span class="fc" id="L81">        cell.setPaddingRight(paddings[3]);</span>
+<span class="fc" id="L82">        cell.setLeading(leading, 0f);</span>
+<span class="fc" id="L83">        return cell;</span>
+    }
+    /**
+     * 创建单元格（指定字体、左对齐零padding..、单元格跨x列合并、设置单元格内边距）
+     * @param values
+     * @param font
+     * @param otherFont
+     * @param alignH
+     * @param haveBorder
+     * @param paddings
+     * @param thickness
+     * @return
+     */
+    public static PdfPCell createCell(String[] values, Font font, Font otherFont, int alignH,  int alignV, int haveBorder, int colSpan, int rowSpan, float[] paddings, float thickness) {
+<span class="fc" id="L97">        PdfPCell cell = new PdfPCell();</span>
+<span class="fc" id="L98">        cell.setVerticalAlignment(alignV);</span>
+<span class="fc" id="L99">        cell.setHorizontalAlignment(alignH);</span>
+<span class="fc" id="L100">        Phrase container = new Phrase();</span>
+        // combine.setLeading();    // 设置行距
+<span class="fc bfc" id="L102" title="All 2 branches covered.">        for (int i = 0; i &lt; values.length; i++) {</span>
+<span class="fc bfc" id="L103" title="All 2 branches covered.">            if (i % 2 == 0) {</span>
+<span class="fc" id="L104">                Chunk chunk = new Chunk(values[i], font);</span>
+<span class="fc" id="L105">                chunk.setUnderline(thickness, -3f);</span>
+<span class="fc" id="L106">                container.add(chunk);</span>
+<span class="fc" id="L107">            }</span>
+            else {
+<span class="fc" id="L109">                Chunk chunk = new Chunk(values[i], otherFont);</span>
+<span class="fc" id="L110">                container.add(chunk);</span>
+            }
+        }
+<span class="fc" id="L113">        cell.setPhrase(container);</span>
+<span class="fc" id="L114">        cell.setRowspan(rowSpan);</span>
+<span class="fc" id="L115">        cell.setColspan(colSpan);</span>
+<span class="fc" id="L116">        cell.setBorder(haveBorder);</span>
+<span class="fc" id="L117">        cell.setPaddingTop(paddings[0]);</span>
+<span class="fc" id="L118">        cell.setPaddingBottom(paddings[1]);</span>
+<span class="fc" id="L119">        cell.setPaddingLeft(paddings[2]);</span>
+<span class="fc" id="L120">        cell.setPaddingRight(paddings[3]);</span>
+<span class="fc" id="L121">        return cell;</span>
+    }
+    /**
+     * 创建单元格（指定字体、水平居..、单元格跨x列合并）
+     * @param value
+     * @param font
+     * @param align
+     * @param colspan
+     * @return
+     */
+    public static PdfPCell createCell(String value, Font font, int align, int colspan) {
+<span class="nc" id="L132">        PdfPCell cell = new PdfPCell();</span>
+<span class="nc" id="L133">        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);</span>
+<span class="nc" id="L134">        cell.setHorizontalAlignment(align);</span>
+<span class="nc" id="L135">        cell.setColspan(colspan);</span>
+<span class="nc" id="L136">        cell.setPhrase(new Phrase(value, font));</span>
+<span class="nc" id="L137">        cell.setPhrase(new Phrase(value, font));</span>
+<span class="nc" id="L138">        return cell;</span>
+    }
+    /**
+     * 创建单元格（指定字体、水平居..、单元格跨x行合并）
+     * @param value
+     * @param font
+     * @param align
+     * @param colspan
+     * @param rowspan
+     * @return
+     */
+    public static PdfPCell createCell(String value, Font font, int align, int colspan, int rowspan, float[] paddings, float borderWidth) {
+<span class="fc" id="L150">        PdfPCell cell = new PdfPCell();</span>
+<span class="fc" id="L151">        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);</span>
+<span class="fc" id="L152">        cell.setHorizontalAlignment(align);</span>
+<span class="fc" id="L153">        cell.setColspan(colspan);</span>
+<span class="fc" id="L154">        cell.setRowspan(rowspan);</span>
+<span class="fc" id="L155">        cell.setPhrase(new Phrase(value, font));</span>
+//        cell.setPaddingTop(10.0f);
+//        cell.setPaddingBottom(10.0f);
+//        cell.setPaddingLeft(5.0f);
+//        cell.setPaddingRight(5.0f);
+//        cell.setBorderWidth(1f);
+<span class="fc" id="L161">        cell.setPaddingTop(paddings[0]);</span>
+<span class="fc" id="L162">        cell.setPaddingBottom(paddings[1]);</span>
+<span class="fc" id="L163">        cell.setPaddingLeft(paddings[2]);</span>
+<span class="fc" id="L164">        cell.setPaddingRight(paddings[3]);</span>
+<span class="fc" id="L165">        cell.setBorderWidth(borderWidth);</span>
+//        cell.setBorder(haveBorder);
+//        cell.setLeading(12f, 0f);
+<span class="fc" id="L168">        return cell;</span>
+    }
+
+    public static PdfPCell createCell_Height(String value, Font font, int align, int colspan, int rowspan, float height, float[] paddings, float borderWidth) {
+<span class="fc" id="L172">        PdfPCell cell = new PdfPCell();</span>
+<span class="fc" id="L173">        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);</span>
+<span class="fc" id="L174">        cell.setHorizontalAlignment(align);</span>
+<span class="fc" id="L175">        cell.setColspan(colspan);</span>
+<span class="fc" id="L176">        cell.setRowspan(rowspan);</span>
+<span class="fc" id="L177">        cell.setPhrase(new Phrase(value, font));</span>
+//        cell.setPaddingTop(10.0f);
+//        cell.setPaddingBottom(10.0f);
+//        cell.setPaddingLeft(5.0f);
+//        cell.setPaddingRight(5.0f);
+//        cell.setBorderWidth(1f);
+<span class="fc" id="L183">        cell.setFixedHeight(height);</span>
+<span class="fc" id="L184">        cell.setPaddingTop(paddings[0]);</span>
+<span class="fc" id="L185">        cell.setPaddingBottom(paddings[1]);</span>
+<span class="fc" id="L186">        cell.setPaddingLeft(paddings[2]);</span>
+<span class="fc" id="L187">        cell.setPaddingRight(paddings[3]);</span>
+<span class="fc" id="L188">        cell.setBorderWidth(borderWidth);</span>
+//        cell.setBorder(haveBorder);
+//        cell.setLeading(12f, 0f);
+<span class="fc" id="L191">        return cell;</span>
+    }
+
+    public static PdfPCell createCell_Leading(String value, Font font, int align, int colspan, int rowspan, float leading, float[] paddings, float borderWidth) {
+<span class="fc" id="L195">        PdfPCell cell = new PdfPCell();</span>
+<span class="fc" id="L196">        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);</span>
+<span class="fc" id="L197">        cell.setHorizontalAlignment(align);</span>
+<span class="fc" id="L198">        cell.setColspan(colspan);</span>
+<span class="fc" id="L199">        cell.setRowspan(rowspan);</span>
+<span class="fc" id="L200">        Phrase phrase=new Phrase(value, font);</span>
+<span class="fc" id="L201">        cell.setPhrase(phrase);</span>
+//        cell.setPaddingTop(10.0f);
+//        cell.setPaddingBottom(10.0f);
+//        cell.setPaddingLeft(5.0f);
+//        cell.setPaddingRight(5.0f);
+//        cell.setBorderWidth(1f);
+<span class="fc" id="L207">        cell.setPaddingTop(paddings[0]);</span>
+<span class="fc" id="L208">        cell.setPaddingBottom(paddings[1]);</span>
+<span class="fc" id="L209">        cell.setPaddingLeft(paddings[2]);</span>
+<span class="fc" id="L210">        cell.setPaddingRight(paddings[3]);</span>
+<span class="fc" id="L211">        cell.setBorderWidth(borderWidth);</span>
+//        cell.setBorder(haveBorder);
+<span class="fc" id="L213">        cell.setLeading(leading, 0f);</span>
+<span class="fc" id="L214">        return cell;</span>
+    }
+
+    public static PdfPCell createGreyCell(String value, Font font, int align, int colspan, int rowspan, float[] paddings, float borderWidth) {
+<span class="fc" id="L218">        PdfPCell cell = new PdfPCell();</span>
+<span class="fc" id="L219">        cell.setBackgroundColor(new BaseColor(220, 220, 220));</span>
+<span class="fc" id="L220">        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);</span>
+<span class="fc" id="L221">        cell.setHorizontalAlignment(align);</span>
+<span class="fc" id="L222">        cell.setColspan(colspan);</span>
+<span class="fc" id="L223">        cell.setRowspan(rowspan);</span>
+<span class="fc" id="L224">        cell.setPhrase(new Phrase(value, font));</span>
+//        cell.setPaddingTop(10.0f);
+//        cell.setPaddingBottom(10.0f);
+//        cell.setPaddingLeft(5.0f);
+//        cell.setPaddingRight(5.0f);
+//        cell.setBorderWidth(1f);
+<span class="fc" id="L230">        cell.setPaddingTop(paddings[0]);</span>
+<span class="fc" id="L231">        cell.setPaddingBottom(paddings[1]);</span>
+<span class="fc" id="L232">        cell.setPaddingLeft(paddings[2]);</span>
+<span class="fc" id="L233">        cell.setPaddingRight(paddings[3]);</span>
+<span class="fc" id="L234">        cell.setBorderWidth(borderWidth);</span>
+//        cell.setBorder(haveBorder);
+//        cell.setLeading(12f, 0f);
+<span class="fc" id="L237">        return cell;</span>
+    }
+
+    public static PdfPCell createGreyCell_Height(String value, Font font, int align, int colspan, int rowspan, float height, float[] paddings, float borderWidth) {
+<span class="fc" id="L241">        PdfPCell cell = new PdfPCell();</span>
+<span class="fc" id="L242">        cell.setBackgroundColor(new BaseColor(220, 220, 220));</span>
+<span class="fc" id="L243">        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);</span>
+<span class="fc" id="L244">        cell.setHorizontalAlignment(align);</span>
+<span class="fc" id="L245">        cell.setColspan(colspan);</span>
+<span class="fc" id="L246">        cell.setRowspan(rowspan);</span>
+<span class="fc" id="L247">        cell.setPhrase(new Phrase(value, font));</span>
+//        cell.setPaddingTop(10.0f);
+//        cell.setPaddingBottom(10.0f);
+//        cell.setPaddingLeft(5.0f);
+//        cell.setPaddingRight(5.0f);
+//        cell.setBorderWidth(1f);
+<span class="fc" id="L253">        cell.setFixedHeight(height);</span>
+<span class="fc" id="L254">        cell.setPaddingTop(paddings[0]);</span>
+<span class="fc" id="L255">        cell.setPaddingBottom(paddings[1]);</span>
+<span class="fc" id="L256">        cell.setPaddingLeft(paddings[2]);</span>
+<span class="fc" id="L257">        cell.setPaddingRight(paddings[3]);</span>
+<span class="fc" id="L258">        cell.setBorderWidth(borderWidth);</span>
+//        cell.setBorder(haveBorder);
+//        cell.setLeading(12f, 0f);
+<span class="fc" id="L261">        return cell;</span>
+    }
+
+    public static PdfPCell createGreenCell_Height(String value, Font font, int align, int colspan, int rowspan, float height, float[] paddings, float borderWidth) {
+<span class="fc" id="L265">        PdfPCell cell = new PdfPCell();</span>
+<span class="fc" id="L266">        cell.setBackgroundColor(new BaseColor(240, 255, 240));</span>
+<span class="fc" id="L267">        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);</span>
+<span class="fc" id="L268">        cell.setHorizontalAlignment(align);</span>
+<span class="fc" id="L269">        cell.setColspan(colspan);</span>
+<span class="fc" id="L270">        cell.setRowspan(rowspan);</span>
+<span class="fc" id="L271">        cell.setPhrase(new Phrase(value, font));</span>
+//        cell.setPaddingTop(10.0f);
+//        cell.setPaddingBottom(10.0f);
+//        cell.setPaddingLeft(5.0f);
+//        cell.setPaddingRight(5.0f);
+//        cell.setBorderWidth(1f);
+<span class="fc" id="L277">        cell.setFixedHeight(height);</span>
+<span class="fc" id="L278">        cell.setPaddingTop(paddings[0]);</span>
+<span class="fc" id="L279">        cell.setPaddingBottom(paddings[1]);</span>
+<span class="fc" id="L280">        cell.setPaddingLeft(paddings[2]);</span>
+<span class="fc" id="L281">        cell.setPaddingRight(paddings[3]);</span>
+<span class="fc" id="L282">        cell.setBorderWidth(borderWidth);</span>
+//        cell.setBorder(haveBorder);
+//        cell.setLeading(12f, 0f);
+<span class="fc" id="L285">        return cell;</span>
+    }
+
+    public static PdfPCell createCell(int align, int colspan, int rowspan, float fixedLeading, float[] paddings, float borderWidth) {
+<span class="fc" id="L289">        PdfPCell cell = new PdfPCell();</span>
+<span class="fc" id="L290">        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);</span>
+<span class="fc" id="L291">        cell.setHorizontalAlignment(align);</span>
+<span class="fc" id="L292">        cell.setColspan(colspan);</span>
+<span class="fc" id="L293">        cell.setRowspan(rowspan);</span>
+//        cell.setPaddingTop(10.0f);
+//        cell.setPaddingBottom(10.0f);
+//        cell.setPaddingLeft(5.0f);
+//        cell.setPaddingRight(5.0f);
+//        cell.setBorderWidth(1f);
+<span class="fc" id="L299">        cell.setPaddingTop(paddings[0]);</span>
+<span class="fc" id="L300">        cell.setPaddingBottom(paddings[1]);</span>
+<span class="fc" id="L301">        cell.setPaddingLeft(paddings[2]);</span>
+<span class="fc" id="L302">        cell.setPaddingRight(paddings[3]);</span>
+<span class="fc" id="L303">        cell.setBorderWidth(borderWidth);</span>
+<span class="fc" id="L304">        cell.setLeading(fixedLeading, 0f);</span>
+//        cell.setBorder(haveBorder);
+<span class="fc" id="L306">        return cell;</span>
+    }
+
+    public static PdfPCell createCell(String value, Font font, int align, int colspan, int rowspan, float fixedLeading, float[] paddings, float borderWidth) {
+<span class="fc" id="L310">        PdfPCell cell = new PdfPCell();</span>
+<span class="fc" id="L311">        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);</span>
+<span class="fc" id="L312">        cell.setHorizontalAlignment(align);</span>
+<span class="fc" id="L313">        cell.setColspan(colspan);</span>
+<span class="fc" id="L314">        cell.setRowspan(rowspan);</span>
+<span class="fc" id="L315">        cell.setPhrase(new Phrase(value, font));</span>
+//        cell.setPaddingTop(10.0f);
+//        cell.setPaddingBottom(10.0f);
+//        cell.setPaddingLeft(5.0f);
+//        cell.setPaddingRight(5.0f);
+//        cell.setBorderWidth(1f);
+<span class="fc" id="L321">        cell.setPaddingTop(paddings[0]);</span>
+<span class="fc" id="L322">        cell.setPaddingBottom(paddings[1]);</span>
+<span class="fc" id="L323">        cell.setPaddingLeft(paddings[2]);</span>
+<span class="fc" id="L324">        cell.setPaddingRight(paddings[3]);</span>
+<span class="fc" id="L325">        cell.setBorderWidth(borderWidth);</span>
+//        cell.setBorder(haveBorder);
+<span class="fc" id="L327">        cell.setLeading(fixedLeading, 0f);</span>
+<span class="fc" id="L328">        return cell;</span>
+    }
+
+    public static PdfPCell createCell(String value, Font font, int alignH, int alignV, int colspan, int rowspan, float[] paddings, int haveBorder, int fixLength, float thickness) {
+<span class="nc" id="L332">        PdfPCell cell = new PdfPCell();</span>
+<span class="nc" id="L333">        cell.setVerticalAlignment(alignV);</span>
+<span class="nc" id="L334">        cell.setHorizontalAlignment(alignH);</span>
+<span class="nc" id="L335">        cell.setColspan(colspan);</span>
+<span class="nc" id="L336">        cell.setRowspan(rowspan);</span>
+<span class="nc" id="L337">        cell.setPhrase(new Phrase(value, font));</span>
+//        Chunk chunk = ItextUtils.fixedUnderlineChunk(value, font, fixLength, thickness);
+//        cell.setPhrase(new Phrase(chunk));
+//        cell.setPaddingTop(10.0f);
+//        cell.setPaddingBottom(10.0f);
+//        cell.setPaddingLeft(5.0f);
+//        cell.setPaddingRight(5.0f);
+//        cell.setBorderWidth(1f);
+<span class="nc" id="L345">        cell.setPaddingTop(paddings[0]);</span>
+<span class="nc" id="L346">        cell.setPaddingBottom(paddings[1]);</span>
+<span class="nc" id="L347">        cell.setPaddingLeft(paddings[2]);</span>
+<span class="nc" id="L348">        cell.setPaddingRight(paddings[3]);</span>
+<span class="nc" id="L349">        cell.setBorder(haveBorder);</span>
+//        cell.setBorder(haveBorder);
+//        cell.setLeading(12f, 0f);
+<span class="nc" id="L352">        return cell;</span>
+    }
+
+    /**
+     * 创建单元格（指定字体、水平居..、单元格跨x列合并、设置单元格内边距）
+     * @param value
+     * @param font
+     * @param align
+     * @param colspan
+     * @param boderFlag
+     * @return
+     */
+    public static PdfPCell createCell(String value, Font font, int align, int colspan, boolean boderFlag) {
+<span class="nc" id="L365">        PdfPCell cell = new PdfPCell();</span>
+<span class="nc" id="L366">        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);</span>
+<span class="nc" id="L367">        cell.setHorizontalAlignment(align);</span>
+<span class="nc" id="L368">        cell.setColspan(colspan);</span>
+<span class="nc" id="L369">        cell.setPhrase(new Phrase(value, font));</span>
+<span class="nc" id="L370">        cell.setPadding(3.0f);</span>
+<span class="nc bnc" id="L371" title="All 2 branches missed.">        if (!boderFlag) {</span>
+<span class="nc" id="L372">            cell.setBorder(0);</span>
+<span class="nc" id="L373">            cell.setPaddingTop(15.0f);</span>
+<span class="nc" id="L374">            cell.setPaddingBottom(8.0f);</span>
+<span class="nc bnc" id="L375" title="All 2 branches missed.">        } else if (boderFlag) {</span>
+<span class="nc" id="L376">            cell.setBorder(0);</span>
+<span class="nc" id="L377">            cell.setPaddingTop(0.0f);</span>
+<span class="nc" id="L378">            cell.setPaddingBottom(15.0f);</span>
+        }
+<span class="nc" id="L380">        return cell;</span>
+    }
+    /**
+     * 创建单元格（指定字体、左对齐零padding..、单元格跨x列合并、设置单元格内边距）
+     * @param values
+     * @param font
+     * @param otherFont
+     * @param align
+     * @param colspan
+     * @param boderFlag
+     * @return
+     */
+    public static PdfPCell createCell(String[] values, Font font, Font otherFont, int align, int colspan, boolean boderFlag) {
+<span class="nc" id="L393">        PdfPCell cell = new PdfPCell();</span>
+<span class="nc" id="L394">        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);</span>
+<span class="nc" id="L395">        cell.setHorizontalAlignment(align);</span>
+<span class="nc" id="L396">        cell.setColspan(colspan);</span>
+<span class="nc" id="L397">        Phrase combine = new Phrase();</span>
+        // combine.setLeading();    // 设置行距
+<span class="nc bnc" id="L399" title="All 2 branches missed.">        for (int i = 0; i &lt; values.length; i++) {</span>
+<span class="nc bnc" id="L400" title="All 2 branches missed.">            combine.add(new Chunk(values[i], (i%2 == 0) ? font : otherFont));</span>
+        }
+<span class="nc" id="L402">        cell.setPhrase(combine);</span>
+<span class="nc" id="L403">        cell.setPadding(3.0f);</span>
+<span class="nc bnc" id="L404" title="All 2 branches missed.">        if (!boderFlag) {</span>
+<span class="nc" id="L405">            cell.setBorder(0);</span>
+<span class="nc" id="L406">            cell.setPaddingTop(15.0f);</span>
+<span class="nc" id="L407">            cell.setPaddingBottom(3.0f);</span>
+<span class="nc" id="L408">            cell.setPaddingLeft(0.0f);</span>
+<span class="nc bnc" id="L409" title="All 2 branches missed.">        } else if (boderFlag) {</span>
+<span class="nc" id="L410">            cell.setBorder(0);</span>
+<span class="nc" id="L411">            cell.setPaddingTop(0.0f);</span>
+<span class="nc" id="L412">            cell.setPaddingBottom(15.0f);</span>
+        }
+<span class="nc" id="L414">        return cell;</span>
+    }
+
+    /**
+     * 创建单元格（指定字体、水平..、边框宽度：0表示无边框、内边距）
+     * @param value
+     * @param font
+     * @param align
+     * @param borderWidth
+     * @param paddingSize
+     * @param flag
+     * @return
+     */
+    public static PdfPCell createCell(String value, Font font, int align, float[] borderWidth, float[] paddingSize, boolean flag) {
+<span class="nc" id="L428">        PdfPCell cell = new PdfPCell();</span>
+<span class="nc" id="L429">        cell.setVerticalAlignment(Element.ALIGN_MIDDLE);</span>
+<span class="nc" id="L430">        cell.setHorizontalAlignment(align);</span>
+<span class="nc" id="L431">        cell.setPhrase(new Phrase(value, font));</span>
+<span class="nc" id="L432">        cell.setBorderWidthLeft(borderWidth[0]);</span>
+<span class="nc" id="L433">        cell.setBorderWidthRight(borderWidth[1]);</span>
+<span class="nc" id="L434">        cell.setBorderWidthTop(borderWidth[2]);</span>
+<span class="nc" id="L435">        cell.setBorderWidthBottom(borderWidth[3]);</span>
+<span class="nc" id="L436">        cell.setPaddingTop(paddingSize[0]);</span>
+<span class="nc" id="L437">        cell.setPaddingBottom(paddingSize[1]);</span>
+<span class="nc bnc" id="L438" title="All 2 branches missed.">        if (flag) {</span>
+<span class="nc" id="L439">            cell.setColspan(2);</span>
+        }
+<span class="nc" id="L441">        return cell;</span>
+    }
+
+/**------------------------创建表格单元格的方法end----------------------------*/
+
+
+/**--------------------------创建表格的方法start------------------- ---------*/
+    /**
+     * 创建默认列宽，指定列数、水平(居中、右、左)的表格
+     * @param colNumber
+     * @param align
+     * @return
+     */
+    public static PdfPTable createTable(int colNumber, int align, float maxWidth) {
+<span class="nc" id="L455">        PdfPTable table = new PdfPTable(colNumber);</span>
+        try {
+<span class="nc" id="L457">            table.setTotalWidth(maxWidth);</span>
+<span class="nc" id="L458">            table.setLockedWidth(true);</span>
+<span class="nc" id="L459">            table.setHorizontalAlignment(align);</span>
+<span class="nc" id="L460">            table.getDefaultCell().setBorder(1);</span>
+<span class="nc" id="L461">        } catch (Exception e) {</span>
+<span class="nc" id="L462">            e.printStackTrace();</span>
+<span class="nc" id="L463">        }</span>
+<span class="nc" id="L464">        return table;</span>
+    }
+    /**
+     * 创建指定列宽、列数的表格
+     * @param widths
+     * @return
+     */
+    public static PdfPTable createTable(float[] widths, float maxWidth) {
+<span class="fc" id="L472">        PdfPTable table = new PdfPTable(widths);</span>
+        try {
+<span class="fc" id="L474">            table.setTotalWidth(maxWidth);</span>
+<span class="fc" id="L475">            table.setLockedWidth(true);</span>
+<span class="fc" id="L476">            table.setHorizontalAlignment(Element.ALIGN_CENTER);</span>
+//            table.getDefaultCell().setBorder(1);
+//            table.getDefaultCell().setBorder(PdfPCell.NO_BORDER);
+            // 直接调用table.addCell()，不会设置边界
+<span class="nc" id="L480">        } catch (Exception e) {</span>
+<span class="nc" id="L481">            e.printStackTrace();</span>
+<span class="fc" id="L482">        }</span>
+<span class="fc" id="L483">        return table;</span>
+    }
+/**--------------------------创建表格的方法end------------------- ---------*/
+
+    /**
+     * 给图片添加图章（通过拷贝生成另一份pdf实现，新生成pdf文件名后缀为 _out.pdf）
+     * @param pdfPath
+     * @param sealPath
+     * @param pageNums
+     * @param locX
+     * @param locY
+     * @param percent
+     */
+    public static void addImageSeal(String pdfPath, String[] sealPath, int[] pageNums, float[] locX, float[] locY, float[] percent) throws Exception {
+<span class="nc" id="L497">        String newPDFPath = pdfPath.replace(&quot;tmp&quot;, &quot;out&quot;);            //生成的新文件路径</span>
+<span class="nc" id="L498">        PdfReader reader = null;                            // pdf读入流</span>
+<span class="nc" id="L499">        FileOutputStream output = null;                     // 文件输出流</span>
+<span class="nc" id="L500">        PdfStamper stamper = null;                          // pdf填充器</span>
+        try {
+<span class="nc" id="L502">            output = new FileOutputStream(newPDFPath);      // 打开文件输出流</span>
+<span class="nc" id="L503">            reader = new PdfReader(pdfPath);</span>
+<span class="nc" id="L504">            stamper = new PdfStamper(reader, output);       // 根据表单生成一个新的pdf(通过打印器)</span>
+            // 添加图片印章
+<span class="nc bnc" id="L506" title="All 2 branches missed.">            for (int i = 0; i &lt; pageNums.length; i++) {</span>
+<span class="nc" id="L507">                Image img = Image.getInstance(sealPath[i]);</span>
+<span class="nc" id="L508">                img.setAbsolutePosition(locX[i], locY[i]);</span>
+<span class="nc" id="L509">                img.scalePercent(percent[i]);</span>
+<span class="nc" id="L510">                PdfContentByte under = stamper.getUnderContent(pageNums[i]);     // 背景被覆盖，字体不被覆盖</span>
+<span class="nc" id="L511">                under.addImage(img);</span>
+            }
+<span class="nc" id="L513">        } catch (Exception e) {</span>
+<span class="nc" id="L514">            e.printStackTrace();</span>
+        } finally {
+            try {
+<span class="nc" id="L517">                stamper.close();</span>
+<span class="nc" id="L518">                reader.close();</span>
+<span class="nc" id="L519">                output.close();</span>
+<span class="nc" id="L520">            } catch (Exception e) {</span>
+<span class="nc" id="L521">                e.printStackTrace();</span>
+<span class="nc" id="L522">            }</span>
+        }
+<span class="nc" id="L524">    }</span>
+
+    /**
+     * 生成每行固定长度的下划线Chunk，以实现下划线对齐居中效果，超过一行则换行
+     * TODO: 英文、数字、和其他特殊字符
+     * */
+    public static Chunk fixedUnderlineChunk(String value, Font font, int fixLength, float thickness) {
+<span class="fc" id="L531">        String res = &quot;&quot;;</span>
+<span class="fc" id="L532">        Pattern pattern = Pattern.compile(&quot;[a-z0-9A-Z_-]&quot;);</span>
+<span class="fc bfc" id="L533" title="All 2 branches covered.">        while (value.length() &gt; 0) {</span>
+<span class="fc" id="L534">            Matcher matcher1 = pattern.matcher(value);</span>
+<span class="fc" id="L535">            int letters = 0;</span>
+<span class="fc bfc" id="L536" title="All 2 branches covered.">            while (matcher1.find()) letters++;</span>
+<span class="fc bfc" id="L537" title="All 2 branches covered.">            if (value.length() - letters / 2 &gt; fixLength) {</span>
+<span class="fc" id="L538">                String tmp = value.substring(0, fixLength);</span>
+<span class="fc" id="L539">                value = value.substring(fixLength);</span>
+<span class="fc" id="L540">                Matcher matcher2 = pattern.matcher(tmp);</span>
+<span class="fc" id="L541">                int subletters = 0;</span>
+<span class="pc bpc" id="L542" title="1 of 2 branches missed.">                while (matcher2.find())  subletters++;</span>
+<span class="pc bpc" id="L543" title="1 of 2 branches missed.">                if (subletters &gt; 0) {</span>
+<span class="nc" id="L544">                    tmp += value.substring(subletters / 2);</span>
+<span class="nc" id="L545">                    value = value.substring(subletters / 2);</span>
+<span class="nc bnc" id="L546" title="All 2 branches missed.">                    if (subletters % 2 == 1) tmp += &quot; &quot;;</span>
+                }
+<span class="fc" id="L548">                res += &quot; &quot; + tmp + &quot; \u0232\n&quot;;</span>
+<span class="fc" id="L549">            }</span>
+            else {
+<span class="fc" id="L551">                int blanks = fixLength - value.length() + letters / 2;</span>
+<span class="fc" id="L552">                String tmp = &quot; &quot;;</span>
+<span class="fc bfc" id="L553" title="All 2 branches covered.">                for (int i = 0; i &lt; blanks; i++) { tmp = &quot; &quot; + tmp; }</span>
+<span class="fc" id="L554">                tmp = tmp + value;</span>
+<span class="fc bfc" id="L555" title="All 2 branches covered.">                for (int i = 0; i &lt; blanks; i++) { tmp = tmp + &quot; &quot;; }</span>
+<span class="fc bfc" id="L556" title="All 2 branches covered.">                if (letters % 2 == 1) tmp = tmp + &quot; &quot;;</span>
+<span class="fc" id="L557">                tmp = tmp + &quot; \u0232&quot;;</span>
+<span class="fc" id="L558">                value = &quot;&quot;;</span>
+<span class="fc" id="L559">                res += tmp;</span>
+            }
+<span class="fc" id="L561">        }</span>
+<span class="fc" id="L562">        Chunk chunk = new Chunk(res, font);</span>
+<span class="fc" id="L563">        chunk.setUnderline(thickness, -3f);</span>
+<span class="fc" id="L564">        return chunk;</span>
+    }
+
+    public static Chunk leastUnderlineChunk(String value, Font font, int leastLen, float thickness, boolean isCenter) {
+        String res;
+<span class="fc" id="L569">        System.out.println(value);</span>
+<span class="fc" id="L570">        Pattern pattern = Pattern.compile(&quot;[a-z0-9A-Z_-]|\\x20&quot;);</span>
+<span class="fc" id="L571">        Matcher matcher1 = pattern.matcher(value);</span>
+<span class="fc" id="L572">        int letters = 0;</span>
+<span class="fc bfc" id="L573" title="All 2 branches covered.">        while (matcher1.find()) letters++;</span>
+<span class="fc" id="L574">        int blanks = leastLen - value.length() + letters / 2;</span>
+<span class="fc bfc" id="L575" title="All 2 branches covered.">        if (blanks &gt; 0) {</span>
+<span class="fc bfc" id="L576" title="All 2 branches covered.">            if (isCenter == true) {</span>
+<span class="fc" id="L577">                res = &quot;&quot;;</span>
+<span class="fc bfc" id="L578" title="All 2 branches covered.">                for (int i = 0; i &lt; blanks; i++) {</span>
+<span class="fc" id="L579">                    res = &quot; &quot; + res;</span>
+                }
+<span class="fc" id="L581">                res = res + value;</span>
+<span class="fc bfc" id="L582" title="All 2 branches covered.">                for (int i = 0; i &lt; blanks; i++) {</span>
+<span class="fc" id="L583">                    res += &quot; &quot;;</span>
+                }
+<span class="fc bfc" id="L585" title="All 2 branches covered.">                if (letters % 2 == 1) res += &quot; &quot;;</span>
+<span class="fc" id="L586">                res += &quot;\u0232&quot;;</span>
+            }
+            else {
+<span class="fc" id="L589">                res = value;</span>
+<span class="fc bfc" id="L590" title="All 2 branches covered.">                for (int i = 0; i &lt; blanks; i++) {</span>
+<span class="fc" id="L591">                    res += &quot;  &quot;;</span>
+                }
+<span class="pc bpc" id="L593" title="1 of 2 branches missed.">                if (letters % 2 == 1) res += &quot; &quot;;</span>
+<span class="fc" id="L594">                res += &quot;\u0232&quot;;</span>
+            }
+        }
+        else
+<span class="fc" id="L598">            res = value;</span>
+<span class="fc" id="L599">        System.out.println(blanks);</span>
+<span class="fc" id="L600">        Chunk chunk = new Chunk(res, font);</span>
+<span class="fc" id="L601">        chunk.setUnderline(thickness, -3f);</span>
+<span class="fc" id="L602">        return chunk;</span>
+    }
+
+    public static Phrase crossSetFont(String[] value, Font font, Font otherFont) {
+<span class="fc" id="L606">        Phrase phrase = new Phrase();</span>
+<span class="fc bfc" id="L607" title="All 2 branches covered.">        for(int i = 0; i &lt; value.length; i++) {</span>
+<span class="fc bfc" id="L608" title="All 2 branches covered.">            phrase.add(i % 2 == 0 ?</span>
+<span class="fc" id="L609">                    new Chunk(value[i], font) :</span>
+<span class="fc" id="L610">                    new Chunk(value[i], otherFont));</span>
+        }
+<span class="fc" id="L612">        return phrase;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

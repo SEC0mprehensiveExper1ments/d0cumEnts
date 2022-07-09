@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EntrustTestReviewController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-test</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.test.controller.review</a> &gt; <span class="el_source">EntrustTestReviewController.java</span></div><h1>EntrustTestReviewController.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.test.controller.review;
+
+import com.njustc.onlinebiz.common.model.Role;
+import com.njustc.onlinebiz.common.model.test.review.EntrustTestReview;
+import com.njustc.onlinebiz.test.service.review.EntrustTestReviewService;
+import org.springframework.web.bind.annotation.*;
+
+/**
+ * 委托测试检查控制器
+ *
+ */
+@RestController
+@RequestMapping(&quot;/api&quot;)
+public class EntrustTestReviewController {
+    private final EntrustTestReviewService entrustTestReviewService;
+
+<span class="fc" id="L17">    public EntrustTestReviewController(EntrustTestReviewService entrustTestReviewService) {</span>
+<span class="fc" id="L18">        this.entrustTestReviewService = entrustTestReviewService;</span>
+<span class="fc" id="L19">    }</span>
+
+    /**
+     * 获取检查表详情
+     *
+     * @param entrustTestReviewId 委托测试评论id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @return {@link EntrustTestReview}
+     */
+    @GetMapping(&quot;/review/entrustTest/{entrustTestReviewId}&quot;)
+    public EntrustTestReview getEntrustTestReview(
+            @PathVariable(&quot;entrustTestReviewId&quot;) String entrustTestReviewId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole) {
+<span class="nc" id="L34">        return entrustTestReviewService.findEntrustTestReview(entrustTestReviewId, userId, userRole);</span>
+    }
+
+    /**
+     * 更新检查表内容
+     *
+     * @param entrustTestReviewId 委托测试评论id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @param entrustTestReview 委托测试评估
+     */
+    @PostMapping(&quot;/review/entrustTest/{entrustTestReviewId}&quot;)
+    public void updateEntrustTestReview(
+            @PathVariable(&quot;entrustTestReviewId&quot;) String entrustTestReviewId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole,
+            @RequestBody EntrustTestReview entrustTestReview
+    ) {
+<span class="nc" id="L52">        entrustTestReviewService.updateEntrustTestReview(entrustTestReviewId, entrustTestReview, userId, userRole);</span>
+<span class="nc" id="L53">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

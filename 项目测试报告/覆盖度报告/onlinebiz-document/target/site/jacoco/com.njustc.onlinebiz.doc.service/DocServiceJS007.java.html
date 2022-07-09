@@ -1,0 +1,597 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DocServiceJS007.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-document</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.doc.service</a> &gt; <span class="el_source">DocServiceJS007.java</span></div><h1>DocServiceJS007.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.doc.service;
+
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.*;
+import com.njustc.onlinebiz.common.model.test.report.SoftwareEnvironment;
+import com.njustc.onlinebiz.common.model.test.report.TestContent;
+import com.njustc.onlinebiz.doc.dao.OSSProvider;
+import com.njustc.onlinebiz.doc.model.JS007;
+import com.njustc.onlinebiz.doc.util.HeaderFooter;
+import com.njustc.onlinebiz.doc.util.ItextUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.util.List;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+@Service
+public class DocServiceJS007 {
+    private final OSSProvider ossProvider;
+
+<span class="fc" id="L25">    public DocServiceJS007(OSSProvider ossProvider) {</span>
+<span class="fc" id="L26">        this.ossProvider = ossProvider;</span>
+<span class="fc" id="L27">    }</span>
+
+    private static final float marginLeft;
+    private static final float marginRight;
+    private static final float marginTop;
+    private static final float marginBottom;
+
+    @Value(&quot;${document-dir}&quot;)
+    private String DOCUMENT_DIR;
+
+    static {
+        // 在 iText 中每一个单位大小默认近似于点（pt）
+        // 1mm = 72 ÷ 25.4 ≈ 2.834645...（pt）
+<span class="fc" id="L40">        marginLeft = 60f;</span>
+<span class="fc" id="L41">        marginRight = 60f;</span>
+<span class="fc" id="L42">        marginTop = 72f;</span>
+<span class="fc" id="L43">        marginBottom = 72f;</span>
+<span class="fc" id="L44">    }</span>
+
+    public void mergePdfFiles(String[] files, String savepath) {
+        try
+        {
+            //获取当前pdf的高度及宽度
+<span class="fc" id="L50">            Document document = new Document(new PdfReader(files[0]).getPageSize(1));</span>
+<span class="fc" id="L51">            PdfCopy copy = new PdfCopy(document, new FileOutputStream(savepath));</span>
+            //打开当前操作的document，方便写入
+<span class="fc" id="L53">            document.open();</span>
+<span class="fc bfc" id="L54" title="All 2 branches covered.">            for (String file : files) {</span>
+                //读取当前文件的内容
+<span class="fc" id="L56">                PdfReader reader = new PdfReader(file);</span>
+                //获取当前文件的长度
+<span class="fc" id="L58">                int n = reader.getNumberOfPages();</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">                for (int j = 1; j &lt;= n; j++) {</span>
+                    //一页一页的复制
+<span class="fc" id="L61">                    document.newPage();</span>
+<span class="fc" id="L62">                    PdfImportedPage page = copy.getImportedPage(reader, j);</span>
+                    //这个方法是获取当前页面内容 注意：只是文本内容
+                    //PdfTextExtractor.getTextFromPage(reader, j);
+<span class="fc" id="L65">                    copy.addPage(page);</span>
+                }
+<span class="fc" id="L67">                reader.close();</span>
+            }
+<span class="fc" id="L69">            document.close();</span>
+<span class="nc" id="L70">        } catch (IOException | DocumentException e) {</span>
+<span class="nc" id="L71">            e.printStackTrace();</span>
+<span class="fc" id="L72">        }</span>
+<span class="fc" id="L73">    }</span>
+
+    private static JS007 JS007Json;
+    /**
+     * 填充
+     *
+     * @param reportId 委托id
+     * @param newJson 新json
+     * @return {@link String} OSS下载链接
+     */
+    public String fill(String reportId, JS007 newJson) {
+<span class="fc" id="L84">        JS007Json = newJson;</span>
+<span class="fc" id="L85">        String pdfPath = DOCUMENT_DIR + &quot;JS007_&quot; + reportId + &quot;.pdf&quot;;</span>
+<span class="fc" id="L86">        String pdfCover = DOCUMENT_DIR + &quot;JS007_cover_&quot; + reportId + &quot;.pdf&quot;;</span>
+<span class="fc" id="L87">        String pdfMainText = DOCUMENT_DIR + &quot;JS007_mainbody_&quot; + reportId + &quot;.pdf&quot;;</span>
+        try {
+            // 生辰pdf封面
+            // 1.新建document对象
+<span class="fc" id="L91">            Document coverDocument = new Document(PageSize.A4);// 建立一个Document对象</span>
+<span class="fc" id="L92">            coverDocument.setMargins(marginLeft, marginRight, marginTop, marginBottom);</span>
+            // 2.建立一个书写器(Writer)与document对象关联
+<span class="fc" id="L94">            File coverFile = new File(pdfCover.replaceAll(&quot;\\\\&quot;, &quot;/&quot;));</span>
+<span class="fc" id="L95">            PdfWriter coverWriter = PdfWriter.getInstance(coverDocument, new FileOutputStream(coverFile)); // 不要删</span>
+            // 3.打开文档
+<span class="fc" id="L97">            coverDocument.open();</span>
+            // 4.向文档中添加内容
+<span class="fc" id="L99">            generateCover(coverDocument);</span>
+            // 5.关闭文档
+<span class="fc" id="L101">            coverDocument.close();</span>
+
+            // 生成pdf正文
+            // 1.新建document对象
+<span class="fc" id="L105">            Document bodyDocument = new Document(PageSize.A4);// 建立一个Document对象</span>
+<span class="fc" id="L106">            bodyDocument.setMargins(marginLeft, marginRight, marginTop, marginBottom);</span>
+            // 2.建立一个书写器(Writer)与document对象关联
+<span class="fc" id="L108">            File bodyFile = new File(pdfMainText.replaceAll(&quot;\\\\&quot;, &quot;/&quot;));</span>
+<span class="fc" id="L109">            PdfWriter bodyWriter = PdfWriter.getInstance(bodyDocument, new FileOutputStream(bodyFile));</span>
+            // 2.5 添加页眉/页脚
+<span class="fc" id="L111">            String header = &quot;报告编号：&quot; + JS007Json.getInputBaoGaoBianHao();</span>
+<span class="fc" id="L112">            String[] footer = new String[]{&quot;南京大学计算机软件新技术国家重点实验室      &quot; + header + &quot;         第 &quot;, &quot; 页，共 &quot;, &quot; 页&quot;};</span>
+<span class="fc" id="L113">            int headerToPage = 0;</span>
+<span class="fc" id="L114">            int footerFromPage = 1;</span>
+<span class="fc" id="L115">            boolean isHaderLine = false;</span>
+<span class="fc" id="L116">            boolean isFooterLine = false;</span>
+<span class="fc" id="L117">            float[] headerLoc = new float[]{bodyDocument.right() - 5, bodyDocument.top() + 15};</span>
+<span class="fc" id="L118">            float[] footerLoc = new float[]{bodyDocument.left() + 15, bodyDocument.bottom() - 20};</span>
+<span class="fc" id="L119">            float headLineOff = -5f;</span>
+<span class="fc" id="L120">            float footLineOff = 12f;</span>
+<span class="fc" id="L121">            bodyWriter.setPageEvent(new HeaderFooter(header, footer, headerToPage, footerFromPage, isHaderLine, isFooterLine,</span>
+                    headerLoc, footerLoc, headLineOff, footLineOff));
+            // 3.打开文档
+<span class="fc" id="L124">            bodyDocument.open();</span>
+            // 4.向文档中添加内容
+<span class="fc" id="L126">            generatePage(bodyDocument);</span>
+            // 5.关闭文档
+<span class="fc" id="L128">            bodyDocument.close();</span>
+<span class="nc" id="L129">        } catch (Exception e) {</span>
+<span class="nc" id="L130">            e.printStackTrace();</span>
+<span class="nc" id="L131">            return &quot;unable to generate a pdf&quot;;</span>
+<span class="fc" id="L132">        }</span>
+        // 合并pdf
+<span class="fc" id="L134">        mergePdfFiles(new String[]{pdfCover, pdfMainText}, pdfPath);</span>
+        // 删除封面与正文pdf
+<span class="fc" id="L136">        System.gc();    // 及时清除缓存</span>
+<span class="fc" id="L137">        deleteOutFile(pdfCover);</span>
+<span class="fc" id="L138">        deleteOutFile(pdfMainText);</span>
+        // 上传pdf
+        try {
+<span class="pc bpc" id="L141" title="1 of 2 branches missed.">            if (ossProvider.upload(</span>
+<span class="fc" id="L142">                    &quot;doc&quot;, &quot;JS007_&quot; + reportId + &quot;.pdf&quot;, Files.readAllBytes(Path.of(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;))), &quot;application/pdf&quot;)) {</span>
+                //System.out.println(pdfPath);
+<span class="fc" id="L144">                deleteOutFile(pdfPath);</span>
+<span class="fc" id="L145">                return &quot;https://oss.syh1en.asia/doc/JS007_&quot; + reportId + &quot;.pdf&quot;;</span>
+            } else {
+<span class="nc" id="L147">                deleteOutFile(pdfPath);</span>
+<span class="nc" id="L148">                return &quot;upload failed&quot;;</span>
+            }
+<span class="nc" id="L150">        } catch (Exception e) {</span>
+<span class="nc" id="L151">            e.printStackTrace();</span>
+<span class="nc" id="L152">            deleteOutFile(pdfPath);</span>
+<span class="nc" id="L153">            return &quot;minio error&quot;;</span>
+        }
+    }
+
+    /**
+     * 删除中间的out文件
+     */
+    private void deleteOutFile(String pdfPath) {
+        try {
+<span class="fc" id="L162">            File file = new File(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;));</span>
+<span class="pc bpc" id="L163" title="1 of 2 branches missed.">            if (file.delete()) {</span>
+<span class="fc" id="L164">                System.out.println(file.getName() + &quot; is deleted!&quot;);</span>
+            } else {
+<span class="nc" id="L166">                System.out.println(&quot;Delete&quot; + file.getName() + &quot;is failed.&quot;);</span>
+            }
+<span class="nc" id="L168">        } catch (Exception e) {</span>
+<span class="nc" id="L169">            e.printStackTrace();</span>
+<span class="fc" id="L170">        }</span>
+<span class="fc" id="L171">    }</span>
+
+    private static Font boldchusong;
+    private static Font boldxiao3song;
+    private static Font bold3song;
+    private static Font boldxiao1song;
+    private static Font normalxiao4song;
+    private static Font boldxiao4song;
+    private static Font normal4song;
+
+    private static Font normal5song;
+    private static Font bold5song;
+    private static Font bold4song;
+    private static Font bold2song;
+
+    public void generateCover(Document document) throws Exception {
+        try {
+<span class="fc" id="L188">            BaseFont bfChinese = BaseFont.createFont(</span>
+                    DOCUMENT_DIR + &quot;font/simsun.ttf&quot;, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+<span class="fc" id="L190">            boldchusong = new Font(bfChinese, 36f, Font.BOLD);</span>
+<span class="fc" id="L191">            boldxiao3song = new Font(bfChinese, 15f, Font.BOLD);</span>
+<span class="fc" id="L192">            bold3song = new Font(bfChinese, 16f, Font.BOLD);</span>
+<span class="fc" id="L193">            boldxiao1song = new Font(bfChinese, 24f, Font.BOLD);</span>
+<span class="fc" id="L194">            normalxiao4song = new Font(bfChinese, 12f, Font.NORMAL);</span>
+<span class="fc" id="L195">            boldxiao4song = new Font(bfChinese, 12f, Font.BOLD);</span>
+<span class="fc" id="L196">            normal4song = new Font(bfChinese, 14f, Font.NORMAL);</span>
+
+<span class="fc" id="L198">            normal5song = new Font(bfChinese, 10.5f, Font.NORMAL);</span>
+<span class="fc" id="L199">            bold5song = new Font(bfChinese, 10.5f, Font.BOLD);</span>
+<span class="fc" id="L200">            bold4song = new Font(bfChinese, 14f, Font.BOLD);</span>
+<span class="fc" id="L201">            bold2song = new Font(bfChinese, 22f, Font.BOLD);</span>
+<span class="nc" id="L202">        } catch (Exception e) {</span>
+<span class="nc" id="L203">            e.printStackTrace();</span>
+<span class="fc" id="L204">        }</span>
+
+<span class="fc" id="L206">        Paragraph BaoGaoBianHao = new Paragraph(&quot;报告编号：&quot; + JS007Json.getInputBaoGaoBianHao(), boldxiao3song);</span>
+<span class="fc" id="L207">        BaoGaoBianHao.setAlignment(2);</span>
+<span class="fc" id="L208">        BaoGaoBianHao.setSpacingBefore(20f);</span>
+<span class="fc" id="L209">        BaoGaoBianHao.setSpacingAfter(10f);</span>
+<span class="fc" id="L210">        document.add(BaoGaoBianHao);</span>
+
+        // 标题
+<span class="fc" id="L213">        Paragraph title = new Paragraph(&quot;测 试 报 告&quot;, boldchusong);</span>
+<span class="fc" id="L214">        title.setAlignment(1); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L215">        title.setSpacingBefore(60f); // 设置段落上空白</span>
+<span class="fc" id="L216">        title.setSpacingAfter(10f); // 设置段落下空白</span>
+<span class="fc" id="L217">        document.add(title);</span>
+<span class="fc" id="L218">        document.add(new Paragraph(&quot;\n\n\n&quot;));</span>
+
+<span class="fc" id="L220">        Paragraph firstPageContent = new Paragraph(</span>
+<span class="fc" id="L221">                &quot;     软件名称： &quot; + JS007Json.getInputRuanJianMingCheng() + &quot;\n\n&quot; +</span>
+<span class="fc" id="L222">                        &quot;     版 本 号： &quot; + JS007Json.getInputBanBenHao() + &quot;\n\n&quot; +</span>
+<span class="fc" id="L223">                        &quot;     委托单位： &quot; + JS007Json.getInputWeiTuoDanWei() + &quot;\n\n&quot; +</span>
+<span class="fc" id="L224">                        &quot;     测试类别： &quot; + JS007Json.getInputCeShiLeiBie() + &quot;\n\n&quot; +</span>
+<span class="fc" id="L225">                        &quot;     报告日期： &quot; + JS007Json.getInputBaoGaoRiQiNian() + &quot; 年 &quot; + JS007Json.getInputBaoGaoRiQiYue() + &quot; 月 &quot; + JS007Json.getInputBaoGaoRiQiRi() + &quot; 日 \n\n&quot;</span>
+                , bold3song);
+<span class="fc" id="L227">        firstPageContent.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L228">        document.add(firstPageContent);</span>
+<span class="fc" id="L229">        document.add(new Paragraph(&quot;\n\n\n\n\n&quot;));</span>
+
+<span class="fc" id="L231">        Paragraph DanWei = new Paragraph(</span>
+                &quot;南京大学计算机软件新技术\n&quot; +
+                        &quot;国家重点实验室&quot;
+                , boldxiao1song);
+<span class="fc" id="L235">        DanWei.setAlignment(1); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L236">        document.add(DanWei);</span>
+<span class="fc" id="L237">        document.newPage();</span>
+
+<span class="fc" id="L239">        Paragraph ShengMing = new Paragraph(&quot;声  明\n\n&quot;, bold3song);</span>
+<span class="fc" id="L240">        ShengMing.setAlignment(1); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L241">        document.add(ShengMing);</span>
+
+<span class="fc" id="L243">        Paragraph secondPageContent = new Paragraph(</span>
+                &quot;    1、本测试报告仅适用于本报告明确指出的委托单位的被测样品及版本。\n&quot; +
+                        &quot;    2、本测试报告是本实验室对所测样品进行科学、客观测试的结果，为被测样品提供第三方独立、客观、公正的重要判定依据，也为最终用户选择产品提供参考和帮助。\n&quot; +
+                        &quot;    3、未经本实验室书面批准，不得复制本报告中的内容（全文复制除外），以免误导他人（尤其是用户）对被测样品做出不准确的评价。\n&quot; +
+                        &quot;    4、在任何情况下，若需引用本测试报告中的结果或数据都应保持其本来的意义，在使用时务必要保持其完整，不得擅自进行增加、修改、伪造，并应征得本实验室同意。\n&quot; +
+                        &quot;    5、本测试报告不得拷贝或复制作为广告材料使用。\n&quot; +
+                        &quot;    6、当被测样品出现版本更新或其它任何改变时，本测试结果不再适用，涉及到的任何技术、模块（或子系统）甚至整个软件都必须按要求进行必要的备案或重新测试，更不能出现将本测试结果应用于低于被测样品版本的情况。\n&quot; +
+                        &quot;    7、本报告无主测人员、审核人员、批准人员（授权签字人）签字无效。\n&quot; +
+                        &quot;    8、本报告无本实验室章、涂改均无效。&quot;
+                , normalxiao4song);
+<span class="fc" id="L253">        secondPageContent.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L254">        secondPageContent.setLeading(25f);</span>
+<span class="fc" id="L255">        document.add(secondPageContent);</span>
+<span class="fc" id="L256">    }</span>
+
+    public void generatePage(Document document) throws Exception {
+//        document.newPage();
+
+<span class="fc" id="L261">        Paragraph CeShiBaoGaoTitle = new Paragraph(&quot;测 试 报 告&quot;, bold2song);</span>
+<span class="fc" id="L262">        CeShiBaoGaoTitle.setAlignment(1); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L263">        CeShiBaoGaoTitle.setSpacingBefore(20f); // 设置段前间距</span>
+<span class="fc" id="L264">        CeShiBaoGaoTitle.setSpacingAfter(20f); // 设置段后间距</span>
+<span class="fc" id="L265">        document.add(CeShiBaoGaoTitle);</span>
+
+        //表格
+<span class="fc" id="L268">        float[] paddings3 = new float[]{4f, 4f, 3f, 3f};        // 上下左右的间距</span>
+<span class="fc" id="L269">        float borderWidth = 0.3f;</span>
+        //float fixedLeading = 14f;
+<span class="fc" id="L271">        PdfPTable reportTable = new PdfPTable(48);</span>
+<span class="fc" id="L272">        reportTable.setWidthPercentage(100); // 宽度100%居中</span>
+
+<span class="fc" id="L274">        reportTable.addCell(ItextUtils.createCell_Height(&quot;委托单位&quot;, normalxiao4song, Element.ALIGN_CENTER, 8, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L275">        reportTable.addCell(ItextUtils.createCell_Height(JS007Json.getInputWeiTuoDanWei(), normalxiao4song, Element.ALIGN_CENTER, 22, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L276">        reportTable.addCell(ItextUtils.createCell_Height(&quot;项目编号&quot;, normalxiao4song, Element.ALIGN_CENTER, 7, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L277">        reportTable.addCell(ItextUtils.createCell_Height(JS007Json.getInputXiangMuBianHao(), normalxiao4song, Element.ALIGN_CENTER, 11, 2, 25f, paddings3, borderWidth));</span>
+
+<span class="fc" id="L279">        reportTable.addCell(ItextUtils.createCell_Height(&quot;样品名称&quot;, normalxiao4song, Element.ALIGN_CENTER, 8, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L280">        reportTable.addCell(ItextUtils.createCell_Height(JS007Json.getInputYangPinMingCheng(), normalxiao4song, Element.ALIGN_CENTER, 22, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L281">        reportTable.addCell(ItextUtils.createCell_Height(&quot;版本/型号&quot;, normalxiao4song, Element.ALIGN_CENTER, 7, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L282">        reportTable.addCell(ItextUtils.createCell_Height(JS007Json.getInputBanBenXingHao(), normalxiao4song, Element.ALIGN_CENTER, 11, 2, 25f, paddings3, borderWidth));</span>
+
+<span class="fc" id="L284">        reportTable.addCell(ItextUtils.createCell_Height(&quot;来样日期&quot;, normalxiao4song, Element.ALIGN_CENTER, 8, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L285">        reportTable.addCell(ItextUtils.createCell_Height(</span>
+<span class="fc" id="L286">                JS007Json.getInputLaiYangRiQiNian() + &quot; 年 &quot; + JS007Json.getInputLaiYangRiQiYue() + &quot; 月 &quot; + JS007Json.getInputLaiYangRiQiRi() + &quot; 日&quot;</span>
+                , normalxiao4song, Element.ALIGN_CENTER, 22, 2, 25f, paddings3, borderWidth));
+<span class="fc" id="L288">        reportTable.addCell(ItextUtils.createCell_Height(&quot;测试类型&quot;, normalxiao4song, Element.ALIGN_CENTER, 7, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L289">        reportTable.addCell(ItextUtils.createCell_Height(JS007Json.getInputCeShiLeiBie(), normalxiao4song, Element.ALIGN_CENTER, 11, 2, 25f, paddings3, borderWidth));</span>
+
+<span class="fc" id="L291">        reportTable.addCell(ItextUtils.createCell_Height(&quot;测试时间&quot;, normalxiao4song, Element.ALIGN_CENTER, 8, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L292">        reportTable.addCell(ItextUtils.createCell_Height(</span>
+<span class="fc" id="L293">                JS007Json.getInputCeShiKaiShiRiQiNian() + &quot; 年 &quot; + JS007Json.getInputCeShiKaiShiRiQiYue() + &quot; 月 &quot; + JS007Json.getInputCeShiKaiShiRiQiRi() + &quot; 日&quot;</span>
+<span class="fc" id="L294">                        + &quot; 至 &quot; + JS007Json.getInputCeShiJieShuRiQiNian() + &quot; 年 &quot; + JS007Json.getInputCeShiJieShuRiQiYue() + &quot; 月 &quot; + JS007Json.getInputCeShiJieShuRiQiRi() + &quot; 日&quot;</span>
+                , normalxiao4song, Element.ALIGN_CENTER, 40, 2, 25f, paddings3, borderWidth));
+<span class="fc" id="L296">        reportTable.addCell(ItextUtils.createCell_Height(&quot;样品状态&quot;, normalxiao4song, Element.ALIGN_CENTER, 8, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L297">        reportTable.addCell(ItextUtils.createCell_Height(JS007Json.getInputYangPinZhuangTai(), normalxiao4song, Element.ALIGN_CENTER, 40, 2, 25f, paddings3, borderWidth));</span>
+
+<span class="fc" id="L299">        reportTable.addCell(ItextUtils.createCell_Height(&quot;测试依据&quot;, normalxiao4song, Element.ALIGN_CENTER, 8, 2, 45f, paddings3, borderWidth));</span>
+<span class="fc" id="L300">        reportTable.addCell(ItextUtils.createCell_Height(JS007Json.getInputCeShiYiJu(), normalxiao4song, Element.ALIGN_LEFT, 40, 2, 40f, paddings3, borderWidth));</span>
+
+<span class="fc" id="L302">        reportTable.addCell(ItextUtils.createCell_Height(&quot;样品清单&quot;, normalxiao4song, Element.ALIGN_CENTER, 8, 2, 120f, paddings3, borderWidth));</span>
+<span class="fc" id="L303">        reportTable.addCell(ItextUtils.createCell_Height(JS007Json.getInputYangPinQingDan(), normalxiao4song, Element.ALIGN_LEFT, 40, 2, 100f, paddings3, borderWidth));</span>
+
+<span class="fc" id="L305">        reportTable.addCell(ItextUtils.createCell_Height(&quot;测试结论&quot;, normalxiao4song, Element.ALIGN_CENTER, 8, 2, 60f, paddings3, borderWidth));</span>
+<span class="fc" id="L306">        reportTable.addCell(ItextUtils.createCell_Height(JS007Json.getInputCeShiJieLun(), normalxiao4song, Element.ALIGN_LEFT, 40, 2, 60f, paddings3, borderWidth));</span>
+
+<span class="fc" id="L308">        reportTable.addCell(ItextUtils.createCell_Height(&quot;主测人&quot;, normalxiao4song, Element.ALIGN_CENTER, 8, 2, 30f, paddings3, borderWidth));</span>
+<span class="fc" id="L309">        reportTable.addCell(ItextUtils.createCell_Height(JS007Json.getInputZhuCeRen(), normalxiao4song, Element.ALIGN_LEFT, 16, 2, 30f, paddings3, borderWidth));</span>
+<span class="fc" id="L310">        reportTable.addCell(ItextUtils.createCell_Height(&quot;日期&quot;, normalxiao4song, Element.ALIGN_CENTER, 8, 2, 30f, paddings3, borderWidth));</span>
+<span class="fc" id="L311">        reportTable.addCell(ItextUtils.createCell_Height(</span>
+<span class="fc" id="L312">                JS007Json.getInputZhuCeRiQiNian() + &quot; 年 &quot; + JS007Json.getInputZhuCeRiQiYue() + &quot; 月 &quot; + JS007Json.getInputZhuCeRiQiRi() + &quot; 日&quot;</span>
+                , normalxiao4song, Element.ALIGN_CENTER, 16, 2, 30f, paddings3, borderWidth));
+
+<span class="fc" id="L315">        reportTable.addCell(ItextUtils.createCell_Height(&quot;审核人&quot;, normalxiao4song, Element.ALIGN_CENTER, 8, 2, 30f, paddings3, borderWidth));</span>
+<span class="fc" id="L316">        reportTable.addCell(ItextUtils.createCell_Height(JS007Json.getInputZhuCeRen(), normalxiao4song, Element.ALIGN_LEFT, 16, 2, 30f, paddings3, borderWidth));</span>
+<span class="fc" id="L317">        reportTable.addCell(ItextUtils.createCell_Height(&quot;日期&quot;, normalxiao4song, Element.ALIGN_CENTER, 8, 2, 30f, paddings3, borderWidth));</span>
+<span class="fc" id="L318">        reportTable.addCell(ItextUtils.createCell_Height(</span>
+<span class="fc" id="L319">                JS007Json.getInputShenHeRiQiNian() + &quot; 年 &quot; + JS007Json.getInputShenHeRiQiYue() + &quot; 月 &quot; + JS007Json.getInputShenHeRiQiRi() + &quot; 日&quot;</span>
+                , normalxiao4song, Element.ALIGN_CENTER, 16, 2, 30f, paddings3, borderWidth));
+
+<span class="fc" id="L322">        reportTable.addCell(ItextUtils.createCell_Height(&quot;批准人&quot;, normalxiao4song, Element.ALIGN_CENTER, 8, 2, 30f, paddings3, borderWidth));</span>
+<span class="fc" id="L323">        reportTable.addCell(ItextUtils.createCell_Height(JS007Json.getInputPiZhunRen(), normalxiao4song, Element.ALIGN_LEFT, 16, 2, 30f, paddings3, borderWidth));</span>
+<span class="fc" id="L324">        reportTable.addCell(ItextUtils.createCell_Height(&quot;日期&quot;, normalxiao4song, Element.ALIGN_CENTER, 8, 2, 30f, paddings3, borderWidth));</span>
+<span class="fc" id="L325">        reportTable.addCell(ItextUtils.createCell_Height(</span>
+<span class="fc" id="L326">                JS007Json.getInputPiZhunRiQiNian() + &quot; 年 &quot; + JS007Json.getInputPiZhunRiQiYue() + &quot; 月 &quot; + JS007Json.getInputPiZhunRiQiRi() + &quot; 日&quot;</span>
+                , normalxiao4song, Element.ALIGN_CENTER, 16, 2, 30f, paddings3, borderWidth));
+
+<span class="fc" id="L329">        reportTable.addCell(ItextUtils.createCell_Height(&quot;委托单位联系方式&quot;, boldxiao4song, Element.ALIGN_LEFT, 24, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L330">        reportTable.addCell(ItextUtils.createCell_Height(&quot;测试单位联系方式&quot;, boldxiao4song, Element.ALIGN_LEFT, 24, 2, 25f, paddings3, borderWidth));</span>
+
+<span class="fc" id="L332">        reportTable.addCell(ItextUtils.createCell_Leading(</span>
+<span class="fc" id="L333">                &quot;电话：&quot; + JS007Json.getInputDianHua() + &quot;\n&quot; +</span>
+<span class="fc" id="L334">                        &quot;传真：&quot; + JS007Json.getInputChuanZhen() + &quot;\n&quot; +</span>
+<span class="fc" id="L335">                        &quot;地址： &quot; + JS007Json.getInputDiZhi() + &quot;\n&quot; +</span>
+<span class="fc" id="L336">                        &quot;邮编： &quot; + JS007Json.getInputYouBian() + &quot;\n&quot; +</span>
+<span class="fc" id="L337">                        &quot;联系人： &quot; + JS007Json.getInputLianXiRen() + &quot;\n&quot; +</span>
+<span class="fc" id="L338">                        &quot;E-mail: &quot; + JS007Json.getInputEmail() + &quot;\n&quot;</span>
+                , normalxiao4song, Element.ALIGN_LEFT, 24, 2, 20f, paddings3, borderWidth));
+<span class="fc" id="L340">        reportTable.addCell(ItextUtils.createCell_Leading(</span>
+                &quot;单位地址：南京市栖霞区仙林大道163号\n&quot; +
+                        &quot;邮政编码：210023\n&quot; +
+                        &quot;电话： 86-25-89683467\n&quot; +
+                        &quot;传真： 86-25-89686596\n&quot; +
+                        &quot;网址： http://keysoftlab.nju.edu.cn \n&quot; +
+                        &quot;E-mail: keysoftlab@nju.edu.cn\n&quot;
+                , normalxiao4song, Element.ALIGN_LEFT, 24, 2, 20f, paddings3, borderWidth));
+<span class="fc" id="L348">        document.add(reportTable);</span>
+<span class="fc" id="L349">        document.newPage();</span>
+
+<span class="fc" id="L351">        Paragraph CeShiHuanJing = new Paragraph(&quot;一、测试环境&quot;, bold4song);</span>
+<span class="fc" id="L352">        CeShiHuanJing.setSpacingBefore(40f); // 设置段落上空白</span>
+<span class="fc" id="L353">        CeShiHuanJing.setSpacingAfter(20f); // 设置段落下空白</span>
+<span class="fc" id="L354">        CeShiHuanJing.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L355">        document.add(CeShiHuanJing);</span>
+
+<span class="fc" id="L357">        Paragraph YingJianHuanJing = new Paragraph(&quot;硬件环境&quot;, boldxiao4song);</span>
+<span class="fc" id="L358">        YingJianHuanJing.setSpacingAfter(20f); // 设置段落下空白</span>
+<span class="fc" id="L359">        YingJianHuanJing.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L360">        document.add(YingJianHuanJing);</span>
+
+<span class="fc" id="L362">        Paragraph YingJianHuanJingContent = new Paragraph(&quot;    本次测试中使用到的硬件环境如下：&quot;, normalxiao4song);</span>
+<span class="fc" id="L363">        YingJianHuanJingContent.setSpacingAfter(10f); // 设置段落下空白</span>
+<span class="fc" id="L364">        YingJianHuanJingContent.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L365">        document.add(YingJianHuanJingContent);</span>
+
+<span class="fc" id="L367">        PdfPTable YingJianTable = new PdfPTable(48);</span>
+<span class="fc" id="L368">        YingJianTable.setWidthPercentage(100);</span>
+
+        // 第一行
+<span class="fc" id="L371">        YingJianTable.addCell(ItextUtils.createGreyCell_Height(&quot;硬件类别&quot;, bold5song, Element.ALIGN_CENTER, 8, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L372">        YingJianTable.addCell(ItextUtils.createGreyCell_Height(&quot;硬件名称&quot;, bold5song, Element.ALIGN_CENTER, 10, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L373">        YingJianTable.addCell(ItextUtils.createGreyCell_Height(&quot;配置&quot;, bold5song, Element.ALIGN_CENTER, 23, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L374">        YingJianTable.addCell(ItextUtils.createGreyCell_Height(&quot;数量&quot;, bold5song, Element.ALIGN_CENTER, 7, 2, 25f, paddings3, borderWidth));</span>
+
+<span class="fc" id="L376">        YingJianTable.addCell(ItextUtils.createCell_Height(JS007Json.getInputYingJianLeiBie(), normal5song, Element.ALIGN_CENTER, 8, 2, 60f, paddings3, borderWidth));</span>
+<span class="fc" id="L377">        YingJianTable.addCell(ItextUtils.createCell_Height(JS007Json.getInputYingJianMingCheng(), normal5song, Element.ALIGN_CENTER, 10, 2, 60f, paddings3, borderWidth));</span>
+<span class="fc" id="L378">        YingJianTable.addCell(ItextUtils.createCell_Height(JS007Json.getInputYingJianPeiZhi(), normal5song, Element.ALIGN_CENTER, 23, 2, 60f, paddings3, borderWidth));</span>
+<span class="fc" id="L379">        YingJianTable.addCell(ItextUtils.createCell_Height(JS007Json.getInputYingJianShuLiang(), normal5song, Element.ALIGN_CENTER, 7, 2, 60f, paddings3, borderWidth));</span>
+
+<span class="fc" id="L381">        document.add(YingJianTable);</span>
+
+<span class="fc" id="L383">        Paragraph RuanJianHuanJing = new Paragraph(&quot;软件环境&quot;, boldxiao4song);</span>
+<span class="fc" id="L384">        RuanJianHuanJing.setSpacingBefore(10f); // 设置段落上空白</span>
+<span class="fc" id="L385">        RuanJianHuanJing.setSpacingAfter(20f); // 设置段落下空白</span>
+<span class="fc" id="L386">        RuanJianHuanJing.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L387">        document.add(RuanJianHuanJing);</span>
+
+<span class="fc" id="L389">        Paragraph RuanJianHuanJingContent = new Paragraph(&quot;    本次测试中使用到的软件环境如下：&quot;, normalxiao4song);</span>
+<span class="fc" id="L390">        RuanJianHuanJingContent.setSpacingAfter(10f); // 设置段落下空白</span>
+<span class="fc" id="L391">        RuanJianHuanJingContent.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L392">        document.add(RuanJianHuanJingContent);</span>
+
+<span class="fc" id="L394">        PdfPTable RuanJianTable = new PdfPTable(48);</span>
+<span class="fc" id="L395">        RuanJianTable.setWidthPercentage(100);</span>
+
+        // 第一行
+<span class="fc" id="L398">        RuanJianTable.addCell(ItextUtils.createGreyCell_Height(&quot;软件类别&quot;, bold5song, Element.ALIGN_CENTER, 10, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L399">        RuanJianTable.addCell(ItextUtils.createGreyCell_Height(&quot;软件名称&quot;, bold5song, Element.ALIGN_CENTER, 26, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L400">        RuanJianTable.addCell(ItextUtils.createGreyCell_Height(&quot;版本&quot;, bold5song, Element.ALIGN_CENTER, 12, 2, 25f, paddings3, borderWidth));</span>
+
+<span class="fc" id="L402">        RuanJianTable.addCell(ItextUtils.createCell_Height(&quot;操作系统&quot;, normal5song, Element.ALIGN_CENTER, 10, 2, 26f, paddings3, borderWidth));</span>
+<span class="fc" id="L403">        RuanJianTable.addCell(ItextUtils.createCell_Height(JS007Json.getInputCaoZuoXiTongMingCheng(), normal5song, Element.ALIGN_CENTER, 26, 2, 26f, paddings3, borderWidth));</span>
+<span class="fc" id="L404">        RuanJianTable.addCell(ItextUtils.createCell_Height(JS007Json.getInputCaoZuoXiTongBanBen(), normal5song, Element.ALIGN_CENTER, 12, 2, 26f, paddings3, borderWidth));</span>
+
+<span class="fc" id="L406">        List&lt;SoftwareEnvironment&gt; RuanJianHuanJingList = JS007Json.getInputRuanJianHuanJing();</span>
+<span class="fc bfc" id="L407" title="All 2 branches covered.">        for (SoftwareEnvironment softwareEnvironment : RuanJianHuanJingList) {</span>
+<span class="fc" id="L408">            RuanJianTable.addCell(ItextUtils.createCell_Height(softwareEnvironment.getSoftwareType(), normal5song, Element.ALIGN_CENTER, 10, 2, 26f, paddings3, borderWidth));</span>
+<span class="fc" id="L409">            RuanJianTable.addCell(ItextUtils.createCell_Height(softwareEnvironment.getSoftwareName(), normal5song, Element.ALIGN_CENTER, 26, 2, 26f, paddings3, borderWidth));</span>
+<span class="fc" id="L410">            RuanJianTable.addCell(ItextUtils.createCell_Height(softwareEnvironment.getSoftwareVersion(), normal5song, Element.ALIGN_CENTER, 12, 2, 26f, paddings3, borderWidth));</span>
+<span class="fc" id="L411">        }</span>
+<span class="fc" id="L412">        document.add(RuanJianTable);</span>
+
+<span class="fc" id="L414">        Paragraph WangLuoHuanJing = new Paragraph(&quot;网络环境&quot;, boldxiao4song);</span>
+<span class="fc" id="L415">        WangLuoHuanJing.setSpacingBefore(10f); // 设置段落上空白</span>
+<span class="fc" id="L416">        WangLuoHuanJing.setSpacingAfter(20f); // 设置段落下空白</span>
+<span class="fc" id="L417">        WangLuoHuanJing.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L418">        document.add(WangLuoHuanJing);</span>
+
+<span class="fc" id="L420">        Paragraph WangLuoHuanJingContent = new Paragraph(&quot;    &quot; + JS007Json.getInputWangLuoHuanJing(), normalxiao4song);</span>
+<span class="fc" id="L421">        WangLuoHuanJingContent.setSpacingAfter(10f); // 设置段落下空白</span>
+<span class="fc" id="L422">        WangLuoHuanJingContent.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L423">        document.add(WangLuoHuanJingContent);</span>
+
+<span class="fc" id="L425">        Paragraph CeShiYiJuCanKaoZiLiao = new Paragraph(&quot;二、测试依据和参考资料&quot;, bold4song);</span>
+<span class="fc" id="L426">        CeShiYiJuCanKaoZiLiao.setSpacingBefore(10f); // 设置段落上空白</span>
+<span class="fc" id="L427">        CeShiYiJuCanKaoZiLiao.setSpacingAfter(20f); // 设置段落下空白</span>
+<span class="fc" id="L428">        CeShiYiJuCanKaoZiLiao.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L429">        document.add(CeShiYiJuCanKaoZiLiao);</span>
+
+<span class="fc" id="L431">        Paragraph CeShiYiJu = new Paragraph(&quot;测试依据&quot;, boldxiao4song);</span>
+<span class="fc" id="L432">        CeShiYiJu.setSpacingAfter(20f); // 设置段落下空白</span>
+<span class="fc" id="L433">        CeShiYiJu.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L434">        document.add(CeShiYiJu);</span>
+
+<span class="fc" id="L436">        List&lt;String&gt; CeShiYiJuList = JS007Json.getInputTestBases();</span>
+<span class="fc bfc" id="L437" title="All 2 branches covered.">        for (String testBase : CeShiYiJuList) {</span>
+<span class="fc" id="L438">            Paragraph testBaseContent = new Paragraph(&quot;■ &quot; + testBase, normalxiao4song);</span>
+<span class="fc" id="L439">            testBaseContent.setSpacingAfter(10f); // 设置段落下空白</span>
+<span class="fc" id="L440">            testBaseContent.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L441">            document.add(testBaseContent);</span>
+<span class="fc" id="L442">        }</span>
+
+<span class="fc" id="L444">        Paragraph CanKaoZiLiao = new Paragraph(&quot;参考资料&quot;, boldxiao4song);</span>
+<span class="fc" id="L445">        CanKaoZiLiao.setSpacingAfter(20f); // 设置段落下空白</span>
+<span class="fc" id="L446">        CanKaoZiLiao.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L447">        document.add(CanKaoZiLiao);</span>
+
+<span class="fc" id="L449">        List&lt;String&gt; CanKaoZiLiaoList = JS007Json.getInputCanKaoZiLiao();</span>
+<span class="fc bfc" id="L450" title="All 2 branches covered.">        for (String canKaoZiLiao : CanKaoZiLiaoList) {</span>
+<span class="fc" id="L451">            Paragraph canKaoZiLiaoContent = new Paragraph(&quot;■ &quot; + canKaoZiLiao, normalxiao4song);</span>
+<span class="fc" id="L452">            canKaoZiLiaoContent.setSpacingAfter(10f); // 设置段落下空白</span>
+<span class="fc" id="L453">            canKaoZiLiaoContent.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L454">            document.add(canKaoZiLiaoContent);</span>
+<span class="fc" id="L455">        }</span>
+
+<span class="fc" id="L457">        Paragraph CeShiNeiRong = new Paragraph(&quot;三、测试内容&quot;, bold4song);</span>
+<span class="fc" id="L458">        CeShiNeiRong.setSpacingBefore(10f); // 设置段落上空白</span>
+<span class="fc" id="L459">        CeShiNeiRong.setSpacingAfter(20f); // 设置段落下空白</span>
+<span class="fc" id="L460">        CeShiNeiRong.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L461">        document.add(CeShiNeiRong);</span>
+
+<span class="fc" id="L463">        Paragraph GongNengXingCeShi = new Paragraph(&quot;功能性测试&quot;, boldxiao4song);</span>
+<span class="fc" id="L464">        GongNengXingCeShi.setSpacingAfter(10f); // 设置段落下空白</span>
+<span class="fc" id="L465">        GongNengXingCeShi.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L466">        document.add(GongNengXingCeShi);</span>
+
+<span class="fc" id="L468">        PdfPTable GongNengXingCeShiTable = new PdfPTable(48);</span>
+<span class="fc" id="L469">        GongNengXingCeShiTable.setWidthPercentage(100);</span>
+        // 第一行
+<span class="fc" id="L471">        GongNengXingCeShiTable.addCell(ItextUtils.createGreyCell_Height(&quot;功能模块&quot;, bold5song, Element.ALIGN_CENTER, 12, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L472">        GongNengXingCeShiTable.addCell(ItextUtils.createGreyCell_Height(&quot;功能要求&quot;, bold5song, Element.ALIGN_CENTER, 28, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L473">        GongNengXingCeShiTable.addCell(ItextUtils.createGreyCell_Height(&quot;测试结果&quot;, bold5song, Element.ALIGN_CENTER, 8, 2, 25f, paddings3, borderWidth));</span>
+
+<span class="fc" id="L475">        List&lt;TestContent&gt; GongNengXingCeShiList = JS007Json.getInputGongNengXingCeShi();</span>
+<span class="fc bfc" id="L476" title="All 2 branches covered.">        for (TestContent testContent : GongNengXingCeShiList) {</span>
+<span class="fc" id="L477">            GongNengXingCeShiTable.addCell(ItextUtils.createCell_Height(testContent.getContent(), normal5song, Element.ALIGN_LEFT, 12, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L478">            GongNengXingCeShiTable.addCell(ItextUtils.createCell_Height(testContent.getDescription(), normal5song, Element.ALIGN_LEFT, 28, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L479">            GongNengXingCeShiTable.addCell(ItextUtils.createCell_Height(testContent.getResult(), normal5song, Element.ALIGN_LEFT, 8, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L480">        }</span>
+<span class="fc" id="L481">        document.add(GongNengXingCeShiTable);</span>
+
+<span class="fc" id="L483">        Paragraph XiaoLvCeShi = new Paragraph(&quot;效率测试&quot;, boldxiao4song);</span>
+<span class="fc" id="L484">        XiaoLvCeShi.setSpacingAfter(10f); // 设置段落下空白</span>
+<span class="fc" id="L485">        XiaoLvCeShi.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L486">        document.add(XiaoLvCeShi);</span>
+
+<span class="fc" id="L488">        PdfPTable XiaoLvCeShiTable = new PdfPTable(48);</span>
+<span class="fc" id="L489">        XiaoLvCeShiTable.setWidthPercentage(100);</span>
+        // 第一行
+<span class="fc" id="L491">        XiaoLvCeShiTable.addCell(ItextUtils.createGreyCell_Height(&quot;测试特性&quot;, bold5song, Element.ALIGN_CENTER, 12, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L492">        XiaoLvCeShiTable.addCell(ItextUtils.createGreyCell_Height(&quot;测试说明&quot;, bold5song, Element.ALIGN_CENTER, 28, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L493">        XiaoLvCeShiTable.addCell(ItextUtils.createGreyCell_Height(&quot;测试结果&quot;, bold5song, Element.ALIGN_CENTER, 8, 2, 25f, paddings3, borderWidth));</span>
+
+<span class="fc" id="L495">        List&lt;TestContent&gt; XiaoLvCeShiList = JS007Json.getInputXiaoLvCeShi();</span>
+<span class="fc bfc" id="L496" title="All 2 branches covered.">        for (TestContent testContent : XiaoLvCeShiList) {</span>
+<span class="fc" id="L497">            XiaoLvCeShiTable.addCell(ItextUtils.createCell_Height(testContent.getContent(), normal5song, Element.ALIGN_LEFT, 12, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L498">            XiaoLvCeShiTable.addCell(ItextUtils.createCell_Height(testContent.getDescription(), normal5song, Element.ALIGN_LEFT, 28, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L499">            XiaoLvCeShiTable.addCell(ItextUtils.createCell_Height(testContent.getResult(), normal5song, Element.ALIGN_LEFT, 8, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L500">        }</span>
+<span class="fc" id="L501">        document.add(XiaoLvCeShiTable);</span>
+
+<span class="fc" id="L503">        Paragraph KeYiZhiXingCeShi = new Paragraph(&quot;可移植性测试&quot;, boldxiao4song);</span>
+<span class="fc" id="L504">        KeYiZhiXingCeShi.setSpacingAfter(10f); // 设置段落下空白</span>
+<span class="fc" id="L505">        KeYiZhiXingCeShi.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L506">        document.add(KeYiZhiXingCeShi);</span>
+
+<span class="fc" id="L508">        PdfPTable KeYiZhiXingCeShiTable = new PdfPTable(48);</span>
+<span class="fc" id="L509">        KeYiZhiXingCeShiTable.setWidthPercentage(100);</span>
+        // 第一行
+<span class="fc" id="L511">        KeYiZhiXingCeShiTable.addCell(ItextUtils.createGreyCell_Height(&quot;测试特性&quot;, bold5song, Element.ALIGN_CENTER, 12, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L512">        KeYiZhiXingCeShiTable.addCell(ItextUtils.createGreyCell_Height(&quot;测试说明&quot;, bold5song, Element.ALIGN_CENTER, 28, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L513">        KeYiZhiXingCeShiTable.addCell(ItextUtils.createGreyCell_Height(&quot;测试结果&quot;, bold5song, Element.ALIGN_CENTER, 8, 2, 25f, paddings3, borderWidth));</span>
+
+<span class="fc" id="L515">        List&lt;TestContent&gt; KeYiZhiXingCeShiList = JS007Json.getInputKeYiZhiXingCeShi();</span>
+<span class="fc bfc" id="L516" title="All 2 branches covered.">        for (TestContent testContent : KeYiZhiXingCeShiList) {</span>
+<span class="fc" id="L517">            KeYiZhiXingCeShiTable.addCell(ItextUtils.createCell_Height(testContent.getContent(), normal5song, Element.ALIGN_LEFT, 12, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L518">            KeYiZhiXingCeShiTable.addCell(ItextUtils.createCell_Height(testContent.getDescription(), normal5song, Element.ALIGN_LEFT, 28, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L519">            KeYiZhiXingCeShiTable.addCell(ItextUtils.createCell_Height(testContent.getResult(), normal5song, Element.ALIGN_LEFT, 8, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L520">        }</span>
+<span class="fc" id="L521">        document.add(KeYiZhiXingCeShiTable);</span>
+
+<span class="fc" id="L523">        Paragraph YiYongXingCeShi = new Paragraph(&quot;易用性测试&quot;, boldxiao4song);</span>
+<span class="fc" id="L524">        YiYongXingCeShi.setSpacingAfter(10f); // 设置段落下空白</span>
+<span class="fc" id="L525">        YiYongXingCeShi.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L526">        document.add(YiYongXingCeShi);</span>
+
+<span class="fc" id="L528">        PdfPTable YiYongXingCeShiTable = new PdfPTable(48);</span>
+<span class="fc" id="L529">        YiYongXingCeShiTable.setWidthPercentage(100);</span>
+        // 第一行
+<span class="fc" id="L531">        YiYongXingCeShiTable.addCell(ItextUtils.createGreyCell_Height(&quot;测试特性&quot;, bold5song, Element.ALIGN_CENTER, 12, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L532">        YiYongXingCeShiTable.addCell(ItextUtils.createGreyCell_Height(&quot;测试说明&quot;, bold5song, Element.ALIGN_CENTER, 28, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L533">        YiYongXingCeShiTable.addCell(ItextUtils.createGreyCell_Height(&quot;测试结果&quot;, bold5song, Element.ALIGN_CENTER, 8, 2, 25f, paddings3, borderWidth));</span>
+
+<span class="fc" id="L535">        List&lt;TestContent&gt; YiYongXingCeShiList = JS007Json.getInputYiYongXingCeShi();</span>
+<span class="fc bfc" id="L536" title="All 2 branches covered.">        for (TestContent testContent : YiYongXingCeShiList) {</span>
+<span class="fc" id="L537">            YiYongXingCeShiTable.addCell(ItextUtils.createCell_Height(testContent.getContent(), normal5song, Element.ALIGN_LEFT, 12, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L538">            YiYongXingCeShiTable.addCell(ItextUtils.createCell_Height(testContent.getDescription(), normal5song, Element.ALIGN_LEFT, 28, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L539">            YiYongXingCeShiTable.addCell(ItextUtils.createCell_Height(testContent.getResult(), normal5song, Element.ALIGN_LEFT, 8, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L540">        }</span>
+<span class="fc" id="L541">        document.add(YiYongXingCeShiTable);</span>
+
+<span class="fc" id="L543">        Paragraph KeKaoXingCeShi = new Paragraph(&quot;可靠性测试&quot;, boldxiao4song);</span>
+<span class="fc" id="L544">        KeKaoXingCeShi.setSpacingAfter(10f); // 设置段落下空白</span>
+<span class="fc" id="L545">        KeKaoXingCeShi.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L546">        document.add(KeKaoXingCeShi);</span>
+
+<span class="fc" id="L548">        PdfPTable KeKaoXingCeShiTable = new PdfPTable(48);</span>
+<span class="fc" id="L549">        KeKaoXingCeShiTable.setWidthPercentage(100);</span>
+        // 第一行
+<span class="fc" id="L551">        KeKaoXingCeShiTable.addCell(ItextUtils.createGreyCell_Height(&quot;测试特性&quot;, bold5song, Element.ALIGN_CENTER, 12, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L552">        KeKaoXingCeShiTable.addCell(ItextUtils.createGreyCell_Height(&quot;测试说明&quot;, bold5song, Element.ALIGN_CENTER, 28, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L553">        KeKaoXingCeShiTable.addCell(ItextUtils.createGreyCell_Height(&quot;测试结果&quot;, bold5song, Element.ALIGN_CENTER, 8, 2, 25f, paddings3, borderWidth));</span>
+
+<span class="fc" id="L555">        List&lt;TestContent&gt; KeKaoXingCeShiList = JS007Json.getInputKeKaoXingCeShi();</span>
+<span class="fc bfc" id="L556" title="All 2 branches covered.">        for (TestContent testContent : KeKaoXingCeShiList) {</span>
+<span class="fc" id="L557">            KeKaoXingCeShiTable.addCell(ItextUtils.createCell_Height(testContent.getContent(), normal5song, Element.ALIGN_LEFT, 12, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L558">            KeKaoXingCeShiTable.addCell(ItextUtils.createCell_Height(testContent.getDescription(), normal5song, Element.ALIGN_LEFT, 28, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L559">            KeKaoXingCeShiTable.addCell(ItextUtils.createCell_Height(testContent.getResult(), normal5song, Element.ALIGN_LEFT, 8, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L560">        }</span>
+<span class="fc" id="L561">        document.add(KeKaoXingCeShiTable);</span>
+
+<span class="fc" id="L563">        Paragraph KeWeiHuXingCeShi = new Paragraph(&quot;可维护性测试&quot;, boldxiao4song);</span>
+<span class="fc" id="L564">        KeWeiHuXingCeShi.setSpacingAfter(10f); // 设置段落下空白</span>
+<span class="fc" id="L565">        KeWeiHuXingCeShi.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L566">        document.add(KeWeiHuXingCeShi);</span>
+
+<span class="fc" id="L568">        PdfPTable KeWeiHuXingCeShiTable = new PdfPTable(48);</span>
+<span class="fc" id="L569">        KeWeiHuXingCeShiTable.setWidthPercentage(100);</span>
+        // 第一行
+<span class="fc" id="L571">        KeWeiHuXingCeShiTable.addCell(ItextUtils.createGreyCell_Height(&quot;测试特性&quot;, bold5song, Element.ALIGN_CENTER, 12, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L572">        KeWeiHuXingCeShiTable.addCell(ItextUtils.createGreyCell_Height(&quot;测试说明&quot;, bold5song, Element.ALIGN_CENTER, 28, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L573">        KeWeiHuXingCeShiTable.addCell(ItextUtils.createGreyCell_Height(&quot;测试结果&quot;, bold5song, Element.ALIGN_CENTER, 8, 2, 25f, paddings3, borderWidth));</span>
+
+<span class="fc" id="L575">        List&lt;TestContent&gt; KeWeiHuXingCeShiList = JS007Json.getInputKeWeiHuXingCeShi();</span>
+<span class="fc bfc" id="L576" title="All 2 branches covered.">        for (TestContent testContent : KeWeiHuXingCeShiList) {</span>
+<span class="fc" id="L577">            KeWeiHuXingCeShiTable.addCell(ItextUtils.createCell_Height(testContent.getContent(), normal5song, Element.ALIGN_LEFT, 12, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L578">            KeWeiHuXingCeShiTable.addCell(ItextUtils.createCell_Height(testContent.getDescription(), normal5song, Element.ALIGN_LEFT, 28, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L579">            KeWeiHuXingCeShiTable.addCell(ItextUtils.createCell_Height(testContent.getResult(), normal5song, Element.ALIGN_LEFT, 8, 2, 25f, paddings3, borderWidth));</span>
+<span class="fc" id="L580">        }</span>
+<span class="fc" id="L581">        document.add(KeWeiHuXingCeShiTable);</span>
+
+<span class="fc" id="L583">        Paragraph CeShiZhiXingJiLu = new Paragraph(&quot;四、测试执行记录&quot;, bold4song);</span>
+<span class="fc" id="L584">        CeShiZhiXingJiLu.setSpacingBefore(10f); // 设置段落上空白</span>
+<span class="fc" id="L585">        CeShiZhiXingJiLu.setSpacingAfter(20f); // 设置段落下空白</span>
+<span class="fc" id="L586">        CeShiZhiXingJiLu.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L587">        document.add(CeShiZhiXingJiLu);</span>
+
+<span class="fc" id="L589">        Paragraph KongBai = new Paragraph(&quot;以 下 空 白&quot;, normal4song);</span>
+<span class="fc" id="L590">        KongBai.setSpacingBefore(10f); // 设置段落上空白</span>
+<span class="fc" id="L591">        KongBai.setSpacingAfter(20f); // 设置段落下空白</span>
+<span class="fc" id="L592">        KongBai.setAlignment(0); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L593">        document.add(KongBai);</span>
+<span class="fc" id="L594">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

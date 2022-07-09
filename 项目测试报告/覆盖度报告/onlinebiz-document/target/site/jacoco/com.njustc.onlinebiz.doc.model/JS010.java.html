@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JS010.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-document</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.doc.model</a> &gt; <span class="el_source">JS010.java</span></div><h1>JS010.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.doc.model;
+
+
+import com.njustc.onlinebiz.common.model.test.review.ReportReview;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+import java.util.List;
+
+<span class="pc bnc" id="L12" title="All 134 branches missed.">@Data</span>
+<span class="fc" id="L13">@NoArgsConstructor</span>
+<span class="nc" id="L14">@AllArgsConstructor</span>
+@Accessors(chain = true)
+public class JS010 {
+<span class="pc" id="L17">    private String inputRuanJianMingChen = &quot;&quot;;</span>
+<span class="pc" id="L18">    private String inputWeiTuoDanWei = &quot;&quot;;</span>
+<span class="pc" id="L19">    private String inputJianChaJieGuo01 = &quot;&quot;;</span>
+<span class="pc" id="L20">    private String inputJianChaJieGuo02 = &quot;&quot;;</span>
+<span class="pc" id="L21">    private String inputJianChaJieGuo03 = &quot;&quot;;</span>
+<span class="pc" id="L22">    private String inputJianChaJieGuo04 = &quot;&quot;;</span>
+<span class="pc" id="L23">    private String inputJianChaJieGuo05 = &quot;&quot;;</span>
+<span class="pc" id="L24">    private String inputJianChaJieGuo06 = &quot;&quot;;</span>
+<span class="pc" id="L25">    private String inputJianChaJieGuo07 = &quot;&quot;;</span>
+<span class="pc" id="L26">    private String inputJianChaJieGuo08 = &quot;&quot;;</span>
+<span class="pc" id="L27">    private String inputJianChaJieGuo09 = &quot;&quot;;</span>
+<span class="pc" id="L28">    private String inputJianChaJieGuo010 = &quot;&quot;;</span>
+<span class="pc" id="L29">    private String inputJianChaJieGuo0111 = &quot;&quot;;</span>
+<span class="pc" id="L30">    private String inputJianChaJieGuo0112 = &quot;&quot;;</span>
+<span class="pc" id="L31">    private String inputJianChaJieGuo0113 = &quot;&quot;;</span>
+<span class="pc" id="L32">    private String inputJianChaJieGuo012 = &quot;&quot;;</span>
+
+<span class="nc" id="L34">    public JS010(ReportReview reportReview) {</span>
+<span class="nc bnc" id="L35" title="All 2 branches missed.">        if (reportReview == null) {</span>
+<span class="nc" id="L36">            throw new IllegalArgumentException(&quot;reportReview is null&quot;);</span>
+        }
+<span class="nc" id="L38">        this.inputRuanJianMingChen = reportReview.getSoftwareName();</span>
+<span class="nc" id="L39">        this.inputWeiTuoDanWei = reportReview.getPrincipal();</span>
+<span class="nc" id="L40">        List&lt;ReportReview.ConclusionRow&gt; conclusions = reportReview.getConclusions();</span>
+<span class="nc bnc" id="L41" title="All 4 branches missed.">        if (conclusions != null &amp;&amp; conclusions.size() == 14) {</span>
+<span class="nc bnc" id="L42" title="All 2 branches missed.">            this.inputJianChaJieGuo01 = conclusions.get(0).isPassed() ? &quot;通过&quot; : &quot;不通过&quot;;</span>
+<span class="nc bnc" id="L43" title="All 2 branches missed.">            this.inputJianChaJieGuo02 = conclusions.get(1).isPassed() ? &quot;通过&quot; : &quot;不通过&quot;;</span>
+<span class="nc bnc" id="L44" title="All 2 branches missed.">            this.inputJianChaJieGuo03 = conclusions.get(2).isPassed() ? &quot;通过&quot; : &quot;不通过&quot;;</span>
+<span class="nc bnc" id="L45" title="All 2 branches missed.">            this.inputJianChaJieGuo04 = conclusions.get(3).isPassed() ? &quot;通过&quot; : &quot;不通过&quot;;</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">            this.inputJianChaJieGuo05 = conclusions.get(4).isPassed() ? &quot;通过&quot; : &quot;不通过&quot;;</span>
+<span class="nc bnc" id="L47" title="All 2 branches missed.">            this.inputJianChaJieGuo06 = conclusions.get(5).isPassed() ? &quot;通过&quot; : &quot;不通过&quot;;</span>
+<span class="nc bnc" id="L48" title="All 2 branches missed.">            this.inputJianChaJieGuo07 = conclusions.get(6).isPassed() ? &quot;通过&quot; : &quot;不通过&quot;;</span>
+<span class="nc bnc" id="L49" title="All 2 branches missed.">            this.inputJianChaJieGuo08 = conclusions.get(7).isPassed() ? &quot;通过&quot; : &quot;不通过&quot;;</span>
+<span class="nc bnc" id="L50" title="All 2 branches missed.">            this.inputJianChaJieGuo09 = conclusions.get(8).isPassed() ? &quot;通过&quot; : &quot;不通过&quot;;</span>
+<span class="nc bnc" id="L51" title="All 2 branches missed.">            this.inputJianChaJieGuo010 = conclusions.get(9).isPassed() ? &quot;通过&quot; : &quot;不通过&quot;;</span>
+<span class="nc bnc" id="L52" title="All 2 branches missed.">            this.inputJianChaJieGuo0111 = conclusions.get(10).isPassed() ? &quot;通过&quot; : &quot;不通过&quot;;</span>
+<span class="nc bnc" id="L53" title="All 2 branches missed.">            this.inputJianChaJieGuo0112 = conclusions.get(11).isPassed() ? &quot;通过&quot; : &quot;不通过&quot;;</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">            this.inputJianChaJieGuo0113 = conclusions.get(12).isPassed() ? &quot;通过&quot; : &quot;不通过&quot;;</span>
+<span class="nc bnc" id="L55" title="All 2 branches missed.">            this.inputJianChaJieGuo012 = conclusions.get(13).isPassed() ? &quot;通过&quot; : &quot;不通过&quot;;</span>
+        }
+        //增加字段的非空性检查
+<span class="nc bnc" id="L58" title="All 2 branches missed.">        if (this.inputRuanJianMingChen == null) {</span>
+<span class="nc" id="L59">            this.inputRuanJianMingChen = &quot;&quot;;</span>
+        }
+<span class="nc bnc" id="L61" title="All 2 branches missed.">        if (this.inputWeiTuoDanWei == null) {</span>
+<span class="nc" id="L62">            this.inputWeiTuoDanWei = &quot;&quot;;</span>
+        }
+<span class="nc" id="L64">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

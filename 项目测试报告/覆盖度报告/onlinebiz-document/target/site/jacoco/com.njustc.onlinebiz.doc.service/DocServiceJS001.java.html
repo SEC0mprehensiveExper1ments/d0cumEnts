@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DocServiceJS001.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-document</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.doc.service</a> &gt; <span class="el_source">DocServiceJS001.java</span></div><h1>DocServiceJS001.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.doc.service;
+
+
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.njustc.onlinebiz.doc.dao.OSSProvider;
+import com.njustc.onlinebiz.doc.util.HeaderFooter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.stereotype.Service;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+
+
+@Service
+@PropertySource(&quot;classpath:application.yml&quot;)
+public class DocServiceJS001 {
+
+    private final OSSProvider ossProvider;
+
+<span class="fc" id="L25">    public DocServiceJS001(OSSProvider ossProvider) {</span>
+<span class="fc" id="L26">        this.ossProvider = ossProvider;</span>
+<span class="fc" id="L27">    }</span>
+
+    /**
+     * 以下是文档生成部分
+     * */
+    //  基础页面设置
+    // 在 iText 中每一个单位大小默认近似于点（pt）
+    // 1mm = 72 ÷ 25.4 ≈ 2.834645...（pt）
+    private static final float marginLeft = 65f;
+    private static final float marginRight = 65f;
+    private static final float marginTop = 68f;
+    private static final float marginBottom = 65f;
+
+    @Value(&quot;${document-dir}&quot;)
+    private String DOCUMENT_DIR;
+
+    private Font titlefont2;
+    private Font keyfont;
+    private Font textfont;
+
+
+    /**
+     * 填充JS001文档
+     * @return 成功返回OSS链接，失败返回原因字符串
+     * */
+    public String fill(){
+<span class="fc" id="L53">        String pdfPath = DOCUMENT_DIR + &quot;JS001_out.pdf&quot;;</span>
+<span class="fc" id="L54">        System.out.println(DOCUMENT_DIR);</span>
+        // 创建文档
+        try {
+            // 1.新建document对象
+<span class="fc" id="L58">            Document document = new Document(PageSize.A4);// 建立一个Document对象</span>
+<span class="fc" id="L59">            document.setMargins(marginLeft, marginRight, marginTop, marginBottom);</span>
+            // 2.建立一个书写器(Writer)与document对象关联
+<span class="fc" id="L61">            File file = new File(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;));</span>
+<span class="fc" id="L62">            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(file));</span>
+            // 2.5 添加页眉/页脚
+<span class="fc" id="L64">            String header = &quot;NST－04－JS001－2011&quot;;</span>
+<span class="fc" id="L65">            String[] footer = new String[] {&quot;第 &quot;, &quot; 页 共 &quot;, &quot; 页&quot;};</span>
+<span class="fc" id="L66">            int headerToPage = 100;</span>
+<span class="fc" id="L67">            int footerFromPage = 1;</span>
+<span class="fc" id="L68">            boolean isHeaderLine = true;</span>
+<span class="fc" id="L69">            boolean isFooterLine = false;</span>
+<span class="fc" id="L70">            float[] headerLoc = new float[]{document.right() - 5, document.top() + 15};</span>
+<span class="fc" id="L71">            float[] footerLoc = new float[] {(document.left() + document.right()) / 2.0f - 35, document.bottom() - 20};</span>
+<span class="fc" id="L72">            float headLineOff = -5f;</span>
+<span class="fc" id="L73">            float footLineOff = 12f;</span>
+<span class="fc" id="L74">            writer.setPageEvent(new HeaderFooter(header, footer, headerToPage, footerFromPage, isHeaderLine, isFooterLine,</span>
+                    headerLoc, footerLoc, headLineOff, footLineOff));
+            // 3.打开文档
+<span class="fc" id="L77">            document.open();</span>
+            // 4.向文档中添加内容
+<span class="fc" id="L79">            generatePageOne(document);</span>
+            // 5.关闭文档
+<span class="fc" id="L81">            document.close();</span>
+<span class="pc" id="L82">        } catch (Exception e) { e.printStackTrace(); return &quot;unable to generate a pdf&quot;; }</span>
+        // 上传pdf
+        try {
+<span class="pc bpc" id="L85" title="1 of 2 branches missed.">            if(ossProvider.upload(</span>
+<span class="fc" id="L86">                    &quot;doc&quot;, &quot;JS001_out.pdf&quot;, Files.readAllBytes(Path.of(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;))), &quot;application/pdf&quot;)) {</span>
+<span class="fc" id="L87">                deleteOutFile(pdfPath);</span>
+<span class="fc" id="L88">                return &quot;https://oss.syh1en.asia/doc/JS001_out.pdf&quot;;</span>
+<span class="nc" id="L89">            } else { deleteOutFile(pdfPath); return &quot;upload failed&quot;; }</span>
+<span class="nc" id="L90">        } catch (Exception e) { e.printStackTrace(); deleteOutFile(pdfPath); return &quot;minio error&quot;; }</span>
+    }
+
+    // 删除中间的out文件
+    private void deleteOutFile(String pdfPath) {
+        try {
+<span class="fc" id="L96">            File file = new File(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;));</span>
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">            if (file.delete()) {</span>
+<span class="fc" id="L98">                System.out.println(file.getName() + &quot; is deleted!&quot;);</span>
+<span class="nc" id="L99">            } else { System.out.println(&quot;Delete&quot; + file.getName() + &quot;is failed.&quot;); }</span>
+<span class="pc" id="L100">        } catch(Exception e) { e.printStackTrace(); }</span>
+<span class="fc" id="L101">    }</span>
+
+    public void generatePageOne(Document document) throws Exception {
+        // 加载字体
+        try {
+<span class="fc" id="L106">            BaseFont bfChinese = BaseFont.createFont(DOCUMENT_DIR + &quot;font/simsun.ttf&quot;, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);</span>
+<span class="fc" id="L107">            titlefont2 = new Font(bfChinese, 21, Font.NORMAL);</span>
+<span class="fc" id="L108">            keyfont = new Font(bfChinese, 12.5f, Font.BOLD);</span>
+<span class="fc" id="L109">            textfont = new Font(bfChinese, 12f, Font.NORMAL);</span>
+<span class="pc" id="L110">        } catch (Exception e) { e.printStackTrace(); }</span>
+        // 标题
+<span class="fc" id="L112">        Paragraph title = new Paragraph(&quot;软件项目委托测试提交材料&quot;, titlefont2);</span>
+<span class="fc" id="L113">        title.setAlignment(1); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L114">        title.setSpacingBefore(10f); // 设置段落上空白</span>
+<span class="fc" id="L115">        title.setSpacingAfter(30f); // 设置段落下空白</span>
+
+<span class="fc" id="L117">        Paragraph text1 = new Paragraph();</span>
+<span class="fc" id="L118">        text1.setLeading(24f);</span>
+<span class="fc" id="L119">        text1.add(new Chunk(&quot;一、 软件项目委托测试需要提交的文档：\n&quot;, keyfont));</span>
+<span class="fc" id="L120">        text1.add(new Chunk(&quot;     1.《软件项目委托测试申请表》：\n&quot; +</span>
+                                      &quot;         ① 书面一份加盖公章；\n&quot; +
+                                      &quot;         ② 电子文档。\n&quot; +
+                                      &quot;     2.《委托测试软件功能列表》: ①书面一份加盖公章；②电子文档\n&quot; +
+                                      &quot;     3.《软件项目委托测试保密协议》、《软件项目委托测试合同》：格式按照合\n&quot; +
+                                      &quot;       同及协议规范签订。①书面各两分；②电子文档\n&quot; +
+                                      &quot;     4.软件资料: 包括《用户手册》、《安装手册》、《操作手册》、《维护手册》。\n&quot; +
+                                      &quot;       (手册要有详细的目录索引、页码标识、文档版本号、技术支持联系方法、公司\n&quot; +
+                                      &quot;       名称、地址等) \n&quot; +
+                                      &quot;     ① 电子文档。\n&quot; +
+                                      &quot;     5. 《无法检测功能的声明》\n&quot; +
+                                      &quot;     ① 书面一份加盖公章；②电子文档。\n&quot;, textfont));
+<span class="fc" id="L132">        text1.setSpacingAfter(0f); // 设置段落下空白</span>
+
+<span class="fc" id="L134">        Paragraph text2 = new Paragraph();</span>
+<span class="fc" id="L135">        text2.setLeading(24f);</span>
+<span class="fc" id="L136">        text2.add(new Phrase(&quot;二、 提交软件样品\n&quot;, keyfont));</span>
+<span class="fc" id="L137">        text2.add(</span>
+                new Phrase(
+                        &quot;     1、提交软件样品一套（与《委托测试软件功能列表》一致）；附相\n&quot; +
+                                &quot;        应的平台及支持性数据。\n&quot;,
+                        textfont));
+<span class="fc" id="L142">        text2.setSpacingAfter(0f); // 设置段落下空白</span>
+
+<span class="fc" id="L144">        Paragraph text3 = new Paragraph();</span>
+<span class="fc" id="L145">        text3.setLeading(24f);</span>
+<span class="fc" id="L146">        text3.add(new Phrase(&quot;三、 其它\n&quot;, keyfont));</span>
+<span class="fc" id="L147">        text3.add(</span>
+                new Phrase(
+                        &quot;     1、以上一、二项所要求提交的电子文档集中刻成一张（或按实际情\n&quot; +
+                                &quot;        况分开来刻录）光盘里；\n&quot; +
+                                &quot;     2、以上申报材料（书面文档、电子文档）请在签订合同 5 天内提交\n&quot; +
+                                &quot;        我中心；\n&quot; +
+                                &quot;     3、如有疑问请发电子邮件或电话联系。\n&quot;,
+                        textfont));
+<span class="fc" id="L155">        text3.setSpacingAfter(0f); // 设置段落下空白</span>
+
+<span class="fc" id="L157">        document.add(title);</span>
+<span class="fc" id="L158">        document.add(text1);</span>
+<span class="fc" id="L159">        document.add(text2);</span>
+<span class="fc" id="L160">        document.add(text3);</span>
+<span class="fc" id="L161">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

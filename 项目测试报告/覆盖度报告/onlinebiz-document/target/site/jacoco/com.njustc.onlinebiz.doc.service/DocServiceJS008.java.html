@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DocServiceJS008.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-document</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.doc.service</a> &gt; <span class="el_source">DocServiceJS008.java</span></div><h1>DocServiceJS008.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.doc.service;
+
+
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.njustc.onlinebiz.common.model.test.testcase.Testcase.TestcaseList;
+import com.njustc.onlinebiz.doc.dao.OSSProvider;
+import com.njustc.onlinebiz.doc.model.JS008;
+import com.njustc.onlinebiz.doc.util.HeaderFooter;
+import com.njustc.onlinebiz.doc.util.ItextUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
+
+@Service
+public class DocServiceJS008 {
+
+    private final OSSProvider ossProvider;
+
+<span class="fc" id="L28">    public DocServiceJS008(OSSProvider ossProvider) {</span>
+<span class="fc" id="L29">        this.ossProvider = ossProvider;</span>
+<span class="fc" id="L30">    }</span>
+
+    /**
+     * 以下是文档生成部分
+     * */
+    private static final int marginLeft;
+    private static final int marginRight;
+    private static final int marginTop;
+    private static final int marginBottom;
+
+    @Value(&quot;${document-dir}&quot;)
+    private String DOCUMENT_DIR;
+
+    private static Font titlefont1;
+    private static Font titlefont2;
+    private static Font textfont;
+
+    static {
+        // absolutePath = Objects.requireNonNull(Objects.requireNonNull(ClassUtils.getDefaultClassLoader()).getResource(&quot;font&quot;)).getPath().substring(1) + &quot;/../&quot;;
+        // ---&gt; 下面有com, font, out, static
+        // 在 iText 中每一个单位大小默认近似于点（pt）
+        // 1mm = 72 ÷ 25.4 ≈ 2.834645...（pt）
+<span class="fc" id="L52">        marginLeft = 50; // 页边距：左</span>
+<span class="fc" id="L53">        marginRight = 50; // 页边距：右</span>
+<span class="fc" id="L54">        marginTop = 20; // 页边距：上</span>
+<span class="fc" id="L55">        marginBottom = 60; // 页边距：下</span>
+<span class="fc" id="L56">    }</span>
+
+    private static JS008 JS008Json;
+
+    /** 填充JS008文档 */
+    public String fill(String testcaseId, JS008 newJson) {
+<span class="fc" id="L62">        JS008Json = newJson;</span>
+<span class="fc" id="L63">        String pdfPath = DOCUMENT_DIR + &quot;JS008_&quot; + testcaseId + &quot;.pdf&quot;;</span>
+        try {
+            // 1.新建document对象
+<span class="fc" id="L66">            Rectangle pageSizeJS008 = new RectangleReadOnly(841.8F, 595.2F);</span>
+<span class="fc" id="L67">            Document document = new Document(pageSizeJS008);// 建立一个Document对象</span>
+<span class="fc" id="L68">            document.setMargins(marginLeft, marginRight, marginTop, marginBottom);</span>
+            // 2.建立一个书写器(Writer)与document对象关联
+<span class="fc" id="L70">            File file = new File(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;));</span>
+<span class="fc" id="L71">            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(file));</span>
+            // 2.5 添加页眉/页脚
+<span class="fc" id="L73">            String header = &quot;NST－04－JS008－2011&quot;;</span>
+<span class="fc" id="L74">            String[] footer = new String[]{&quot;第 &quot;, &quot; 页，共 &quot;, &quot; 页&quot;};</span>
+<span class="fc" id="L75">            int headerToPage = 100;</span>
+<span class="fc" id="L76">            int footerFromPage = 1;</span>
+<span class="fc" id="L77">            boolean isHaderLine = false;</span>
+<span class="fc" id="L78">            boolean isFooterLine = false;</span>
+<span class="fc" id="L79">            float[] headerLoc = new float[]{document.right() - 5, document.top() - 20};</span>
+<span class="fc" id="L80">            float[] footerLoc = new float[]{(document.left() + document.right()) / 2.0f - 35, document.bottom() - 30};</span>
+<span class="fc" id="L81">            float headLineOff = -5f;</span>
+<span class="fc" id="L82">            float footLineOff = 12f;</span>
+<span class="fc" id="L83">            writer.setPageEvent(new HeaderFooter(header, footer, headerToPage, footerFromPage, isHaderLine, isFooterLine,</span>
+                    headerLoc, footerLoc, headLineOff, footLineOff));
+            // 3.打开文档
+<span class="fc" id="L86">            document.open();</span>
+            // 4.向文档中添加内容
+<span class="fc" id="L88">            generatePageOne(document);</span>
+            // 5.关闭文档
+<span class="fc" id="L90">            document.close();</span>
+<span class="pc" id="L91">        } catch (Exception e) { e.printStackTrace(); return &quot;unable to generate a pdf&quot;; }</span>
+        // 上传pdf
+        try {
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">            if(ossProvider.upload(</span>
+<span class="fc" id="L95">                    &quot;doc&quot;, &quot;JS008_&quot; + testcaseId + &quot;.pdf&quot;, Files.readAllBytes(Path.of(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;))), &quot;application/pdf&quot;)) {</span>
+<span class="fc" id="L96">                deleteOutFile(pdfPath);</span>
+<span class="fc" id="L97">                return &quot;https://oss.syh1en.asia/doc/JS008_&quot; + testcaseId + &quot;.pdf&quot;;</span>
+<span class="nc" id="L98">            } else { deleteOutFile(pdfPath); return &quot;upload failed&quot;; }</span>
+<span class="nc" id="L99">        } catch (Exception e) { e.printStackTrace(); deleteOutFile(pdfPath); return &quot;minio error&quot;; }</span>
+    }
+
+    /**
+     * 删除中间的out文件
+     * */
+    private void deleteOutFile(String pdfPath) {
+<span class="fc" id="L106">        System.out.println(pdfPath);</span>
+        try {
+<span class="fc" id="L108">            File file = new File(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;));</span>
+<span class="pc bpc" id="L109" title="1 of 2 branches missed.">            if (file.delete()) {</span>
+<span class="fc" id="L110">                System.out.println(file.getName() + &quot; is deleted!&quot;);</span>
+<span class="nc" id="L111">            } else { System.out.println(&quot;Delete&quot; + file.getName() + &quot;is failed.&quot;); }</span>
+<span class="pc" id="L112">        } catch(Exception e) { e.printStackTrace(); }</span>
+<span class="fc" id="L113">    }</span>
+
+    public void generatePageOne(Document document) throws Exception {
+        // 加载字体
+        try {
+<span class="fc" id="L118">            BaseFont bfChinese = BaseFont.createFont(DOCUMENT_DIR + &quot;font/simsun.ttf&quot;, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);</span>
+<span class="fc" id="L119">            titlefont1 = new Font(bfChinese, 20, Font.NORMAL);</span>
+<span class="fc" id="L120">            titlefont2 = new Font(bfChinese, 12, Font.BOLD);</span>
+            // keyfont = new Font(bfChinese, 12.5f, Font.BOLD);
+<span class="fc" id="L122">            textfont = new Font(bfChinese, 12f, Font.NORMAL);</span>
+<span class="pc" id="L123">        } catch (Exception e) { e.printStackTrace(); }</span>
+
+
+        // 标题
+<span class="fc" id="L127">        Paragraph title = new Paragraph(&quot;测试用例(项目编号)&quot;, titlefont1);</span>
+<span class="fc" id="L128">        title.setAlignment(1); // 设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L129">        title.setSpacingBefore(0f); // 设置段落上空白</span>
+<span class="fc" id="L130">        title.setSpacingAfter(15f); // 设置段落下空白</span>
+
+        // 表格
+<span class="fc" id="L133">        float tableWidth = document.right()-document.left();</span>
+<span class="fc" id="L134">        float[] widths = new float[58];</span>
+        // 每一行的各单元的span col数值要达到30
+<span class="fc" id="L136">        Arrays.fill(widths, tableWidth/58);</span>
+        // 行列每个基础单元格为 5mm x 5mm
+<span class="fc" id="L138">        PdfPTable table = ItextUtils.createTable(widths, tableWidth);</span>
+
+<span class="fc" id="L140">        float[] paddings3 = new float[]{4f, 4f, 3f, 3f};        // 上下左右的间距</span>
+<span class="fc" id="L141">        float borderWidth = 0.3f;</span>
+
+<span class="fc" id="L143">        table.addCell(ItextUtils.createCell(&quot;测试分类&quot;, titlefont2, Element.ALIGN_CENTER, 8, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L144">        table.addCell(ItextUtils.createCell(&quot;ID&quot;, titlefont2, Element.ALIGN_CENTER, 8, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L145">        table.addCell(ItextUtils.createCell(&quot;测试用例设计说明&quot;, titlefont2, Element.ALIGN_CENTER, 8, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L146">        table.addCell(ItextUtils.createCell(&quot;与本测试用例有关的规约说明&quot;, titlefont2, Element.ALIGN_CENTER, 8, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L147">        table.addCell(ItextUtils.createCell(&quot;预期的结果&quot;, titlefont2, Element.ALIGN_CENTER, 8, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L148">        table.addCell(ItextUtils.createCell(&quot;测试用例设计者&quot;, titlefont2, Element.ALIGN_CENTER, 8, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L149">        table.addCell(ItextUtils.createCell(&quot;测试时间&quot;, titlefont2, Element.ALIGN_CENTER, 12, 2, paddings3, borderWidth));</span>
+
+<span class="fc" id="L151">        List&lt;TestcaseList&gt; testcases = JS008Json.getTestcases();</span>
+<span class="fc bfc" id="L152" title="All 2 branches covered.">        for (TestcaseList testcaseList: testcases) {</span>
+<span class="fc" id="L153">            table.addCell(ItextUtils.createCell(testcaseList.getCategory(), textfont, Element.ALIGN_CENTER, 8, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L154">            table.addCell(ItextUtils.createCell(testcaseList.getTestcaseId(), textfont, Element.ALIGN_CENTER, 8, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L155">            table.addCell(ItextUtils.createCell(testcaseList.getDesignInstruction(), textfont, Element.ALIGN_CENTER, 8, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L156">            table.addCell(ItextUtils.createCell(testcaseList.getStatute(), textfont, Element.ALIGN_CENTER, 8, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L157">            table.addCell(ItextUtils.createCell(testcaseList.getExpectedResult(), textfont, Element.ALIGN_CENTER, 8, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L158">            table.addCell(ItextUtils.createCell(testcaseList.getDesigner(), textfont, Element.ALIGN_CENTER, 8, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L159">            table.addCell(ItextUtils.createCell(testcaseList.getTime(), textfont, Element.ALIGN_CENTER, 12, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L160">        }</span>
+
+<span class="fc" id="L162">        document.add(title);</span>
+<span class="fc" id="L163">        document.add(table);</span>
+<span class="fc" id="L164">    }</span>
+
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

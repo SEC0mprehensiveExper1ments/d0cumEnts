@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MongoReportService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-test</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.test.service.report</a> &gt; <span class="el_source">MongoReportService.java</span></div><h1>MongoReportService.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.test.service.report;
+
+import com.njustc.onlinebiz.common.model.Role;
+import com.njustc.onlinebiz.common.model.test.project.ProjectStage;
+import com.njustc.onlinebiz.common.model.test.report.Report;
+import com.njustc.onlinebiz.test.dao.project.ProjectDAO;
+import com.njustc.onlinebiz.test.dao.report.ReportDAO;
+import com.njustc.onlinebiz.test.exception.report.ReportDAOFailureException;
+import com.njustc.onlinebiz.test.exception.report.ReportInvalidStageException;
+import com.njustc.onlinebiz.test.exception.report.ReportNotFoundException;
+import com.njustc.onlinebiz.test.exception.report.ReportPermissionDeniedException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+<span class="fc" id="L15">@Slf4j</span>
+@Service
+public class MongoReportService implements ReportService {
+    private final ReportDAO reportDAO;
+    private final ProjectDAO projectDAO;
+
+<span class="fc" id="L21">    public MongoReportService(ReportDAO reportDAO, ProjectDAO projectDAO) {</span>
+<span class="fc" id="L22">        this.reportDAO = reportDAO;</span>
+<span class="fc" id="L23">        this.projectDAO = projectDAO;</span>
+<span class="fc" id="L24">    }</span>
+
+    @Override
+    public String createReport(String projectId, String entrustId, Report.ReportContent content, Long userId, Role userRole) {
+<span class="pc bpc" id="L28" title="2 of 6 branches missed.">        if (!(userRole == Role.ADMIN || userRole == Role.MARKETER || userRole == Role.MARKETING_SUPERVISOR)) {</span>
+<span class="fc" id="L29">            throw new ReportPermissionDeniedException(&quot;无权新建测试报告&quot;);</span>
+        }
+<span class="fc" id="L31">        Report report = new Report();</span>
+<span class="fc" id="L32">        report.setProjectId(projectId);</span>
+<span class="fc" id="L33">        report.setContent(content);</span>
+<span class="fc" id="L34">        report.setEntrustId(entrustId);</span>
+<span class="fc" id="L35">        return reportDAO.insertReport(report).getId();</span>
+    }
+
+    @Override
+    public Report findReport(String reportId, Long userId, Role userRole) {
+<span class="fc" id="L40">        Report report = reportDAO.findReportById(reportId);</span>
+<span class="fc bfc" id="L41" title="All 2 branches covered.">        if (report == null) {</span>
+<span class="fc" id="L42">            throw new ReportNotFoundException(&quot;该测试报告不存在&quot;);</span>
+        }
+<span class="fc bfc" id="L44" title="All 2 branches covered.">        if (!hasAuthorityToCheck(report, userId, userRole)) {</span>
+<span class="fc" id="L45">            throw new ReportPermissionDeniedException(&quot;无权查看测试报告&quot;);</span>
+        }
+
+<span class="fc" id="L48">        ProjectStage projectStage = projectDAO.findProjectById(report.getProjectId()).getStatus().getStage();</span>
+<span class="pc bpc" id="L49" title="3 of 8 branches missed.">        if (projectStage == ProjectStage.WAIT_FOR_QA || projectStage == ProjectStage.SCHEME_UNFILLED ||</span>
+                projectStage == ProjectStage.SCHEME_AUDITING || projectStage == ProjectStage.SCHEME_AUDITING_DENIED) {
+<span class="fc" id="L51">            throw new ReportInvalidStageException(&quot;此阶段不可查看测试报告&quot;);</span>
+        }
+        // 用户请求时，判断状态是否为REPORT_WAIT_CUSTOMER及其之后的状态，不是则抛出异常
+<span class="fc bfc" id="L54" title="All 2 branches covered.">        if (userRole == Role.CUSTOMER) {</span>
+<span class="pc bpc" id="L55" title="4 of 10 branches missed.">            if (projectStage != ProjectStage.REPORT_WAIT_CUSTOMER &amp;&amp;</span>
+                    projectStage != ProjectStage.REPORT_CUSTOMER_CONFIRM &amp;&amp;
+                    projectStage != ProjectStage.REPORT_CUSTOMER_REJECT &amp;&amp;
+                    projectStage != ProjectStage.QA_ALL_REJECTED &amp;&amp;
+                    projectStage != ProjectStage.QA_ALL_PASSED) {
+<span class="fc" id="L60">                throw new ReportInvalidStageException(&quot;此阶段不可查看测试报告&quot;);</span>
+            }
+        }
+
+<span class="fc" id="L64">        return report;</span>
+    }
+
+    @Override
+    public void updateReport(String reportId, Report.ReportContent content, Long userId, Role userRole) {
+<span class="fc" id="L69">        Report report = reportDAO.findReportById(reportId);</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">        if (report == null) {</span>
+<span class="fc" id="L71">            throw new ReportNotFoundException(&quot;该测试报告不存在&quot;);</span>
+        }
+<span class="fc bfc" id="L73" title="All 2 branches covered.">        if (!hasAuthorityToFill(report, userId, userRole)) {</span>
+<span class="fc" id="L74">            throw new ReportPermissionDeniedException(&quot;无权修改测试报告&quot;);</span>
+        }
+
+<span class="fc" id="L77">        ProjectStage projectStage = projectDAO.findProjectById(report.getProjectId()).getStatus().getStage();</span>
+<span class="pc bpc" id="L78" title="3 of 8 branches missed.">        if (!(projectStage == ProjectStage.SCHEME_REVIEW_UPLOADED || projectStage == ProjectStage.REPORT_QA_DENIED ||</span>
+                projectStage == ProjectStage.REPORT_CUSTOMER_REJECT || projectStage == ProjectStage.QA_ALL_REJECTED)) {
+<span class="fc" id="L80">            throw new ReportInvalidStageException(&quot;此阶段不可修改测试报告&quot;);</span>
+        }
+
+<span class="fc bfc" id="L83" title="All 2 branches covered.">        if (!reportDAO.updateContent(reportId, content)){</span>
+<span class="fc" id="L84">            throw new ReportDAOFailureException(&quot;更新测试报告失败&quot;);</span>
+        }
+<span class="fc" id="L86">    }</span>
+
+    @Override
+    public void deleteReport(String reportId, Long userId, Role userRole) {
+<span class="fc bfc" id="L90" title="All 2 branches covered.">        if (userRole != Role.ADMIN) {</span>
+<span class="fc" id="L91">            throw new ReportPermissionDeniedException(&quot;无权删除测试报告&quot;);</span>
+        }
+<span class="fc" id="L93">        Report report = reportDAO.findReportById(reportId);</span>
+<span class="fc bfc" id="L94" title="All 2 branches covered.">        if (report == null) {</span>
+<span class="fc" id="L95">            throw new ReportNotFoundException(&quot;该测试报告不存在&quot;);</span>
+        }
+<span class="fc bfc" id="L97" title="All 2 branches covered.">        if (!reportDAO.deleteReport(report.getId())) {</span>
+<span class="fc" id="L98">            throw new ReportDAOFailureException(&quot;删除测试报告失败&quot;);</span>
+        }
+<span class="fc" id="L100">    }</span>
+
+    private boolean hasAuthorityToCheck(Report report, Long userId, Role userRole) {
+<span class="pc bpc" id="L103" title="2 of 4 branches missed.">        if (userId == null || userRole == null) {</span>
+<span class="nc" id="L104">            return false;</span>
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">        } else if (userRole == Role.ADMIN) {</span>
+<span class="nc" id="L106">            return true;</span>
+<span class="pc bpc" id="L107" title="2 of 4 branches missed.">        } else if (userRole == Role.TESTING_SUPERVISOR || userRole == Role.QA_SUPERVISOR) {</span>
+<span class="nc" id="L108">            return true;</span>
+        }
+        //项目的测试相关人员及质量相关人员可以查看
+<span class="fc" id="L111">        Long testerId = projectDAO.findProjectById(report.getProjectId()).getProjectBaseInfo().getTesterId();</span>
+<span class="fc" id="L112">        Long qaId = projectDAO.findProjectById(report.getProjectId()).getProjectBaseInfo().getQaId();</span>
+<span class="fc" id="L113">        Long customerId = projectDAO.findProjectById(report.getProjectId()).getProjectBaseInfo().getCustomerId();</span>
+<span class="fc bfc" id="L114" title="All 4 branches covered.">        if (userRole == Role.TESTER &amp;&amp; userId.equals(testerId)) return true;</span>
+<span class="fc bfc" id="L115" title="All 4 branches covered.">        else if (userRole == Role.CUSTOMER &amp;&amp; userId.equals(customerId)) return true;</span>
+<span class="fc bfc" id="L116" title="All 4 branches covered.">        return userRole == Role.QA &amp;&amp; userId.equals(qaId);</span>
+    }
+
+    private boolean hasAuthorityToFill(Report report, Long userId, Role userRole) {
+<span class="pc bpc" id="L120" title="2 of 4 branches missed.">        if (userId == null || userRole == null) {</span>
+<span class="nc" id="L121">            return false;</span>
+<span class="pc bpc" id="L122" title="1 of 2 branches missed.">        } else if (userRole == Role.ADMIN) {</span>
+<span class="nc" id="L123">            return true;</span>
+<span class="pc bpc" id="L124" title="1 of 2 branches missed.">        } else if (userRole == Role.TESTING_SUPERVISOR) {</span>
+<span class="nc" id="L125">            return true;</span>
+        }
+        //项目的测试相关人员可以修改
+<span class="fc" id="L128">        Long testerId = projectDAO.findProjectById(report.getProjectId()).getProjectBaseInfo().getTesterId();</span>
+<span class="fc bfc" id="L129" title="All 4 branches covered.">        return userRole == Role.TESTER &amp;&amp; userId.equals(testerId);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,523 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JS002.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-document</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.doc.model</a> &gt; <span class="el_source">JS002.java</span></div><h1>JS002.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.doc.model;
+
+
+import com.njustc.onlinebiz.common.model.PartyDetail;
+import com.njustc.onlinebiz.common.model.Software;
+import com.njustc.onlinebiz.common.model.entrust.Entrust;
+import com.njustc.onlinebiz.common.model.entrust.EntrustReview;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+<span class="pc bnc" id="L17" title="All 1070 branches missed.">@Data</span>
+<span class="fc" id="L18">@NoArgsConstructor</span>
+<span class="nc" id="L19">@AllArgsConstructor</span>
+@Accessors(chain = true)
+public class JS002 {
+    /* 子项先从左往右，从上至下，递增 */
+<span class="pc" id="L23">    private String multiCeShiLeiXing01 = &quot;&quot;;</span>
+<span class="pc" id="L24">    private String multiCeShiLeiXing02 = &quot;&quot;;</span>
+<span class="pc" id="L25">    private String inputCeShiLeiXing02 = &quot;&quot;;</span>
+<span class="pc" id="L26">    private String multiCeShiLeiXing03 = &quot;&quot;;</span>
+<span class="pc" id="L27">    private String multiCeShiLeiXing04 = &quot;&quot;;</span>
+<span class="pc" id="L28">    private String inputRuanJianMingChen = &quot;&quot;;</span>
+<span class="pc" id="L29">    private String inputBanBenHao = &quot;&quot;;</span>
+<span class="pc" id="L30">    private String inputWeiTuoDanWeiZhongWen = &quot;&quot;;</span>
+<span class="pc" id="L31">    private String inputWeiTuoDanWeiYingWen = &quot;&quot;;</span>
+<span class="pc" id="L32">    private String inputKaiFaDanWei = &quot;&quot;;</span>
+<span class="pc" id="L33">    private String singleDanWeiXingZhi01 = &quot;&quot;;</span>
+<span class="pc" id="L34">    private String singleDanWeiXingZhi02 = &quot;&quot;;</span>
+<span class="pc" id="L35">    private String singleDanWeiXingZhi03 = &quot;&quot;;</span>
+<span class="pc" id="L36">    private String singleDanWeiXingZhi04 = &quot;&quot;;</span>
+<span class="pc" id="L37">    private String singleDanWeiXingZhi05 = &quot;&quot;;</span>
+<span class="pc" id="L38">    private String singleDanWeiXingZhi06 = &quot;&quot;;</span>
+<span class="pc" id="L39">    private String inputRuanJianMiaoShu = &quot;&quot;;</span>
+<span class="pc" id="L40">    private String inputZhuYaoGongNeng = &quot;&quot;;</span>
+<span class="pc" id="L41">    private String multiCeShiYiJu01 = &quot;&quot;;</span>
+<span class="pc" id="L42">    private String multiCeShiYiJu02 = &quot;&quot;;</span>
+<span class="pc" id="L43">    private String multiCeShiYiJu03 = &quot;&quot;;</span>
+<span class="pc" id="L44">    private String multiCeShiYiJu04 = &quot;&quot;;</span>
+<span class="pc" id="L45">    private String multiCeShiYiJu05 = &quot;&quot;;</span>
+<span class="pc" id="L46">    private String inputCeShiYiJu05 = &quot;&quot;;</span>
+<span class="pc" id="L47">    private String multiJiShuZhiBiao01 = &quot;&quot;;</span>
+<span class="pc" id="L48">    private String multiJiShuZhiBiao02 = &quot;&quot;;</span>
+<span class="pc" id="L49">    private String multiJiShuZhiBiao03 = &quot;&quot;;</span>
+<span class="pc" id="L50">    private String multiJiShuZhiBiao04 = &quot;&quot;;</span>
+<span class="pc" id="L51">    private String multiJiShuZhiBiao05 = &quot;&quot;;</span>
+<span class="pc" id="L52">    private String multiJiShuZhiBiao06 = &quot;&quot;;</span>
+<span class="pc" id="L53">    private String multiJiShuZhiBiao07 = &quot;&quot;;</span>
+<span class="pc" id="L54">    private String multiJiShuZhiBiao08 = &quot;&quot;;</span>
+<span class="pc" id="L55">    private String multiJiShuZhiBiao09 = &quot;&quot;;</span>
+<span class="pc" id="L56">    private String multiJiShuZhiBiao010 = &quot;&quot;;</span>
+<span class="pc" id="L57">    private String multiJiShuZhiBiao011 = &quot;&quot;;</span>
+<span class="pc" id="L58">    private String multiJiShuZhiBiao012 = &quot;&quot;;</span>
+<span class="pc" id="L59">    private String multiJiShuZhiBiao013 = &quot;&quot;;</span>
+<span class="pc" id="L60">    private String inputJiShuZhiBiao013 = &quot;&quot;;</span>
+<span class="pc" id="L61">    private String inputRuanJianGuiMo01 = &quot;&quot;;</span>
+<span class="pc" id="L62">    private String inputRuanJianGuiMo02 = &quot;&quot;;</span>
+<span class="pc" id="L63">    private String inputRuanJianGuiMo03 = &quot;&quot;;</span>
+<span class="pc" id="L64">    private String singleRuanJianLeiXing0XiTong01 = &quot;&quot;;</span>
+<span class="pc" id="L65">    private String singleRuanJianLeiXing0XiTong02 = &quot;&quot;;</span>
+<span class="pc" id="L66">    private String singleRuanJianLeiXing0XiTong03 = &quot;&quot;;</span>
+<span class="pc" id="L67">    private String singleRuanJianLeiXing0XiTong04 = &quot;&quot;;</span>
+<span class="pc" id="L68">    private String singleRuanJianLeiXing0XiTong05 = &quot;&quot;;</span>
+<span class="pc" id="L69">    private String singleRuanJianLeiXing0ZhiChi01 = &quot;&quot;;</span>
+<span class="pc" id="L70">    private String singleRuanJianLeiXing0ZhiChi02 = &quot;&quot;;</span>
+<span class="pc" id="L71">    private String singleRuanJianLeiXing0ZhiChi03 = &quot;&quot;;</span>
+<span class="pc" id="L72">    private String singleRuanJianLeiXing0ZhiChi04 = &quot;&quot;;</span>
+<span class="pc" id="L73">    private String singleRuanJianLeiXing0ZhiChi05 = &quot;&quot;;</span>
+<span class="pc" id="L74">    private String singleRuanJianLeiXing0ZhiChi06 = &quot;&quot;;</span>
+<span class="pc" id="L75">    private String singleRuanJianLeiXing0YingYong01 = &quot;&quot;;</span>
+<span class="pc" id="L76">    private String singleRuanJianLeiXing0YingYong02 = &quot;&quot;;</span>
+<span class="pc" id="L77">    private String singleRuanJianLeiXing0YingYong03 = &quot;&quot;;</span>
+<span class="pc" id="L78">    private String singleRuanJianLeiXing0YingYong04 = &quot;&quot;;</span>
+<span class="pc" id="L79">    private String singleRuanJianLeiXing0YingYong05 = &quot;&quot;;</span>
+<span class="pc" id="L80">    private String singleRuanJianLeiXing0YingYong06 = &quot;&quot;;</span>
+<span class="pc" id="L81">    private String singleRuanJianLeiXing0YingYong07 = &quot;&quot;;</span>
+<span class="pc" id="L82">    private String singleRuanJianLeiXing0YingYong08 = &quot;&quot;;</span>
+<span class="pc" id="L83">    private String singleRuanJianLeiXing0YingYong09 = &quot;&quot;;</span>
+<span class="pc" id="L84">    private String singleRuanJianLeiXing0YingYong010 = &quot;&quot;;</span>
+<span class="pc" id="L85">    private String singleRuanJianLeiXing0YingYong011 = &quot;&quot;;</span>
+<span class="pc" id="L86">    private String singleRuanJianLeiXing0YingYong012 = &quot;&quot;;</span>
+<span class="pc" id="L87">    private String singleRuanJianLeiXing0YingYong013 = &quot;&quot;;</span>
+<span class="pc" id="L88">    private String singleRuanJianLeiXing0QiTa01 = &quot;&quot;;</span>
+<span class="pc" id="L89">    private String multiKeHuDuan0Windows = &quot;&quot;;</span>
+<span class="pc" id="L90">    private String inputKeHuDuan0Windows = &quot;&quot;;</span>
+<span class="pc" id="L91">    private String multiKeHuDuan0Linux = &quot;&quot;;</span>
+<span class="pc" id="L92">    private String inputKeHuDuan0Linux = &quot;&quot;;</span>
+<span class="pc" id="L93">    private String multiKeHuDuan0QiTa = &quot;&quot;;</span>
+<span class="pc" id="L94">    private String inputKeHuDuan0QiTa = &quot;&quot;;</span>
+<span class="pc" id="L95">    private String inputKeHuDuan0NeiCunYaoQiu = &quot;&quot;;</span>
+<span class="pc" id="L96">    private String inputKeHuDuan0QiTaYaoQiu = &quot;&quot;;</span>
+<span class="pc" id="L97">    private String multiFuWuQiYingJian0PC = &quot;&quot;;</span>
+<span class="pc" id="L98">    private String multiFuWuQiYingJian0Linux = &quot;&quot;;</span>
+<span class="pc" id="L99">    private String multiFuWuQiYingJian0QiTa = &quot;&quot;;</span>
+<span class="pc" id="L100">    private String inputFuWuQiYingJian0QiTa = &quot;&quot;;</span>
+<span class="pc" id="L101">    private String inputFuWuQiYingJian0NeiCunYaoQiu = &quot;&quot;;</span>
+<span class="pc" id="L102">    private String inputFuWuQiYingJian0YingPanYaoQiu = &quot;&quot;;</span>
+<span class="pc" id="L103">    private String inputFuWuQiYingJian0QiTaYaoQiu = &quot;&quot;;</span>
+<span class="pc" id="L104">    private String inputFuWuQiRuanJian0CaoZuoXiTong = &quot;&quot;;</span>
+<span class="pc" id="L105">    private String inputFuWuQiRuanJian0BanBen = &quot;&quot;;</span>
+<span class="pc" id="L106">    private String inputFuWuQiRuanJian0BianChengYuYan = &quot;&quot;;</span>
+<span class="pc" id="L107">    private String multiFuWuQiRuanJian0GouJia0CS = &quot;&quot;;</span>
+<span class="pc" id="L108">    private String multiFuWuQiRuanJian0GouJia0BS = &quot;&quot;;</span>
+<span class="pc" id="L109">    private String multiFuWuQiRuanJian0GouJia0QiTa = &quot;&quot;;</span>
+<span class="pc" id="L110">    private String inputFuWuQiRuanJian0ShuJuKu = &quot;&quot;;</span>
+<span class="pc" id="L111">    private String inputFuWuQiRuanJian0ZhongJianJian = &quot;&quot;;</span>
+<span class="pc" id="L112">    private String inputFuWuQiRuanJian0QiTaZhiCheng = &quot;&quot;;</span>
+<span class="pc" id="L113">    private String inputWangLuoHuanJing = &quot;&quot;;</span>
+<span class="pc" id="L114">    private String singleRuanJianJieZhi0GuangPan = &quot;&quot;;</span>
+<span class="pc" id="L115">    private String singleRuanJianJieZhi0UPan = &quot;&quot;;</span>
+<span class="pc" id="L116">    private String singleRuanJianJieZhi0QiTa = &quot;&quot;;</span>
+<span class="pc" id="L117">    private String inputRuanJianJieZhi0QiTa = &quot;&quot;;</span>
+<span class="pc" id="L118">    private String inputWenDangZiLiao = &quot;&quot;;</span>
+<span class="pc" id="L119">    private String singleYangPingChuLi01 = &quot;&quot;;</span>
+<span class="pc" id="L120">    private String singleYangPingChuLi02 = &quot;&quot;;</span>
+<span class="pc" id="L121">    private String inputWeiTuoDanWei0DianHua = &quot;&quot;;</span>
+<span class="pc" id="L122">    private String inputWeiTuoDanWei0ChuanZhen = &quot;&quot;;</span>
+<span class="pc" id="L123">    private String inputWeiTuoDanWei0DiZhi = &quot;&quot;;</span>
+<span class="pc" id="L124">    private String inputWeiTuoDanWei0YouBian = &quot;&quot;;</span>
+<span class="pc" id="L125">    private String inputWeiTuoDanWei0LianXiRen = &quot;&quot;;</span>
+<span class="pc" id="L126">    private String inputWeiTuoDanWei0ShouJi = &quot;&quot;;</span>
+<span class="pc" id="L127">    private String inputWeiTuoDanWei0Email = &quot;&quot;;</span>
+<span class="pc" id="L128">    private String inputWeiTuoDanWei0WangZhi = &quot;&quot;;</span>
+<span class="pc" id="L129">    private String singleMiJi01 = &quot;&quot;;</span>
+<span class="pc" id="L130">    private String singleMiJi02 = &quot;&quot;;</span>
+<span class="pc" id="L131">    private String singleMiJi03 = &quot;&quot;;</span>
+<span class="pc" id="L132">    private String singleChaShaBingDu01 = &quot;&quot;;</span>
+<span class="pc" id="L133">    private String singleChaShaBingDu02 = &quot;&quot;;</span>
+<span class="pc" id="L134">    private String inputChaShaBingDu02 = &quot;&quot;;</span>
+<span class="pc" id="L135">    private String multiCaiLiaoJianCha0CeshiYangPing01 = &quot;&quot;;</span>
+<span class="pc" id="L136">    private String multiCaiLiaoJianCha0CeshiYangPing02 = &quot;&quot;;</span>
+<span class="pc" id="L137">    private String multiCaiLiaoJianCha0XuQiuWenDang01 = &quot;&quot;;</span>
+<span class="pc" id="L138">    private String multiCaiLiaoJianCha0XuQiuWenDang02 = &quot;&quot;;</span>
+<span class="pc" id="L139">    private String multiCaiLiaoJianCha0XuQiuWenDang03 = &quot;&quot;;</span>
+<span class="pc" id="L140">    private String multiCaiLiaoJianCha0YongHuWenDang01 = &quot;&quot;;</span>
+<span class="pc" id="L141">    private String multiCaiLiaoJianCha0YongHuWenDang02 = &quot;&quot;;</span>
+<span class="pc" id="L142">    private String multiCaiLiaoJianCha0CaoZuoWenDang01 = &quot;&quot;;</span>
+<span class="pc" id="L143">    private String multiCaiLiaoJianCha0CaoZuoWenDang02 = &quot;&quot;;</span>
+<span class="pc" id="L144">    private String multiCaiLiaoJianCha0CaoZuoWenDang03 = &quot;&quot;;</span>
+<span class="pc" id="L145">    private String multiCaiLiaoJianCha0CaoZuoWenDang04 = &quot;&quot;;</span>
+<span class="pc" id="L146">    private String inputCaiLiaoJianCha0QiTa = &quot;&quot;;</span>
+<span class="pc" id="L147">    private String singleQueRenYiJian01 = &quot;&quot;;</span>
+<span class="pc" id="L148">    private String singleQueRenYiJian02 = &quot;&quot;;</span>
+<span class="pc" id="L149">    private String singleQueRenYiJian03 = &quot;&quot;;</span>
+<span class="pc" id="L150">    private String singleQueRenYiJian04 = &quot;&quot;;</span>
+<span class="pc" id="L151">    private String singleShouLiYiJian01 = &quot;&quot;;</span>
+<span class="pc" id="L152">    private String singleShouLiYiJian02 = &quot;&quot;;</span>
+<span class="pc" id="L153">    private String singleShouLiYiJian03 = &quot;&quot;;</span>
+<span class="pc" id="L154">    private String inputCeShiXiangMuBianHao = &quot;&quot;;</span>
+<span class="pc" id="L155">    private String inputBeiZhu = &quot;&quot;;</span>
+
+    /**
+     * 从Entrust对象中抽取填充JS002
+     */
+    public String safe(String s) {
+<span class="nc bnc" id="L161" title="All 2 branches missed.">        return s == null ? &quot;&quot; : s;</span>
+    }
+
+<span class="nc" id="L164">    public JS002(Entrust entrust) {</span>
+<span class="nc bnc" id="L165" title="All 2 branches missed.">        if (entrust == null) {</span>
+<span class="nc" id="L166">            throw new NullPointerException(&quot;entrust is null&quot;);</span>
+        }
+
+        // 委托单位信息
+<span class="nc" id="L170">        PartyDetail principal = entrust.getContent().getPrincipal();</span>
+
+        // 测试类型
+<span class="nc" id="L173">        List&lt;String&gt; testType = entrust.getContent().getTestType();</span>
+<span class="nc bnc" id="L174" title="All 2 branches missed.">        if (testType != null) {</span>
+<span class="nc bnc" id="L175" title="All 2 branches missed.">            for (String value : testType) {</span>
+<span class="nc bnc" id="L176" title="All 2 branches missed.">                if (safe(value).equals(&quot;软件确认测试&quot;)) {</span>
+<span class="nc" id="L177">                    this.multiCeShiLeiXing01 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L178" title="All 2 branches missed.">                } else if (safe(value).startsWith(&quot;_0641#toReplaceA1C1_0&quot;)) {</span>
+<span class="nc" id="L179">                    this.multiCeShiLeiXing02 = &quot;1&quot;;</span>
+<span class="nc" id="L180">                    Pattern pattern = Pattern.compile(&quot;(?&lt;=_0641#toReplaceA1C1_0).*?(?=_0641#toReplaceA2C2_0)&quot;);</span>
+<span class="nc" id="L181">                    Matcher matcher = pattern.matcher(value);</span>
+<span class="nc bnc" id="L182" title="All 2 branches missed.">                    if (matcher.find()) {</span>
+<span class="nc" id="L183">                        this.inputCeShiLeiXing02 = matcher.group();</span>
+                    }
+<span class="nc bnc" id="L185" title="All 2 branches missed.">                } else if (safe(value).equals(&quot;成果/技术鉴定测试&quot;)) {</span>
+<span class="nc" id="L186">                    this.multiCeShiLeiXing03 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L187" title="All 2 branches missed.">                } else if (safe(value).equals(&quot;专项资金验收测试&quot;)) {</span>
+<span class="nc" id="L188">                    this.multiCeShiLeiXing04 = &quot;1&quot;;</span>
+                }
+<span class="nc" id="L190">            }</span>
+        }
+
+        // 委托申请测试软件的软件信息
+<span class="nc" id="L194">        Software software = entrust.getContent().getSoftware();</span>
+<span class="nc bnc" id="L195" title="All 2 branches missed.">        if (software != null) {</span>
+<span class="nc" id="L196">            this.inputRuanJianMingChen = safe(software.getName());</span>
+<span class="nc" id="L197">            this.inputBanBenHao = safe(software.getVersion());</span>
+<span class="nc" id="L198">            this.inputWeiTuoDanWeiZhongWen = safe(principal.getCompanyCH());</span>
+<span class="nc" id="L199">            this.inputWeiTuoDanWeiYingWen = safe(principal.getCompanyEN());</span>
+<span class="nc" id="L200">            this.inputKaiFaDanWei = safe(software.getDeveloper());</span>
+<span class="nc bnc" id="L201" title="All 2 branches missed.">            if (safe(software.getDeveloperType()).equals(&quot;1&quot;)) {</span>
+<span class="nc" id="L202">                this.singleDanWeiXingZhi01 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L203" title="All 2 branches missed.">            } else if (safe(software.getDeveloperType()).equals(&quot;2&quot;)) {</span>
+<span class="nc" id="L204">                this.singleDanWeiXingZhi02 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L205" title="All 2 branches missed.">            } else if (safe(software.getDeveloperType()).equals(&quot;3&quot;)) {</span>
+<span class="nc" id="L206">                this.singleDanWeiXingZhi03 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L207" title="All 2 branches missed.">            } else if (safe(software.getDeveloperType()).equals(&quot;4&quot;)) {</span>
+<span class="nc" id="L208">                this.singleDanWeiXingZhi04 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L209" title="All 2 branches missed.">            } else if (safe(software.getDeveloperType()).equals(&quot;5&quot;)) {</span>
+<span class="nc" id="L210">                this.singleDanWeiXingZhi05 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L211" title="All 2 branches missed.">            } else if (safe(software.getDeveloperType()).equals(&quot;6&quot;)) {</span>
+<span class="nc" id="L212">                this.singleDanWeiXingZhi06 = &quot;1&quot;;</span>
+            }
+<span class="nc" id="L214">            System.out.println(&quot;Test : : &quot; + software.getDeveloperType() + &quot;\n&quot;);</span>
+<span class="nc" id="L215">            this.inputRuanJianMiaoShu = safe(software.getUserDescription());</span>
+<span class="nc" id="L216">            this.inputZhuYaoGongNeng = safe(software.getFunctionIntro());</span>
+
+<span class="nc" id="L218">            this.inputRuanJianGuiMo01 = safe(software.getFunctionNums());</span>
+<span class="nc" id="L219">            this.inputRuanJianGuiMo02 = safe(software.getFunctionPoint());</span>
+<span class="nc" id="L220">            this.inputRuanJianGuiMo03 = safe(software.getCodeLine());</span>
+            //
+<span class="nc bnc" id="L222" title="All 2 branches missed.">            if (safe(software.getType()).equals(&quot;操作系统&quot;)) {</span>
+<span class="nc" id="L223">                this.singleRuanJianLeiXing0XiTong01 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L224" title="All 2 branches missed.">            } else if (safe(software.getType()).equals(&quot;中文处理系统&quot;)) {</span>
+<span class="nc" id="L225">                this.singleRuanJianLeiXing0XiTong02 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L226" title="All 2 branches missed.">            } else if (safe(software.getType()).equals(&quot;网络系统&quot;)) {</span>
+<span class="nc" id="L227">                this.singleRuanJianLeiXing0XiTong03 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L228" title="All 2 branches missed.">            } else if (safe(software.getType()).equals(&quot;嵌入式操作系统&quot;)) {</span>
+<span class="nc" id="L229">                this.singleRuanJianLeiXing0XiTong04 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L230" title="All 2 branches missed.">            } else if (safe(software.getType()).equals(&quot;其他&quot;)) {</span>
+<span class="nc" id="L231">                this.singleRuanJianLeiXing0XiTong05 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L232" title="All 2 branches missed.">            } else if (safe(software.getType()).equals(&quot;程序设计语言&quot;)) {</span>
+<span class="nc" id="L233">                this.singleRuanJianLeiXing0ZhiChi01 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L234" title="All 2 branches missed.">            } else if (safe(software.getType()).equals(&quot;数据库系统设计&quot;)) {</span>
+<span class="nc" id="L235">                this.singleRuanJianLeiXing0ZhiChi02 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L236" title="All 2 branches missed.">            } else if (safe(software.getType()).equals(&quot;工具软件&quot;)) {</span>
+<span class="nc" id="L237">                this.singleRuanJianLeiXing0ZhiChi03 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L238" title="All 2 branches missed.">            } else if (safe(software.getType()).equals(&quot;网络通信软件&quot;)) {</span>
+<span class="nc" id="L239">                this.singleRuanJianLeiXing0ZhiChi04 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L240" title="All 2 branches missed.">            } else if (safe(software.getType()).equals(&quot;中间件&quot;)) {</span>
+<span class="nc" id="L241">                this.singleRuanJianLeiXing0ZhiChi05 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L242" title="All 2 branches missed.">            } else if (safe(software.getType()).equals(&quot;其他&quot;)) {</span>
+<span class="nc" id="L243">                this.singleRuanJianLeiXing0ZhiChi06 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L244" title="All 2 branches missed.">            } else if (safe(software.getType()).equals(&quot;行业管理软件&quot;)) {</span>
+<span class="nc" id="L245">                this.singleRuanJianLeiXing0YingYong01 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L246" title="All 2 branches missed.">            } else if (safe(software.getType()).equals(&quot;办公软件&quot;)) {</span>
+<span class="nc" id="L247">                this.singleRuanJianLeiXing0YingYong02 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L248" title="All 2 branches missed.">            } else if (safe(software.getType()).equals(&quot;模式识别软件&quot;)) {</span>
+<span class="nc" id="L249">                this.singleRuanJianLeiXing0YingYong03 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L250" title="All 2 branches missed.">            } else if (safe(software.getType()).equals(&quot;图形图像软件&quot;)) {</span>
+<span class="nc" id="L251">                this.singleRuanJianLeiXing0YingYong04 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L252" title="All 2 branches missed.">            } else if (safe(software.getType()).equals(&quot;控制软件&quot;)) {</span>
+<span class="nc" id="L253">                this.singleRuanJianLeiXing0YingYong05 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L254" title="All 2 branches missed.">            } else if (safe(software.getType()).equals(&quot;网络应用软件&quot;)) {</span>
+<span class="nc" id="L255">                this.singleRuanJianLeiXing0YingYong06 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L256" title="All 2 branches missed.">            } else if (safe(software.getType()).equals(&quot;信息管理软件&quot;)) {</span>
+<span class="nc" id="L257">                this.singleRuanJianLeiXing0YingYong07 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L258" title="All 2 branches missed.">            } else if (safe(software.getType()).equals(&quot;数据库管理应用软件&quot;)) {</span>
+<span class="nc" id="L259">                this.singleRuanJianLeiXing0YingYong08 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L260" title="All 2 branches missed.">            } else if (safe(software.getType()).equals(&quot;安全与保密软件&quot;)) {</span>
+<span class="nc" id="L261">                this.singleRuanJianLeiXing0YingYong09 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L262" title="All 2 branches missed.">            } else if (safe(software.getType()).equals(&quot;嵌入式应用软件&quot;)) {</span>
+<span class="nc" id="L263">                this.singleRuanJianLeiXing0YingYong010 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L264" title="All 2 branches missed.">            } else if (safe(software.getType()).equals(&quot;教育软件&quot;)) {</span>
+<span class="nc" id="L265">                this.singleRuanJianLeiXing0YingYong011 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L266" title="All 2 branches missed.">            } else if (safe(software.getType()).equals(&quot;游戏软件&quot;)) {</span>
+<span class="nc" id="L267">                this.singleRuanJianLeiXing0YingYong012 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L268" title="All 2 branches missed.">            } else if (safe(software.getType()).equals(&quot;其他&quot;)) {</span>
+<span class="nc" id="L269">                this.singleRuanJianLeiXing0YingYong013 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L270" title="All 2 branches missed.">            } else if (safe(software.getType()).equals(&quot;其他&quot;)) {</span>
+<span class="nc" id="L271">                this.singleRuanJianLeiXing0QiTa01 = &quot;1&quot;;</span>
+            }
+
+<span class="nc" id="L274">            List&lt;String&gt; clientOS = software.getClientOS();</span>
+<span class="nc bnc" id="L275" title="All 2 branches missed.">            if (clientOS != null) {</span>
+<span class="nc bnc" id="L276" title="All 2 branches missed.">                for (String value : clientOS) {</span>
+<span class="nc bnc" id="L277" title="All 2 branches missed.">                    if (safe(value).startsWith(&quot;Windows&quot;)) {</span>
+<span class="nc" id="L278">                        this.multiKeHuDuan0Windows = &quot;1&quot;;</span>
+<span class="nc" id="L279">                        String[] tmp = value.split(&quot;\\s+&quot;);</span>
+<span class="nc" id="L280">                        Pattern pattern = Pattern.compile(&quot;(?&lt;=_0641#toReplaceA1C1_1).*?(?=_0641#toReplaceA2C2_1)&quot;);</span>
+<span class="nc" id="L281">                        Matcher matcher = pattern.matcher(tmp[1]);</span>
+<span class="nc bnc" id="L282" title="All 2 branches missed.">                        if (matcher.find()) {</span>
+<span class="nc" id="L283">                            this.inputKeHuDuan0Windows = matcher.group();</span>
+                        }
+<span class="nc bnc" id="L285" title="All 2 branches missed.">                    } else if (safe(value).startsWith(&quot;Linux&quot;)) {</span>
+<span class="nc" id="L286">                        this.multiKeHuDuan0Linux = &quot;1&quot;;</span>
+<span class="nc" id="L287">                        String[] tmp = value.split(&quot;\\s+&quot;);</span>
+<span class="nc" id="L288">                        Pattern pattern = Pattern.compile(&quot;(?&lt;=_0641#toReplaceA1C1_2).*?(?=_0641#toReplaceA2C2_2)&quot;);</span>
+<span class="nc" id="L289">                        Matcher matcher = pattern.matcher(tmp[1]);</span>
+<span class="nc bnc" id="L290" title="All 2 branches missed.">                        if (matcher.find()) {</span>
+<span class="nc" id="L291">                            this.inputKeHuDuan0Linux = matcher.group();</span>
+                        }
+<span class="nc bnc" id="L293" title="All 2 branches missed.">                    } else if (value != null) {</span>
+<span class="nc" id="L294">                        this.multiKeHuDuan0QiTa = &quot;1&quot;;</span>
+<span class="nc" id="L295">                        Pattern pattern = Pattern.compile(&quot;(?&lt;=_0641#toReplaceA1C1_3).*?(?=_0641#toReplaceA2C2_3)&quot;);</span>
+<span class="nc" id="L296">                        Matcher matcher = pattern.matcher(value);</span>
+<span class="nc bnc" id="L297" title="All 2 branches missed.">                        if (matcher.find()) {</span>
+<span class="nc" id="L298">                            this.inputKeHuDuan0QiTa = matcher.group();</span>
+                        }
+                    }
+<span class="nc" id="L301">                }</span>
+            }
+<span class="nc" id="L303">            this.inputKeHuDuan0NeiCunYaoQiu = safe(software.getClientMemoryRequirement());</span>
+<span class="nc" id="L304">            this.inputKeHuDuan0QiTaYaoQiu = safe(software.getClientOtherRequirement());</span>
+
+<span class="nc" id="L306">            List&lt;String&gt; serverHardArch = software.getServerHardArch();</span>
+<span class="nc bnc" id="L307" title="All 2 branches missed.">            if (serverHardArch != null) {</span>
+<span class="nc bnc" id="L308" title="All 2 branches missed.">                for (String value : serverHardArch) {</span>
+<span class="nc bnc" id="L309" title="All 2 branches missed.">                    if (value.equals(&quot;PC服务器&quot;)) {</span>
+<span class="nc" id="L310">                        this.multiFuWuQiYingJian0PC = &quot;1&quot;;</span>
+<span class="nc bnc" id="L311" title="All 2 branches missed.">                    } else if (value.equals(&quot;UNIX/Linux服务器&quot;)) {</span>
+<span class="nc" id="L312">                        this.multiFuWuQiYingJian0Linux = &quot;1&quot;;</span>
+<span class="nc bnc" id="L313" title="All 2 branches missed.">                    } else if (value != null) {</span>
+<span class="nc" id="L314">                        this.multiFuWuQiYingJian0QiTa = &quot;1&quot;;</span>
+<span class="nc" id="L315">                        Pattern pattern = Pattern.compile(&quot;(?&lt;=_0641#toReplaceA1C1_4).*?(?=_0641#toReplaceA2C2_4)&quot;);</span>
+<span class="nc" id="L316">                        Matcher matcher = pattern.matcher(value);</span>
+<span class="nc bnc" id="L317" title="All 2 branches missed.">                        if (matcher.find()) {</span>
+<span class="nc" id="L318">                            this.inputFuWuQiYingJian0QiTa = matcher.group();</span>
+                        }
+                    }
+<span class="nc" id="L321">                }</span>
+            }
+<span class="nc" id="L323">            this.inputFuWuQiYingJian0NeiCunYaoQiu = safe(software.getServHardMemoryRequirement());</span>
+<span class="nc" id="L324">            this.inputFuWuQiYingJian0YingPanYaoQiu = safe(software.getServHardDiskRequirement());</span>
+<span class="nc" id="L325">            this.inputFuWuQiYingJian0QiTaYaoQiu = safe(software.getServHardOtherRequirement());</span>
+<span class="nc" id="L326">            this.inputFuWuQiRuanJian0CaoZuoXiTong = safe(software.getServSoftOS());</span>
+<span class="nc" id="L327">            this.inputFuWuQiRuanJian0BanBen = safe(software.getServSoftVersion());</span>
+<span class="nc" id="L328">            this.inputFuWuQiRuanJian0BianChengYuYan = safe(software.getServSoftProgramLang());</span>
+
+<span class="nc" id="L330">            List&lt;String&gt; servSoftArch = software.getServSoftArch();</span>
+<span class="nc bnc" id="L331" title="All 2 branches missed.">            if (servSoftArch != null) {</span>
+<span class="nc bnc" id="L332" title="All 2 branches missed.">                for (String value : servSoftArch) {</span>
+<span class="nc bnc" id="L333" title="All 2 branches missed.">                    if (value.equals(&quot;C/S&quot;)) {</span>
+<span class="nc" id="L334">                        this.multiFuWuQiRuanJian0GouJia0CS = &quot;1&quot;;</span>
+<span class="nc bnc" id="L335" title="All 2 branches missed.">                    } else if (value.equals(&quot;B/S&quot;)) {</span>
+<span class="nc" id="L336">                        this.multiFuWuQiRuanJian0GouJia0BS = &quot;1&quot;;</span>
+<span class="nc bnc" id="L337" title="All 2 branches missed.">                    } else if (value.equals(&quot;其他&quot;)) {</span>
+<span class="nc" id="L338">                        this.multiFuWuQiRuanJian0GouJia0QiTa = &quot;1&quot;;</span>
+                    }
+<span class="nc" id="L340">                }</span>
+            }
+<span class="nc" id="L342">            this.inputFuWuQiRuanJian0ShuJuKu = safe(software.getServSoftDatabase());</span>
+<span class="nc" id="L343">            this.inputFuWuQiRuanJian0ZhongJianJian = safe(software.getServSoftMiddleware());</span>
+<span class="nc" id="L344">            this.inputFuWuQiRuanJian0QiTaZhiCheng = safe(software.getServerSideOtherSupport());</span>
+<span class="nc" id="L345">            this.inputWangLuoHuanJing = safe(software.getNetworkEnvironment());</span>
+        }
+
+        // 测试依据
+<span class="nc" id="L349">        List&lt;String&gt; testStandard = entrust.getContent().getTestStandard();</span>
+<span class="nc bnc" id="L350" title="All 2 branches missed.">        if (testStandard != null) {</span>
+<span class="nc bnc" id="L351" title="All 2 branches missed.">            for (String value : testStandard) {</span>
+<span class="nc bnc" id="L352" title="All 2 branches missed.">                if (value.equals(&quot;GB/T 25000.51-2010&quot;)) {</span>
+<span class="nc" id="L353">                    this.multiCeShiYiJu01 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L354" title="All 2 branches missed.">                } else if (value.equals(&quot;GB/T 16260.1-2006&quot;)) {</span>
+<span class="nc" id="L355">                    this.multiCeShiYiJu02 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L356" title="All 2 branches missed.">                } else if (value.equals(&quot;NST-03-WI12-2011&quot;)) {</span>
+<span class="nc" id="L357">                    this.multiCeShiYiJu03 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L358" title="All 2 branches missed.">                } else if (value.equals(&quot;NST-03-WI13-2011&quot;)) {</span>
+<span class="nc" id="L359">                    this.multiCeShiYiJu04 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L360" title="All 2 branches missed.">                } else if (value.startsWith(&quot;_0641#toReplaceA1C1_5&quot;)) {</span>
+<span class="nc" id="L361">                    this.multiCeShiYiJu05 = &quot;1&quot;;</span>
+<span class="nc" id="L362">                    System.out.println(&quot;Teset&quot;);</span>
+<span class="nc" id="L363">                    Pattern pattern = Pattern.compile(&quot;(?&lt;=_0641#toReplaceA1C1_5).*?(?=_0641#toReplaceA2C2_5)&quot;);</span>
+<span class="nc" id="L364">                    Matcher matcher = pattern.matcher(value);</span>
+<span class="nc bnc" id="L365" title="All 2 branches missed.">                    if (matcher.find()) {</span>
+<span class="nc" id="L366">                        this.inputCeShiYiJu05 = matcher.group();</span>
+                    }
+                }
+<span class="nc" id="L369">            }</span>
+        }
+
+        // 技术指标
+<span class="nc" id="L373">        List&lt;String&gt; techIndex = entrust.getContent().getTechIndex();</span>
+<span class="nc bnc" id="L374" title="All 2 branches missed.">        if (techIndex != null) {</span>
+<span class="nc bnc" id="L375" title="All 2 branches missed.">            for (String value : techIndex) {</span>
+<span class="nc bnc" id="L376" title="All 2 branches missed.">                if (value.equals(&quot;功能性&quot;)) {</span>
+<span class="nc" id="L377">                    this.multiJiShuZhiBiao01 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L378" title="All 2 branches missed.">                } else if (value.equals(&quot;可靠性&quot;)) {</span>
+<span class="nc" id="L379">                    this.multiJiShuZhiBiao02 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L380" title="All 2 branches missed.">                } else if (value.equals(&quot;易用性性&quot;)) {</span>
+<span class="nc" id="L381">                    this.multiJiShuZhiBiao03 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L382" title="All 2 branches missed.">                } else if (value.equals(&quot;效率&quot;)) {</span>
+<span class="nc" id="L383">                    this.multiJiShuZhiBiao04 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L384" title="All 2 branches missed.">                } else if (value.equals(&quot;可维护性&quot;)) {</span>
+<span class="nc" id="L385">                    this.multiJiShuZhiBiao05 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L386" title="All 2 branches missed.">                } else if (value.equals(&quot;可移植性&quot;)) {</span>
+<span class="nc" id="L387">                    this.multiJiShuZhiBiao06 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L388" title="All 2 branches missed.">                } else if (value.equals(&quot;代码覆盖度&quot;)) {</span>
+<span class="nc" id="L389">                    this.multiJiShuZhiBiao07 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L390" title="All 2 branches missed.">                } else if (value.equals(&quot;缺陷检测率&quot;)) {</span>
+<span class="nc" id="L391">                    this.multiJiShuZhiBiao08 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L392" title="All 2 branches missed.">                } else if (value.equals(&quot;代码风格符合度&quot;)) {</span>
+<span class="nc" id="L393">                    this.multiJiShuZhiBiao09 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L394" title="All 2 branches missed.">                } else if (value.equals(&quot;代码不符合项检测率&quot;)) {</span>
+<span class="nc" id="L395">                    this.multiJiShuZhiBiao010 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L396" title="All 2 branches missed.">                } else if (value.equals(&quot;产品说明要求&quot;)) {</span>
+<span class="nc" id="L397">                    this.multiJiShuZhiBiao011 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L398" title="All 2 branches missed.">                } else if (value.equals(&quot;用户文档集要求&quot;)) {</span>
+<span class="nc" id="L399">                    this.multiJiShuZhiBiao012 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L400" title="All 2 branches missed.">                } else if (value.startsWith(&quot;_0641#toReplaceA1C1_6&quot;)) {</span>
+<span class="nc" id="L401">                    this.multiJiShuZhiBiao013 = &quot;1&quot;;</span>
+<span class="nc" id="L402">                    Pattern pattern = Pattern.compile(&quot;(?&lt;=_0641#toReplaceA1C1_6).*?(?=_0641#toReplaceA2C2_6)&quot;);</span>
+<span class="nc" id="L403">                    Matcher matcher = pattern.matcher(value);</span>
+<span class="nc bnc" id="L404" title="All 2 branches missed.">                    if (matcher.find()) {</span>
+<span class="nc" id="L405">                        this.inputJiShuZhiBiao013 = matcher.group();</span>
+                    }
+<span class="nc" id="L407">                    System.out.println(&quot;Test: : &quot; + this.inputJiShuZhiBiao013 + &quot;\n&quot;);</span>
+                }
+<span class="nc" id="L409">            }</span>
+        }
+
+        // 软件介质
+<span class="nc" id="L413">        String softwareMedium = entrust.getContent().getSoftwareMedium();</span>
+<span class="nc bnc" id="L414" title="All 2 branches missed.">        if (safe(softwareMedium).equals(&quot;1&quot;)) {</span>
+<span class="nc" id="L415">            this.singleRuanJianJieZhi0GuangPan = &quot;1&quot;;</span>
+<span class="nc bnc" id="L416" title="All 2 branches missed.">        } else if (safe(softwareMedium).equals(&quot;2&quot;)) {</span>
+<span class="nc" id="L417">            this.singleRuanJianJieZhi0UPan = &quot;1&quot;;</span>
+<span class="nc bnc" id="L418" title="All 2 branches missed.">        } else if (softwareMedium != null) {</span>
+<span class="nc" id="L419">            this.singleRuanJianJieZhi0QiTa = &quot;1&quot;;</span>
+<span class="nc" id="L420">            Pattern pattern = Pattern.compile(&quot;(?&lt;=_0641#toReplaceA1C1_7).*?(?=_0641#toReplaceA2C2_7)&quot;);</span>
+<span class="nc" id="L421">            Matcher matcher = pattern.matcher(softwareMedium);</span>
+<span class="nc bnc" id="L422" title="All 2 branches missed.">            if (matcher.find()) {</span>
+<span class="nc" id="L423">                this.inputRuanJianJieZhi0QiTa = matcher.group();</span>
+            }
+        }
+        // 文档资料
+<span class="nc" id="L427">        String softwareDoc = entrust.getContent().getDocument();</span>
+<span class="nc" id="L428">        this.inputWenDangZiLiao = safe(softwareDoc);</span>
+        // 样品处理方式
+<span class="nc" id="L430">        String sampleHandling = entrust.getContent().getSampleHandling();</span>
+<span class="nc bnc" id="L431" title="All 2 branches missed.">        if (safe(sampleHandling).equals(&quot;1&quot;)) {</span>
+<span class="nc" id="L432">            this.singleYangPingChuLi01 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L433" title="All 2 branches missed.">        } else if (sampleHandling != null) {</span>
+<span class="nc" id="L434">            this.singleYangPingChuLi02 = &quot;1&quot;;</span>
+        }
+
+<span class="nc" id="L437">        this.inputWeiTuoDanWei0DianHua = safe(principal.getCompanyPhone());</span>
+<span class="nc" id="L438">        this.inputWeiTuoDanWei0ChuanZhen = safe(principal.getFax());</span>
+<span class="nc" id="L439">        this.inputWeiTuoDanWei0DiZhi = safe(principal.getCompanyAddress());</span>
+<span class="nc" id="L440">        this.inputWeiTuoDanWei0YouBian = safe(principal.getZipCode());</span>
+<span class="nc" id="L441">        this.inputWeiTuoDanWei0LianXiRen = safe(principal.getContact());</span>
+<span class="nc" id="L442">        this.inputWeiTuoDanWei0ShouJi = safe(principal.getContactPhone());</span>
+<span class="nc" id="L443">        this.inputWeiTuoDanWei0Email = safe(principal.getContactEmail());</span>
+<span class="nc" id="L444">        this.inputWeiTuoDanWei0WangZhi = safe(principal.getCompanyWebsite());</span>
+
+        // 从委托评审里获取，注意判断null
+<span class="nc" id="L447">        EntrustReview entrustReview = entrust.getReview();</span>
+<span class="nc bnc" id="L448" title="All 2 branches missed.">        if (entrustReview != null) {</span>
+            // 密级
+<span class="nc" id="L450">            String securityLevel = entrustReview.getSecurityLevel();</span>
+<span class="nc bnc" id="L451" title="All 2 branches missed.">            if (safe(securityLevel).equals(&quot;无密级&quot;)) {</span>
+<span class="nc" id="L452">                this.singleMiJi01 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L453" title="All 2 branches missed.">            } else if (safe(securityLevel).equals(&quot;秘密&quot;)) {</span>
+<span class="nc" id="L454">                this.singleMiJi02 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L455" title="All 2 branches missed.">            } else if (safe(securityLevel).equals(&quot;机密&quot;)) {</span>
+<span class="nc" id="L456">                this.singleMiJi03 = &quot;1&quot;;</span>
+            }
+            // 查杀病毒
+<span class="nc" id="L459">            String checkVirus = entrustReview.getCheckVirus();</span>
+<span class="nc bnc" id="L460" title="All 2 branches missed.">            if (safe(checkVirus).equals(&quot;已完成&quot;)) {</span>
+<span class="nc" id="L461">                this.singleChaShaBingDu01 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L462" title="All 2 branches missed.">            } else if (safe(checkVirus).startsWith(&quot;无法完成&quot;)) {</span>
+<span class="nc" id="L463">                this.singleChaShaBingDu02 = &quot;1&quot;;</span>
+<span class="nc" id="L464">                this.inputChaShaBingDu02 = checkVirus.substring(4);</span>
+            }
+
+            // 材料检查
+<span class="nc" id="L468">            List&lt;String&gt; checkMaterial = entrustReview.getCheckMaterial();</span>
+<span class="nc bnc" id="L469" title="All 2 branches missed.">            if (checkMaterial != null) {</span>
+<span class="nc bnc" id="L470" title="All 2 branches missed.">                for (String value : checkMaterial) {</span>
+<span class="nc bnc" id="L471" title="All 2 branches missed.">                    if (value.equals(&quot;源代码&quot;)) {</span>
+<span class="nc" id="L472">                        this.multiCaiLiaoJianCha0CeshiYangPing01 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L473" title="All 2 branches missed.">                    } else if (value.equals(&quot;可执行文件&quot;)) {</span>
+<span class="nc" id="L474">                        this.multiCaiLiaoJianCha0CeshiYangPing02 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L475" title="All 2 branches missed.">                    } else if (value.equals(&quot;项目计划任务书&quot;)) {</span>
+<span class="nc" id="L476">                        this.multiCaiLiaoJianCha0XuQiuWenDang01 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L477" title="All 2 branches missed.">                    } else if (value.equals(&quot;需求分析报告&quot;)) {</span>
+<span class="nc" id="L478">                        this.multiCaiLiaoJianCha0XuQiuWenDang02 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L479" title="All 2 branches missed.">                    } else if (value.equals(&quot;合同&quot;)) {</span>
+<span class="nc" id="L480">                        this.multiCaiLiaoJianCha0XuQiuWenDang03 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L481" title="All 2 branches missed.">                    } else if (value.equals(&quot;用户手册&quot;)) {</span>
+<span class="nc" id="L482">                        this.multiCaiLiaoJianCha0YongHuWenDang01 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L483" title="All 2 branches missed.">                    } else if (value.equals(&quot;用户指南&quot;)) {</span>
+<span class="nc" id="L484">                        this.multiCaiLiaoJianCha0YongHuWenDang02 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L485" title="All 2 branches missed.">                    } else if (value.equals(&quot;操作员手册&quot;)) {</span>
+<span class="nc" id="L486">                        this.multiCaiLiaoJianCha0CaoZuoWenDang01 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L487" title="All 2 branches missed.">                    } else if (value.equals(&quot;安装手册&quot;)) {</span>
+<span class="nc" id="L488">                        this.multiCaiLiaoJianCha0CaoZuoWenDang02 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L489" title="All 2 branches missed.">                    } else if (value.equals(&quot;诊断手册&quot;)) {</span>
+<span class="nc" id="L490">                        this.multiCaiLiaoJianCha0CaoZuoWenDang03 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L491" title="All 2 branches missed.">                    } else if (value.equals(&quot;支持手册&quot;)) {</span>
+<span class="nc" id="L492">                        this.multiCaiLiaoJianCha0CaoZuoWenDang04 = &quot;1&quot;;</span>
+                    }
+<span class="nc" id="L494">                }</span>
+            }
+
+            // 确认意见
+<span class="nc" id="L498">            String confirmation = entrustReview.getConfirmation();</span>
+<span class="nc bnc" id="L499" title="All 2 branches missed.">            if (safe(confirmation).equals(&quot;0&quot;)) {</span>
+<span class="nc" id="L500">                this.singleQueRenYiJian01 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L501" title="All 2 branches missed.">            } else if (safe(confirmation).equals(&quot;1&quot;)) {</span>
+<span class="nc" id="L502">                this.singleQueRenYiJian02 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L503" title="All 2 branches missed.">            } else if (safe(confirmation).equals(&quot;2&quot;)) {</span>
+<span class="nc" id="L504">                this.singleQueRenYiJian03 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L505" title="All 2 branches missed.">            } else if (safe(confirmation).equals(&quot;3&quot;)) {</span>
+<span class="nc" id="L506">                this.singleQueRenYiJian04 = &quot;1&quot;;</span>
+            }
+            // 受理意见
+<span class="nc" id="L509">            String acceptance = entrustReview.getAcceptance();</span>
+<span class="nc bnc" id="L510" title="All 2 branches missed.">            if (safe(acceptance).equals(&quot;0&quot;)) {</span>
+<span class="nc" id="L511">                this.singleShouLiYiJian01 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L512" title="All 2 branches missed.">            } else if (safe(acceptance).equals(&quot;1&quot;)) {</span>
+<span class="nc" id="L513">                this.singleShouLiYiJian02 = &quot;1&quot;;</span>
+<span class="nc bnc" id="L514" title="All 2 branches missed.">            } else if (safe(acceptance).equals(&quot;2&quot;)) {</span>
+<span class="nc" id="L515">                this.singleShouLiYiJian03 = &quot;1&quot;;</span>
+            }
+            // 测试项目编号
+<span class="nc" id="L518">            this.inputCeShiXiangMuBianHao = safe(entrustReview.getSerialNumber());</span>
+        }
+
+<span class="nc" id="L521">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

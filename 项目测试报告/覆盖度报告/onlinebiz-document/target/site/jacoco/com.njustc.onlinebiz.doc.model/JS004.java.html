@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JS004.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-document</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.doc.model</a> &gt; <span class="el_source">JS004.java</span></div><h1>JS004.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.doc.model;
+
+import com.njustc.onlinebiz.common.model.PartyDetail;
+import com.njustc.onlinebiz.common.model.contract.Contract;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+<span class="pc bnc" id="L10" title="All 262 branches missed.">@Data</span>
+<span class="fc" id="L11">@NoArgsConstructor</span>
+<span class="nc" id="L12">@AllArgsConstructor</span>
+@Accessors(chain = true)
+public class JS004 {
+<span class="pc" id="L15">    private String inputXiangMuMingChen = &quot;&quot;;</span>
+<span class="pc" id="L16">    private String inputJiaFang = &quot;&quot;;</span>
+<span class="pc" id="L17">    private String inputYiFang = &quot;&quot;;</span>
+<span class="pc" id="L18">    private String inputQianDingDiDian = &quot;&quot;;</span>
+<span class="pc" id="L19">    private String inputQianDingRiQi0Nian = &quot;&quot;;</span>
+<span class="pc" id="L20">    private String inputQianDingRiQi0Yue = &quot;&quot;;</span>
+<span class="pc" id="L21">    private String inputQianDingRiQi0Ri = &quot;&quot;;</span>
+<span class="pc" id="L22">    private String inputShouCeRuanJian = &quot;&quot;;</span>
+    //  private String inputZhiLiangTeXing = &quot;&quot;;
+<span class="pc" id="L24">    private String inputCeShiFeiYong = &quot;&quot;;</span>
+<span class="pc" id="L25">    private String inputCeShiFeiYong0Yuan = &quot;&quot;;</span>
+<span class="pc" id="L26">    private String inputLvXingQiXian = &quot;&quot;;</span>
+<span class="pc" id="L27">    private String inputZhengGaiCishu = &quot;&quot;;</span>
+<span class="pc" id="L28">    private String inputZhengGaiTianShu = &quot;&quot;;</span>
+<span class="pc" id="L29">    private String inputJiaFang0ShouQuanDaiBiao = &quot;&quot;;</span>
+<span class="pc" id="L30">    private String inputJiaFang0QianZhangRiQi = &quot;&quot;;</span>
+<span class="pc" id="L31">    private String inputJiaFang0LianXiRen = &quot;&quot;;</span>
+<span class="pc" id="L32">    private String inputJiaFang0TongXunDiZhi = &quot;&quot;;</span>
+<span class="pc" id="L33">    private String inputJiaFang0DianHua = &quot;&quot;;</span>
+<span class="pc" id="L34">    private String inputJiaFang0ChuanZhen = &quot;&quot;;</span>
+<span class="pc" id="L35">    private String inputJiaFang0KaiHuYinHang = &quot;&quot;;</span>
+<span class="pc" id="L36">    private String inputJiaFang0ZhangHao = &quot;&quot;;</span>
+<span class="pc" id="L37">    private String inputJiaFang0YouBian = &quot;&quot;;</span>
+<span class="pc" id="L38">    private String inputYiFang0ShouQuanDaiBiao = &quot;&quot;;</span>
+<span class="pc" id="L39">    private String inputYiFang0QianZhangRiQi = &quot;&quot;;</span>
+<span class="pc" id="L40">    private String inputYiFang0LianXiRen = &quot;&quot;;</span>
+<span class="pc" id="L41">    private String inputYiFang0TongXunDiZhi = &quot;&quot;;</span>
+<span class="pc" id="L42">    private String inputYiFang0DianHua = &quot;&quot;;</span>
+<span class="pc" id="L43">    private String inputYiFang0ChuanZhen = &quot;&quot;;</span>
+<span class="pc" id="L44">    private String inputYiFang0HuMing = &quot;&quot;;</span>
+<span class="pc" id="L45">    private String inputYiFang0KaiHuYinHang = &quot;&quot;;</span>
+<span class="pc" id="L46">    private String inputYiFang0ZhangHao = &quot;&quot;;</span>
+<span class="pc" id="L47">    private String inputYiFang0YouBian = &quot;&quot;;</span>
+
+<span class="nc" id="L49">    public JS004(Contract contract) {</span>
+<span class="nc bnc" id="L50" title="All 2 branches missed.">        if (contract == null) {</span>
+<span class="nc" id="L51">            throw new IllegalArgumentException(&quot;contract is null&quot;);</span>
+        }
+<span class="nc" id="L53">        this.inputXiangMuMingChen = contract.getProjectName();</span>
+
+<span class="nc" id="L55">        PartyDetail jiaFang = contract.getPartyA();</span>
+<span class="nc" id="L56">        PartyDetail yiFang = contract.getPartyB();</span>
+
+
+<span class="nc" id="L59">        this.inputQianDingDiDian = contract.getSignedAt();</span>
+
+<span class="nc" id="L61">        String signedDate = contract.getSignedDate();</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        if (signedDate.length() &gt;= 10) {</span>
+<span class="nc" id="L63">            this.inputQianDingRiQi0Nian = signedDate.substring(0, 4);</span>
+<span class="nc" id="L64">            this.inputQianDingRiQi0Yue = signedDate.substring(5, 7);</span>
+<span class="nc" id="L65">            this.inputQianDingRiQi0Ri = signedDate.substring(8, 10);</span>
+        }
+<span class="nc" id="L67">        this.inputShouCeRuanJian = contract.getTargetSoftware();</span>
+
+<span class="nc" id="L69">        this.inputCeShiFeiYong = contract.getPrice().toString();</span>
+//    this.inputCeShiFeiYong0Yuan = ;
+
+<span class="nc" id="L72">        this.inputLvXingQiXian = Integer.toString(contract.getTotalWorkingDays());</span>
+<span class="nc" id="L73">        this.inputZhengGaiCishu = Integer.toString(contract.getRectificationLimit());</span>
+<span class="nc" id="L74">        this.inputZhengGaiTianShu = Integer.toString(contract.getRectificationDaysEachTime());</span>
+
+<span class="nc bnc" id="L76" title="All 2 branches missed.">        if (jiaFang != null) {</span>
+<span class="nc" id="L77">            this.inputJiaFang = jiaFang.getCompanyCH();</span>
+<span class="nc" id="L78">            this.inputJiaFang0ShouQuanDaiBiao = jiaFang.getRepresentative();</span>
+            // this.inputJiaFang0QianZhangRiQi = &quot;&quot;;
+<span class="nc" id="L80">            this.inputJiaFang0LianXiRen = jiaFang.getContact();</span>
+<span class="nc" id="L81">            this.inputJiaFang0TongXunDiZhi = jiaFang.getCompanyAddress();</span>
+<span class="nc" id="L82">            this.inputJiaFang0DianHua = jiaFang.getCompanyPhone();</span>
+<span class="nc" id="L83">            this.inputJiaFang0ChuanZhen = jiaFang.getFax();</span>
+<span class="nc" id="L84">            this.inputJiaFang0KaiHuYinHang = jiaFang.getBankName();</span>
+<span class="nc" id="L85">            this.inputJiaFang0ZhangHao = jiaFang.getAccount();</span>
+<span class="nc" id="L86">            this.inputJiaFang0YouBian = jiaFang.getZipCode();</span>
+        }
+<span class="nc bnc" id="L88" title="All 2 branches missed.">        if (yiFang != null) {</span>
+<span class="nc" id="L89">            this.inputYiFang = yiFang.getCompanyCH();</span>
+<span class="nc" id="L90">            this.inputYiFang0ShouQuanDaiBiao = yiFang.getRepresentative();</span>
+            // this.inputYiFang0QianZhangRiQi = &quot;&quot;;
+<span class="nc" id="L92">            this.inputYiFang0LianXiRen = yiFang.getContact();</span>
+<span class="nc" id="L93">            this.inputYiFang0TongXunDiZhi = yiFang.getCompanyAddress();</span>
+<span class="nc" id="L94">            this.inputYiFang0DianHua = yiFang.getCompanyPhone();</span>
+<span class="nc" id="L95">            this.inputYiFang0ChuanZhen = yiFang.getFax();</span>
+<span class="nc" id="L96">            this.inputYiFang0HuMing = yiFang.getAccountName();</span>
+<span class="nc" id="L97">            this.inputYiFang0KaiHuYinHang = yiFang.getBankName();</span>
+<span class="nc" id="L98">            this.inputYiFang0ZhangHao = yiFang.getAccount();</span>
+<span class="nc" id="L99">            this.inputYiFang0YouBian = yiFang.getZipCode();</span>
+        }
+        //增加字段的非空性检查
+<span class="nc bnc" id="L102" title="All 2 branches missed.">        if (this.inputXiangMuMingChen == null) this.inputXiangMuMingChen = &quot;&quot;;</span>
+<span class="nc bnc" id="L103" title="All 2 branches missed.">        if (this.inputJiaFang == null) this.inputJiaFang = &quot;&quot;;</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">        if (this.inputYiFang == null) this.inputYiFang = &quot;&quot;;</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">        if (this.inputQianDingDiDian == null) this.inputQianDingDiDian = &quot;&quot;;</span>
+<span class="nc bnc" id="L106" title="All 2 branches missed.">        if (this.inputShouCeRuanJian == null) this.inputShouCeRuanJian = &quot;&quot;;</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">        if (this.inputCeShiFeiYong == null) this.inputCeShiFeiYong = &quot;&quot;;</span>
+<span class="nc bnc" id="L108" title="All 2 branches missed.">        if (this.inputJiaFang0ShouQuanDaiBiao == null) this.inputJiaFang0ShouQuanDaiBiao = &quot;&quot;;</span>
+<span class="nc bnc" id="L109" title="All 2 branches missed.">        if (this.inputJiaFang0LianXiRen == null) this.inputJiaFang0LianXiRen = &quot;&quot;;</span>
+<span class="nc bnc" id="L110" title="All 2 branches missed.">        if (this.inputJiaFang0TongXunDiZhi == null) this.inputJiaFang0TongXunDiZhi = &quot;&quot;;</span>
+<span class="nc bnc" id="L111" title="All 2 branches missed.">        if (this.inputJiaFang0DianHua == null) this.inputJiaFang0DianHua = &quot;&quot;;</span>
+<span class="nc bnc" id="L112" title="All 2 branches missed.">        if (this.inputJiaFang0ChuanZhen == null) this.inputJiaFang0ChuanZhen = &quot;&quot;;</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">        if (this.inputJiaFang0KaiHuYinHang == null) this.inputJiaFang0KaiHuYinHang = &quot;&quot;;</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">        if (this.inputJiaFang0ZhangHao == null) this.inputJiaFang0ZhangHao = &quot;&quot;;</span>
+<span class="nc bnc" id="L115" title="All 2 branches missed.">        if (this.inputJiaFang0YouBian == null) this.inputJiaFang0YouBian = &quot;&quot;;</span>
+<span class="nc bnc" id="L116" title="All 2 branches missed.">        if (this.inputYiFang0ShouQuanDaiBiao == null) this.inputYiFang0ShouQuanDaiBiao = &quot;&quot;;</span>
+<span class="nc bnc" id="L117" title="All 2 branches missed.">        if (this.inputYiFang0LianXiRen == null) this.inputYiFang0LianXiRen = &quot;&quot;;</span>
+<span class="nc bnc" id="L118" title="All 2 branches missed.">        if (this.inputYiFang0TongXunDiZhi == null) this.inputYiFang0TongXunDiZhi = &quot;&quot;;</span>
+<span class="nc bnc" id="L119" title="All 2 branches missed.">        if (this.inputYiFang0DianHua == null) this.inputYiFang0DianHua = &quot;&quot;;</span>
+<span class="nc bnc" id="L120" title="All 2 branches missed.">        if (this.inputYiFang0ChuanZhen == null) this.inputYiFang0ChuanZhen = &quot;&quot;;</span>
+<span class="nc bnc" id="L121" title="All 2 branches missed.">        if (this.inputYiFang0HuMing == null) this.inputYiFang0HuMing = &quot;&quot;;</span>
+<span class="nc bnc" id="L122" title="All 2 branches missed.">        if (this.inputYiFang0KaiHuYinHang == null) this.inputYiFang0KaiHuYinHang = &quot;&quot;;</span>
+<span class="nc bnc" id="L123" title="All 2 branches missed.">        if (this.inputYiFang0ZhangHao == null) this.inputYiFang0ZhangHao = &quot;&quot;;</span>
+<span class="nc bnc" id="L124" title="All 2 branches missed.">        if (this.inputYiFang0YouBian == null) this.inputYiFang0YouBian = &quot;&quot;;</span>
+<span class="nc" id="L125">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

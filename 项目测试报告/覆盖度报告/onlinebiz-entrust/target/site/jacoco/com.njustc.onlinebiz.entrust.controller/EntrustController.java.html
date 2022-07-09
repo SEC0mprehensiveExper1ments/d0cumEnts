@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EntrustController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-entrust</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.entrust.controller</a> &gt; <span class="el_source">EntrustController.java</span></div><h1>EntrustController.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.entrust.controller;
+
+import com.njustc.onlinebiz.common.model.*;
+import com.njustc.onlinebiz.common.model.entrust.*;
+import com.njustc.onlinebiz.entrust.service.EntrustService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
+
+/**
+ * 委托管理的控制类
+ */
+<span class="nc" id="L12">@Slf4j</span>
+@RestController
+@RequestMapping(&quot;/api&quot;)
+public class EntrustController {
+
+    private final EntrustService entrustService;
+
+<span class="nc" id="L19">    public EntrustController(EntrustService entrustService) {</span>
+<span class="nc" id="L20">        this.entrustService = entrustService;</span>
+<span class="nc" id="L21">    }</span>
+
+    // 创建委托，返回委托ID
+    @PostMapping(&quot;/entrust&quot;)
+    public String createEntrust(
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole,
+            @RequestBody EntrustContent content
+    ) {
+<span class="nc" id="L30">        return entrustService.createEntrust(content, userId, userRole);</span>
+    }
+
+    // 获取委托概要列表
+    @GetMapping(&quot;/entrust&quot;)
+    public PageResult&lt;EntrustOutline&gt; getEntrusts(
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole,
+            @RequestParam(&quot;page&quot;) Integer page,
+            @RequestParam(&quot;pageSize&quot;) Integer pageSize
+    ) {
+<span class="nc" id="L41">        return entrustService.findEntrustOutlines(page, pageSize, userId, userRole);</span>
+    }
+
+    // 获取委托的完整信息
+    @GetMapping(&quot;/entrust/{entrustId}&quot;)
+    public Entrust getEntrust(
+            @PathVariable(&quot;entrustId&quot;) String entrustId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L51">        return entrustService.findEntrust(entrustId, userId, userRole);</span>
+    }
+
+    // 分配市场部人员
+    @PostMapping(&quot;/entrust/{entrustId}/marketer&quot;)
+    public void allocateMarketer(
+            @PathVariable(&quot;entrustId&quot;) String entrustId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole,
+            @RequestParam(&quot;marketerId&quot;) Long marketerId
+    ) {
+<span class="nc" id="L62">        entrustService.updateMarketer(entrustId, marketerId, userId, userRole);</span>
+<span class="nc" id="L63">    }</span>
+
+    // 分配测试部人员
+    @PostMapping(&quot;/entrust/{entrustId}/tester&quot;)
+    public void allocateTester(
+            @PathVariable(&quot;entrustId&quot;) String entrustId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole,
+            @RequestParam(&quot;testerId&quot;) Long testerId
+    ) {
+<span class="nc" id="L73">        entrustService.updateTester(entrustId, testerId, userId, userRole);</span>
+<span class="nc" id="L74">    }</span>
+
+    // 修改委托申请
+    @PostMapping(&quot;/entrust/{entrustId}/content&quot;)
+    public void updateContent(
+            @PathVariable(&quot;entrustId&quot;) String entrustId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole,
+            @RequestBody EntrustContent content
+    ) {
+<span class="nc" id="L84">        entrustService.updateContent(entrustId, content, userId, userRole);</span>
+<span class="nc" id="L85">    }</span>
+
+    // 拒绝委托申请
+    @PostMapping(&quot;/entrust/{entrustId}/content/denial&quot;)
+    public void denyContent(
+            @PathVariable(&quot;entrustId&quot;) String entrustId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole,
+            @RequestParam(value = &quot;message&quot;, required = false) String message
+    ) {
+<span class="nc" id="L95">        entrustService.denyContent(entrustId, message, userId, userRole);</span>
+<span class="nc" id="L96">    }</span>
+
+    // 接受委托申请
+    @PostMapping(&quot;/entrust/{entrustId}/content/acceptance&quot;)
+    public void acceptContent(
+            @PathVariable(&quot;entrustId&quot;) String entrustId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L105">        entrustService.approveContent(entrustId, userId, userRole);</span>
+<span class="nc" id="L106">    }</span>
+
+    // 修改委托报价
+    @PostMapping(&quot;/entrust/{entrustId}/quote&quot;)
+    public void updateQuote(
+            @PathVariable(&quot;entrustId&quot;) String entrustId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole,
+            @RequestBody EntrustQuote quote
+    ) {
+<span class="nc" id="L116">        entrustService.updateQuote(entrustId, quote, userId, userRole);</span>
+<span class="nc" id="L117">    }</span>
+
+    // 拒绝委托报价
+    @PostMapping(&quot;/entrust/{entrustId}/quote/denial&quot;)
+    public void denyQuote(
+            @PathVariable(&quot;entrustId&quot;) String entrustId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole,
+            @RequestParam(value = &quot;message&quot;, required = false) String message
+    ) {
+<span class="nc" id="L127">        entrustService.denyQuote(entrustId, message, userId, userRole);</span>
+<span class="nc" id="L128">    }</span>
+
+    // 接受委托报价
+    @PostMapping(&quot;/entrust/{entrustId}/quote/acceptance&quot;)
+    public void acceptQuote(
+            @PathVariable(&quot;entrustId&quot;) String entrustId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L137">        entrustService.approveQuote(entrustId, userId, userRole);</span>
+<span class="nc" id="L138">    }</span>
+
+    @PostMapping(&quot;/entrust/{entrustId}/software_doc_review&quot;)
+    public void updateSoftwareDocReview(
+            @PathVariable(&quot;entrustId&quot;) String entrustId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole,
+            @RequestBody SoftwareDocReview softwareDocReview
+    ) {
+<span class="nc" id="L147">        entrustService.updateSoftwareDocReview(entrustId, softwareDocReview, userId, userRole);</span>
+<span class="nc" id="L148">    }</span>
+
+    // 修改委托评审结果
+    @PostMapping(&quot;/entrust/{entrustId}/review&quot;)
+    public void updateReview(
+            @PathVariable(&quot;entrustId&quot;) String entrustId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole,
+            @RequestBody EntrustReview review
+    ) {
+<span class="nc" id="L158">        entrustService.updateReview(entrustId, review, userId, userRole);</span>
+<span class="nc" id="L159">    }</span>
+
+    // 终止委托流程
+    @PostMapping(&quot;/entrust/{entrustId}/termination&quot;)
+    public void terminateEntrust(
+            @PathVariable(&quot;entrustId&quot;) String entrustId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L168">        entrustService.terminateEntrust(entrustId, userId, userRole);</span>
+<span class="nc" id="L169">    }</span>
+
+    // 修改委托的流程状态
+    @PostMapping(&quot;/entrust/{entrustId}/status&quot;)
+    public void updateStatus(
+            @PathVariable(&quot;entrustId&quot;) String entrustId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole,
+            @RequestBody EntrustStatus status
+    ) {
+<span class="nc" id="L179">        entrustService.updateStatus(entrustId, status, userId, userRole);</span>
+<span class="nc" id="L180">    }</span>
+
+    // 修改委托的客户
+    @PostMapping(&quot;/entrust/{entrustId}/customer&quot;)
+    public void updateCustomer(
+            @PathVariable(&quot;entrustId&quot;) String entrustId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole,
+            @RequestParam(&quot;customerId&quot;) Long customerId
+    ) {
+<span class="nc" id="L190">        entrustService.updateCustomer(entrustId, customerId, userId, userRole);</span>
+<span class="nc" id="L191">    }</span>
+
+    // 删除一份委托
+    @DeleteMapping(&quot;/entrust/{entrustId}&quot;)
+    public void removeEntrust(
+            @PathVariable(&quot;entrustId&quot;) String entrustId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L200">        entrustService.removeEntrust(entrustId, userId, userRole);</span>
+<span class="nc" id="L201">    }</span>
+
+    // 用于合同管理部分检查流程和人员一致性
+    @GetMapping(&quot;/entrust/{entrustId}/check_consistency_with_contract&quot;)
+    public Long checkConsistencyWithContract(
+            @PathVariable(&quot;entrustId&quot;) String entrustId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) {
+<span class="nc" id="L210">        return entrustService.checkConsistencyWithContract(entrustId, userId, userRole);</span>
+    }
+
+    // 供合同管理调用此接口来注册合同ID
+    @PostMapping(&quot;/entrust/{entrustId}/register_contract&quot;)
+    public void registerContract(
+            @PathVariable(&quot;entrustId&quot;) String entrustId,
+            @RequestParam(&quot;contractId&quot;) String contractId
+    ) {
+<span class="nc" id="L219">        entrustService.registerContract(entrustId, contractId);</span>
+<span class="nc" id="L220">    }</span>
+
+    // 内部调用获取测试人员ID
+    @GetMapping(&quot;/entrust/{entrustId}/get_tester_id&quot;)
+    public Long getTesterId(@PathVariable(&quot;entrustId&quot;) String entrustId) {
+<span class="nc" id="L225">        return entrustService.getTesterId(entrustId);</span>
+    }
+
+    // 内部调用获取委托的数据传输对象
+    @GetMapping(&quot;/entrust/{entrustId}/get_dto&quot;)
+    public EntrustDto getEntrustDto(@PathVariable(&quot;entrustId&quot;) String entrustId) {
+<span class="nc" id="L231">        return entrustService.getEntrustDto(entrustId);</span>
+    }
+
+    // 内部调用接口，用于注册测试项目ID到委托中
+    @PostMapping(&quot;/entrust/{entrustId}/register_project&quot;)
+    public void registerProject(
+            @PathVariable(&quot;entrustId&quot;) String entrustId,
+            @RequestParam(&quot;projectId&quot;) String projectId
+    ) {
+<span class="nc" id="L240">        entrustService.registerProject(entrustId, projectId);</span>
+<span class="nc" id="L241">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

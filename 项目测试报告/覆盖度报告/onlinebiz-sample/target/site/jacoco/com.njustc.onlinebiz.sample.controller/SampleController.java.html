@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SampleController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-sample</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.sample.controller</a> &gt; <span class="el_source">SampleController.java</span></div><h1>SampleController.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.sample.controller;
+
+import com.njustc.onlinebiz.common.model.PageResult;
+import com.njustc.onlinebiz.common.model.Role;
+import com.njustc.onlinebiz.common.model.sample.SampleCollection;
+import com.njustc.onlinebiz.sample.service.SampleService;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping(&quot;/api&quot;)
+public class SampleController {
+  private final SampleService sampleService;
+
+<span class="nc" id="L14">  public SampleController(SampleService sampleService) {</span>
+<span class="nc" id="L15">    this.sampleService = sampleService;</span>
+<span class="nc" id="L16">  }</span>
+
+  // 创建样品集，提供委托Id，返回样品集Id
+  @PostMapping(&quot;/sample&quot;)
+  public String createSampleCollection(
+      @RequestParam(&quot;userId&quot;) Long userId,
+      @RequestParam(&quot;userRole&quot;) Role userRole,
+      @RequestParam(&quot;entrustId&quot;) String entrustId) {
+<span class="nc" id="L24">    return sampleService.createSampleCollection(entrustId, userId, userRole);</span>
+  }
+
+  // 获取样品集概要列表
+  @GetMapping(&quot;/sample&quot;)
+  public PageResult&lt;SampleCollection&gt; getSampleCollections(
+          @RequestParam(&quot;userId&quot;) Long userId,
+          @RequestParam(&quot;userRole&quot;) Role userRole,
+          @RequestParam(&quot;page&quot;) Integer page,
+          @RequestParam(&quot;pageSize&quot;) Integer pageSize
+  ) {
+<span class="nc" id="L35">    return sampleService.findAllCollections(page, pageSize, userId, userRole);</span>
+  }
+
+  // 获取样品集详情
+  @GetMapping(&quot;/sample/{sampleCollectionId}&quot;)
+  public SampleCollection getSampleCollection(
+      @RequestParam(&quot;userId&quot;) Long userId,
+      @RequestParam(&quot;userRole&quot;) Role userRole,
+      @PathVariable(&quot;sampleCollectionId&quot;) String sampleCollectionId) {
+<span class="nc" id="L44">    return sampleService.findSpecificCollection(sampleCollectionId, userId, userRole);</span>
+  }
+
+  // 更新样品集
+  @PostMapping(&quot;/sample/{sampleCollectionId}&quot;)
+  public void updateSampleCollection(
+      @RequestParam(&quot;userId&quot;) Long userId,
+      @RequestParam(&quot;userRole&quot;) Role userRole,
+      @PathVariable(&quot;sampleCollectionId&quot;) String sampleCollectionId,
+      @RequestBody SampleCollection sampleCollection) {
+<span class="nc" id="L54">    sampleService.updateSampleCollection(sampleCollectionId, sampleCollection, userId, userRole);</span>
+<span class="nc" id="L55">  }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

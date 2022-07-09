@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SampleControllerAdvice.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-sample</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.sample.controller</a> &gt; <span class="el_source">SampleControllerAdvice.java</span></div><h1>SampleControllerAdvice.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.sample.controller;
+
+import com.njustc.onlinebiz.sample.exception.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+<span class="nc" id="L11">@Slf4j</span>
+@ControllerAdvice
+<span class="nc" id="L13">public class SampleControllerAdvice {</span>
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ExceptionHandler(SampleNotFoundException.class)
+    public String handleNotFoundException(SampleNotFoundException e) {
+<span class="nc" id="L19">        log.warn(&quot;Not Found Exception: &quot; + e.getMessage());</span>
+<span class="nc" id="L20">        return e.getMessage();</span>
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(SamplePermissionDeniedException.class)
+    public String handlePermissionDeniedException(SamplePermissionDeniedException e) {
+<span class="nc" id="L27">        log.warn(&quot;Permission Denied: &quot; + e.getMessage());</span>
+<span class="nc" id="L28">        return e.getMessage();</span>
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(SampleInvalidStageException.class)
+    public String handleInvalidStageException(SampleInvalidStageException e) {
+<span class="nc" id="L35">        log.warn(&quot;Invalid Stage Detected: &quot; + e.getMessage());</span>
+<span class="nc" id="L36">        return e.getMessage();</span>
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler(SampleDAOFailureException.class)
+    public String handleDAOFailureException(SampleDAOFailureException e) {
+<span class="nc" id="L43">        log.warn(&quot;DAO Failure Detected: &quot; + e.getMessage());</span>
+<span class="nc" id="L44">        return e.getMessage();</span>
+    }
+
+    @ResponseBody
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(SampleInvalidArgumentException.class)
+    public String handleInvalidArgumentException(SampleInvalidArgumentException e) {
+<span class="nc" id="L51">        log.warn(&quot;Invalid Argument Detected: &quot; + e.getMessage());</span>
+<span class="nc" id="L52">        return e.getMessage();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

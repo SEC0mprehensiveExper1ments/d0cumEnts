@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MongoTestcaseService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-test</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.test.service.testcase</a> &gt; <span class="el_source">MongoTestcaseService.java</span></div><h1>MongoTestcaseService.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.test.service.testcase;
+
+import com.njustc.onlinebiz.common.model.Role;
+import com.njustc.onlinebiz.common.model.test.project.ProjectStage;
+import com.njustc.onlinebiz.common.model.test.testcase.Testcase;
+import com.njustc.onlinebiz.test.dao.project.ProjectDAO;
+import com.njustc.onlinebiz.test.dao.testcase.TestcaseDAO;
+import com.njustc.onlinebiz.test.exception.testcase.TestcaseDAOFailureException;
+import com.njustc.onlinebiz.test.exception.testcase.TestcaseInvalidStageException;
+import com.njustc.onlinebiz.test.exception.testcase.TestcaseNotFoundException;
+import com.njustc.onlinebiz.test.exception.testcase.TestcasePermissionDeniedException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+<span class="fc" id="L17">@Slf4j</span>
+@Service
+public class MongoTestcaseService implements TestcaseService {
+    private final TestcaseDAO testcaseDAO;
+    private final ProjectDAO projectDAO;
+<span class="fc" id="L22">    public MongoTestcaseService(TestcaseDAO testcaseDAO, ProjectDAO projectDAO) {</span>
+<span class="fc" id="L23">        this.testcaseDAO = testcaseDAO;</span>
+<span class="fc" id="L24">        this.projectDAO = projectDAO;</span>
+<span class="fc" id="L25">    }</span>
+
+    @Override
+    public String createTestcaseList(String projectId, String entrustId, List&lt;Testcase.TestcaseList&gt; testcases, Long userId, Role userRole) {
+<span class="fc bfc" id="L29" title="All 2 branches covered.">        if (!hasAuthorityToCreate(userRole)) {</span>
+<span class="fc" id="L30">            throw new TestcasePermissionDeniedException(&quot;无权新建测试用例表&quot;);</span>
+        }
+<span class="fc" id="L32">        Testcase testcase = new Testcase();</span>
+<span class="fc" id="L33">        testcase.setProjectId(projectId);</span>
+<span class="fc" id="L34">        testcase.setEntrustId(entrustId);</span>
+<span class="fc" id="L35">        testcase.setTestcases(testcases);</span>
+<span class="fc" id="L36">        String testcaseId = testcaseDAO.insertTestcaseList(testcase).getId();</span>
+<span class="fc" id="L37">        return testcaseId;</span>
+    }
+
+    @Override
+    public Testcase findTestcaseList(String testcaseListId, Long userId, Role userRole) {
+<span class="fc" id="L42">        Testcase testcase = testcaseDAO.findTestcaseListById(testcaseListId);</span>
+<span class="fc bfc" id="L43" title="All 2 branches covered.">        if (testcase == null) {</span>
+<span class="fc" id="L44">            throw new TestcaseNotFoundException(&quot;该测试用例表不存在&quot;);</span>
+        }
+<span class="fc bfc" id="L46" title="All 2 branches covered.">        if (!hasAuthorityToCheck(userId, userRole, testcase)) {</span>
+<span class="fc" id="L47">            throw new TestcasePermissionDeniedException(&quot;无权查看该测试用例表&quot;);</span>
+        }
+
+<span class="fc" id="L50">        ProjectStage projectStage = projectDAO.findProjectById(testcase.getProjectId()).getStatus().getStage();</span>
+<span class="pc bpc" id="L51" title="3 of 8 branches missed.">        if (projectStage == ProjectStage.WAIT_FOR_QA || projectStage == ProjectStage.SCHEME_UNFILLED ||</span>
+                projectStage == ProjectStage.SCHEME_AUDITING || projectStage == ProjectStage.SCHEME_AUDITING_DENIED) {
+<span class="fc" id="L53">            throw new TestcaseInvalidStageException(&quot;此阶段不可查看测试用例表&quot;);</span>
+        }
+
+<span class="fc" id="L56">        return testcase;</span>
+    }
+
+    @Override
+    public void updateTestcaseList(String testcaseListId, List&lt;Testcase.TestcaseList&gt; testcases, Long userId, Role userRole) {
+<span class="fc" id="L61">        Testcase testcase = testcaseDAO.findTestcaseListById(testcaseListId);</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">        if (testcase == null) {</span>
+<span class="fc" id="L63">            throw new TestcaseNotFoundException(&quot;该测试用例表不存在&quot;);</span>
+        }
+<span class="fc bfc" id="L65" title="All 2 branches covered.">        if (!hasAuthorityToFill(userId, userRole, testcase)) {</span>
+<span class="fc" id="L66">            throw new TestcasePermissionDeniedException(&quot;无权查看该测试用例表&quot;);</span>
+        }
+
+<span class="fc" id="L69">        ProjectStage projectStage = projectDAO.findProjectById(testcase.getProjectId()).getStatus().getStage();</span>
+<span class="pc bpc" id="L70" title="2 of 8 branches missed.">        if (!(projectStage == ProjectStage.SCHEME_REVIEW_UPLOADED || projectStage == ProjectStage.REPORT_QA_DENIED ||</span>
+                projectStage == ProjectStage.REPORT_CUSTOMER_REJECT || projectStage == ProjectStage.QA_ALL_REJECTED)) {
+<span class="fc" id="L72">            throw new TestcaseInvalidStageException(&quot;此阶段不可修改测试用例表&quot;);</span>
+        }
+
+<span class="fc bfc" id="L75" title="All 2 branches covered.">        if (!testcaseDAO.updateContent(testcaseListId, testcases)) {</span>
+<span class="fc" id="L76">            throw new TestcaseDAOFailureException(&quot;更新测试用例表失败&quot;);</span>
+        }
+<span class="fc" id="L78">    }</span>
+
+    @Override
+    public void removeTestcaseList(String testcaseListId, Long userId, Role userRole) {
+<span class="fc bfc" id="L82" title="All 2 branches covered.">        if (userRole != Role.ADMIN) {</span>
+<span class="fc" id="L83">            throw new TestcasePermissionDeniedException(&quot;无权删除测试用例表&quot;);</span>
+        }
+<span class="fc" id="L85">        Testcase testcase = findTestcaseList(testcaseListId, userId, userRole);</span>
+<span class="fc bfc" id="L86" title="All 2 branches covered.">        if (!testcaseDAO.deleteTestcaseList(testcase.getId())) {</span>
+<span class="fc" id="L87">            throw new TestcaseDAOFailureException(&quot;删除测试用例表失败&quot;);</span>
+        }
+<span class="fc" id="L89">    }</span>
+
+    private boolean hasAuthorityToCreate(Role userRole) {
+        /*根据调研情况，只有市场部人员、市场部主管具有新建测试用例表权限*/
+<span class="pc bpc" id="L93" title="1 of 6 branches missed.">        return userRole == Role.ADMIN || userRole == Role.MARKETER || userRole == Role.MARKETING_SUPERVISOR;</span>
+    }
+
+    private boolean hasAuthorityToCheck(Long userId, Role userRole, Testcase testcase) {
+        /*根据调研情况，分配的测试部人员、测试部主管、分配的质量部人员、质量部主管均有权限查阅*/
+<span class="pc bpc" id="L98" title="2 of 4 branches missed.">        if (userId == null || userRole == null) {</span>
+<span class="nc" id="L99">            return false;</span>
+        }
+<span class="fc bfc" id="L101" title="All 2 branches covered.">        else if (userRole == Role.ADMIN) {</span>
+<span class="fc" id="L102">            return true;</span>
+<span class="fc bfc" id="L103" title="All 4 branches covered.">        } else if (userRole == Role.QA_SUPERVISOR || userRole == Role.TESTING_SUPERVISOR) {</span>
+<span class="fc" id="L104">            return true;</span>
+        }
+<span class="fc" id="L106">        Long testerId = projectDAO.findProjectById(testcase.getProjectId()).getProjectBaseInfo().getTesterId();</span>
+<span class="fc" id="L107">        Long qaId = projectDAO.findProjectById(testcase.getProjectId()).getProjectBaseInfo().getQaId();</span>
+<span class="fc bfc" id="L108" title="All 4 branches covered.">        if (userRole == Role.TESTER &amp;&amp; userId.equals(testerId)) return true;</span>
+<span class="fc bfc" id="L109" title="All 4 branches covered.">        if (userRole == Role.QA &amp;&amp; userId.equals(qaId)) return true;</span>
+<span class="fc" id="L110">        return false;</span>
+    }
+
+    private boolean hasAuthorityToFill(Long userId, Role userRole, Testcase testcase) {
+        /*根据调研情况，超级管理员、分配的测试部人员、测试部主管有权限修改*/
+<span class="pc bpc" id="L115" title="2 of 4 branches missed.">        if (userId == null || userRole == null) {</span>
+<span class="nc" id="L116">            return false;</span>
+<span class="pc bpc" id="L117" title="1 of 2 branches missed.">        } else if (userRole == Role.ADMIN) {</span>
+<span class="nc" id="L118">            return true;</span>
+<span class="fc bfc" id="L119" title="All 2 branches covered.">        } else if (userRole == Role.TESTING_SUPERVISOR) {</span>
+<span class="fc" id="L120">            return true;</span>
+        }
+<span class="fc" id="L122">        Long testerId = projectDAO.findProjectById(testcase.getProjectId()).getProjectBaseInfo().getTesterId();</span>
+<span class="fc bfc" id="L123" title="All 4 branches covered.">        if (userRole == Role.TESTER &amp;&amp; userId.equals(testerId)) return true;</span>
+<span class="fc" id="L124">        return false;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

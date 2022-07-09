@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EntrustQuoteDoc.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-document</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.doc.model</a> &gt; <span class="el_source">EntrustQuoteDoc.java</span></div><h1>EntrustQuoteDoc.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.doc.model;
+
+import com.njustc.onlinebiz.common.model.entrust.EntrustQuote;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+import java.util.ArrayList;
+import java.util.List;
+
+<span class="pc bnc" id="L12" title="All 102 branches missed.">@Data</span>
+<span class="fc" id="L13">@NoArgsConstructor</span>
+<span class="nc" id="L14">@AllArgsConstructor</span>
+@Accessors(chain = true)
+public class EntrustQuoteDoc {
+    // 报价日期
+<span class="fc" id="L18">    private String quotationDate;</span>
+    // 报价有效期
+<span class="fc" id="L20">    private String effectiveDate;</span>
+    // 开户银行
+<span class="fc" id="L22">    private String bankName;</span>
+    // 账号
+<span class="fc" id="L24">    private String account;</span>
+    // 户名
+<span class="fc" id="L26">    private String accountName;</span>
+    // 软件名称
+<span class="fc" id="L28">    private String softwareName;</span>
+    // 报价单前面几行
+<span class="pc" id="L30">    private List&lt;EntrustQuote.EntrustQuoteRow&gt; rowList=new ArrayList&lt;&gt;();</span>
+    // 小计
+<span class="fc" id="L32">    private Double subTotal;</span>
+    // 税率
+<span class="fc" id="L34">    private Double taxRate;</span>
+    // 总计
+<span class="fc" id="L36">    private Double total;</span>
+    // 报价提供人
+<span class="fc" id="L38">    private String provider;</span>
+    // 签字
+<span class="nc" id="L40">    private String signature;</span>
+
+    public String safe(String s) {
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        return s == null ? &quot;&quot; : s;</span>
+    }
+    private Double safe(Double s) {
+<span class="nc bnc" id="L46" title="All 2 branches missed.">        return s == null ? 0f : s;</span>
+    }
+<span class="nc" id="L48">    public EntrustQuoteDoc(EntrustQuote entrustQuote) {</span>
+<span class="nc bnc" id="L49" title="All 2 branches missed.">        if (entrustQuote != null) {</span>
+<span class="nc" id="L50">            this.quotationDate = safe(entrustQuote.getQuotationDate());</span>
+<span class="nc" id="L51">            this.effectiveDate = safe(entrustQuote.getEffectiveDate());</span>
+<span class="nc" id="L52">            this.bankName = safe(entrustQuote.getBankName());</span>
+<span class="nc" id="L53">            this.account = safe(entrustQuote.getAccount());</span>
+<span class="nc" id="L54">            this.accountName = safe(entrustQuote.getAccountName());</span>
+<span class="nc" id="L55">            this.softwareName = safe(entrustQuote.getSoftwareName());</span>
+<span class="nc" id="L56">            this.subTotal = safe(entrustQuote.getSubTotal());</span>
+<span class="nc" id="L57">            this.taxRate = safe(entrustQuote.getTaxRate());</span>
+<span class="nc" id="L58">            this.total = safe(entrustQuote.getTotal());</span>
+<span class="nc" id="L59">            this.provider = safe(entrustQuote.getProvider());</span>
+<span class="nc" id="L60">            this.signature = safe(entrustQuote.getSignature());</span>
+        }
+<span class="nc" id="L62">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

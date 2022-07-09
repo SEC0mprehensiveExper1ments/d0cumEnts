@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DocServiceJS012.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-document</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.doc.service</a> &gt; <span class="el_source">DocServiceJS012.java</span></div><h1>DocServiceJS012.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.doc.service;
+
+import com.itextpdf.text.*;
+import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+import com.njustc.onlinebiz.doc.dao.OSSProvider;
+import com.njustc.onlinebiz.doc.model.JS012;
+import com.njustc.onlinebiz.doc.util.HeaderFooter;
+import com.njustc.onlinebiz.doc.util.ItextUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+
+@Service
+public class DocServiceJS012 {
+
+    private final OSSProvider ossProvider;
+
+<span class="fc" id="L25">    public DocServiceJS012(OSSProvider ossProvider) {</span>
+<span class="fc" id="L26">        this.ossProvider = ossProvider;</span>
+<span class="fc" id="L27">    }</span>
+
+    /**
+     * 以下是文档生成部分
+     * */
+    private static final float marginLeft;
+    private static final float marginRight;
+    private static final float marginTop;
+    private static final float marginBottom;
+
+    @Value(&quot;${document-dir}&quot;)
+    private String DOCUMENT_DIR;
+    static {
+        // absolutePath = Objects.requireNonNull(Objects.requireNonNull(ClassUtils.getDefaultClassLoader()).getResource(&quot;font&quot;)).getPath() + &quot;/../&quot;;
+        // 在 iText 中每一个单位大小默认近似于点（pt）
+        // 1mm = 72 ÷ 25.4 ≈ 2.834645...（pt）
+<span class="fc" id="L43">        marginLeft = 65f;</span>
+<span class="fc" id="L44">        marginRight = 65f;</span>
+<span class="fc" id="L45">        marginTop = 70f;</span>
+<span class="fc" id="L46">        marginBottom = 72f;</span>
+<span class="fc" id="L47">    }</span>
+
+    private static JS012 JS012Json;
+
+
+
+    /**
+     * 填充JS012文档
+     * */
+    public String fill(String entrustTestReviewId, JS012 newJson) {
+<span class="fc" id="L57">        JS012Json = newJson;</span>
+<span class="fc" id="L58">        String pdfPath = DOCUMENT_DIR + &quot;JS012_&quot; + entrustTestReviewId + &quot;.pdf&quot;;</span>
+        try {
+            // 1.新建document对象
+<span class="fc" id="L61">            Document document = new Document(PageSize.A4);// 建立一个Document对象</span>
+<span class="fc" id="L62">            document.setMargins(marginLeft, marginRight, marginTop, marginBottom);</span>
+<span class="fc" id="L63">            System.out.println(PageSize.A4);</span>
+<span class="fc" id="L64">            System.out.println(&quot;document.LeftMargin: &quot; + document.leftMargin());</span>
+<span class="fc" id="L65">            System.out.println(&quot;document.Left: &quot; + document.left());</span>
+<span class="fc" id="L66">            System.out.println(&quot;document.rightMargin: &quot; + document.rightMargin());</span>
+<span class="fc" id="L67">            System.out.println(&quot;document.right: &quot; + document.right());</span>
+            // 2.建立一个书写器(Writer)与document对象关联
+<span class="fc" id="L69">            File file = new File(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;));</span>
+<span class="fc" id="L70">            PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(file));</span>
+            // 2.5 添加页眉/页脚
+<span class="fc" id="L72">            String header = &quot;NST－04－JS012－2011&quot;;</span>
+<span class="fc" id="L73">            String[] footer = new String[]{&quot;第 &quot;, &quot; 页 共 &quot;, &quot; 页&quot;};</span>
+<span class="fc" id="L74">            int headerToPage = 100;</span>
+<span class="fc" id="L75">            int footerFromPage = 1;</span>
+<span class="fc" id="L76">            boolean isHaderLine = true;</span>
+<span class="fc" id="L77">            boolean isFooterLine = false;</span>
+<span class="fc" id="L78">            float[] headerLoc = new float[]{document.right() - 5, document.top() + 15};</span>
+<span class="fc" id="L79">            float[] footerLoc = new float[]{(document.left() + document.right()) / 2.0f - 35, document.bottom() - 20};</span>
+<span class="fc" id="L80">            float headLineOff = -5f;</span>
+<span class="fc" id="L81">            float footLineOff = 12f;</span>
+<span class="fc" id="L82">            writer.setPageEvent(new HeaderFooter(header, footer, headerToPage, footerFromPage, isHaderLine, isFooterLine,</span>
+                    headerLoc, footerLoc, headLineOff, footLineOff));
+            // 3.打开文档
+<span class="fc" id="L85">            document.open();</span>
+            // 4.向文档中添加内容
+<span class="fc" id="L87">            generatePageOne(document);</span>
+            // 5.关闭文档
+<span class="fc" id="L89">            document.close();</span>
+<span class="nc" id="L90">        } catch (Exception e) {</span>
+<span class="nc" id="L91">            e.printStackTrace();</span>
+<span class="nc" id="L92">            return &quot;unable to generate a pdf&quot;;</span>
+<span class="fc" id="L93">        }</span>
+        // 上传pdf
+        try {
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">            if(ossProvider.upload(</span>
+<span class="fc" id="L97">                    &quot;doc&quot;, &quot;JS012_&quot; + entrustTestReviewId + &quot;.pdf&quot;, Files.readAllBytes(Path.of(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;))), &quot;application/pdf&quot;)) {</span>
+<span class="fc" id="L98">                deleteOutFile(pdfPath);</span>
+<span class="fc" id="L99">                return &quot;https://oss.syh1en.asia/doc/JS012_&quot; + entrustTestReviewId + &quot;.pdf&quot;;</span>
+            } else {
+<span class="nc" id="L101">                deleteOutFile(pdfPath);</span>
+<span class="nc" id="L102">                return &quot;upload failed&quot;;</span>
+            }
+<span class="nc" id="L104">        } catch (Exception e) {</span>
+<span class="nc" id="L105">            e.printStackTrace();</span>
+<span class="nc" id="L106">            deleteOutFile(pdfPath);</span>
+<span class="nc" id="L107">            return &quot;minio error&quot;;</span>
+        }
+    }
+
+    /**
+     * 删除中间的out文件
+     * */
+    private void deleteOutFile(String pdfPath) {
+<span class="fc" id="L115">        System.out.println(pdfPath);</span>
+        try {
+<span class="fc" id="L117">            File file = new File(pdfPath.replaceAll(&quot;\\\\&quot;, &quot;/&quot;));</span>
+<span class="pc bpc" id="L118" title="1 of 2 branches missed.">            if (file.delete()) {</span>
+<span class="fc" id="L119">                System.out.println(file.getName() + &quot; is deleted!&quot;);</span>
+            } else {
+<span class="nc" id="L121">                System.out.println(&quot;Delete&quot; + file.getName() + &quot;is failed.&quot;);</span>
+            }
+<span class="nc" id="L123">        } catch(Exception e) {</span>
+<span class="nc" id="L124">            e.printStackTrace();</span>
+<span class="fc" id="L125">        }</span>
+<span class="fc" id="L126">    }</span>
+
+    private static Font titlefont;
+    private static Font titlefont2;
+    private static Font textfont;
+
+    /**
+     * 生成JS012文档第一页
+     * */
+    public void generatePageOne(Document document) throws Exception {
+        // 加载字体
+        try {
+            // 定义全局的字体静态变量
+<span class="fc" id="L139">            BaseFont bfSimSun = BaseFont.createFont(DOCUMENT_DIR + &quot;font/simsun.ttf&quot;, BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);</span>
+<span class="fc" id="L140">            titlefont = new Font(bfSimSun, 17f, Font.BOLD);</span>
+<span class="fc" id="L141">            titlefont2 = new Font(bfSimSun, 12f, Font.NORMAL);</span>
+<span class="fc" id="L142">            textfont = new Font(bfSimSun, 10.5f, Font.NORMAL);</span>
+<span class="nc" id="L143">        } catch (Exception e) {</span>
+<span class="nc" id="L144">            e.printStackTrace();</span>
+<span class="fc" id="L145">        }</span>
+
+        // 标题
+<span class="fc" id="L148">        Paragraph title = new Paragraph(&quot;软件项目委托测试工作检查表&quot;, titlefont);</span>
+<span class="fc" id="L149">        title.setAlignment(1); //设置文字居中 0靠左   1，居中     2，靠右</span>
+<span class="fc" id="L150">        title.setSpacingBefore(-25f); //设置段落上空白</span>
+<span class="fc" id="L151">        title.setSpacingAfter(1f); //设置段落下空白</span>
+
+<span class="fc" id="L153">        Paragraph text = new Paragraph();</span>
+<span class="fc" id="L154">        text.add(new Phrase(&quot;软件名称：&quot;, titlefont2));</span>
+<span class="fc" id="L155">        text.add(ItextUtils.fixedUnderlineChunk(JS012Json.getInputRuanJianMingChen(), titlefont2, 19, 0.3f));</span>
+<span class="fc" id="L156">        text.add(new Phrase(&quot; 版本号：&quot;, titlefont2));</span>
+<span class="fc" id="L157">        text.add(ItextUtils.fixedUnderlineChunk(JS012Json.getInputBanBenHao(), titlefont2, 6, 0.3f));</span>
+<span class="fc" id="L158">        text.add(new Phrase(&quot;\n申报单位：&quot;, titlefont2));</span>
+<span class="fc" id="L159">        text.add(ItextUtils.fixedUnderlineChunk(JS012Json.getInputShenBaoDanWei(), titlefont2, 30, 0.3f));</span>
+<span class="fc" id="L160">        text.add(new Phrase(&quot;\n起始时间：&quot;, titlefont2));</span>
+<span class="fc" id="L161">        text.add(ItextUtils.fixedUnderlineChunk(JS012Json.getInputQiShiShiJian0Nian(), titlefont2, 2, 0.3f));</span>
+<span class="fc" id="L162">        text.add(new Phrase(&quot;年&quot;, titlefont2));</span>
+<span class="fc" id="L163">        text.add(ItextUtils.fixedUnderlineChunk(JS012Json.getInputQiShiShiJian0Yue(), titlefont2, 2, 0.3f));</span>
+<span class="fc" id="L164">        text.add(new Phrase(&quot;月&quot;, titlefont2));</span>
+<span class="fc" id="L165">        text.add(ItextUtils.fixedUnderlineChunk(JS012Json.getInputQiShiShiJian0Ri(), titlefont2, 2, 0.3f));</span>
+<span class="fc" id="L166">        text.add(new Phrase(&quot;日&quot;, titlefont2));</span>
+<span class="fc" id="L167">        text.add(new Phrase(&quot; 预计完成时间：&quot;, titlefont2));</span>
+<span class="fc" id="L168">        text.add(ItextUtils.fixedUnderlineChunk(JS012Json.getInputYuJiShiJian0Nian(), titlefont2, 2, 0.3f));</span>
+<span class="fc" id="L169">        text.add(new Phrase(&quot;年&quot;, titlefont2));</span>
+<span class="fc" id="L170">        text.add(ItextUtils.fixedUnderlineChunk(JS012Json.getInputYuJiShiJian0Yue(), titlefont2, 2, 0.3f));</span>
+<span class="fc" id="L171">        text.add(new Phrase(&quot;月&quot;, titlefont2));</span>
+<span class="fc" id="L172">        text.add(ItextUtils.fixedUnderlineChunk(JS012Json.getInputYuJiShiJian0Ri(), titlefont2, 2, 0.3f));</span>
+<span class="fc" id="L173">        text.add(new Phrase(&quot;日&quot;, titlefont2));</span>
+<span class="fc" id="L174">        text.add(new Phrase(&quot;\n主测人：&quot;, titlefont2));</span>
+<span class="fc" id="L175">        text.add(ItextUtils.fixedUnderlineChunk(JS012Json.getInputZhuCeRen(), titlefont2, 12, 0.3f));</span>
+<span class="fc" id="L176">        text.add(new Phrase(&quot; 实际完成时间：&quot;, titlefont2));</span>
+<span class="fc" id="L177">        text.add(ItextUtils.fixedUnderlineChunk(JS012Json.getInputShiJiShiJian0Nian(), titlefont2, 2, 0.3f));</span>
+<span class="fc" id="L178">        text.add(new Phrase(&quot;年&quot;, titlefont2));</span>
+<span class="fc" id="L179">        text.add(ItextUtils.fixedUnderlineChunk(JS012Json.getInputShiJiShiJian0Yue(), titlefont2, 2, 0.3f));</span>
+<span class="fc" id="L180">        text.add(new Phrase(&quot;月&quot;, titlefont2));</span>
+<span class="fc" id="L181">        text.add(ItextUtils.fixedUnderlineChunk(JS012Json.getInputShiJiShiJian0Ri(), titlefont2, 2, 0.3f));</span>
+<span class="fc" id="L182">        text.add(new Phrase(&quot;日&quot;, titlefont2));</span>
+<span class="fc" id="L183">        text.setLeading(30f);</span>
+<span class="fc" id="L184">        text.setSpacingAfter(17f); //设置段落下空白</span>
+
+<span class="fc" id="L186">        float tableWidth = 465;</span>
+<span class="fc" id="L187">        float[] widths = new float[33];</span>
+<span class="fc" id="L188">        Arrays.fill(widths, tableWidth/33);</span>
+<span class="fc" id="L189">        PdfPTable table = ItextUtils.createTable(widths, tableWidth);</span>
+
+        // float[] paddings = new float[]{6f, 6f, 5f, 5f};
+<span class="fc" id="L192">        float[] paddings2 = new float[]{10f, 10f, 5f, 5f};</span>
+<span class="fc" id="L193">        float[] paddings3 = new float[]{5f, 5f, 5.5f, 5.5f};</span>
+<span class="fc" id="L194">        float borderWidth = 0.3f;</span>
+<span class="fc" id="L195">        float fixedLeading = 14f;</span>
+
+<span class="fc" id="L197">        table.addCell(ItextUtils.createCell(&quot;工作（项目）流程&quot;, textfont, Element.ALIGN_LEFT, 11, 2, paddings2, borderWidth));</span>
+<span class="fc" id="L198">        table.addCell(ItextUtils.createCell(&quot;可预见问题及注意事项&quot;, textfont, Element.ALIGN_CENTER, 17, 2, paddings2, borderWidth));</span>
+<span class="fc" id="L199">        table.addCell(ItextUtils.createCell(&quot;确 认&quot;, textfont, Element.ALIGN_CENTER, 5, 2, paddings2, borderWidth));</span>
+
+<span class="fc" id="L201">        table.addCell(ItextUtils.createCell(&quot;一、前期指导工作&quot;, textfont, Element.ALIGN_LEFT, 33, 2, paddings2, borderWidth));</span>
+
+<span class="fc" id="L203">        table.addCell(ItextUtils.createCell(&quot;1&quot;, textfont, Element.ALIGN_LEFT, 2, 6, paddings3, borderWidth));</span>
+<span class="fc" id="L204">        table.addCell(ItextUtils.createCell(&quot;接受委托单位委托测试申请&quot;, textfont, Element.ALIGN_LEFT, 9, 6, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L205">        table.addCell(ItextUtils.createCell(&quot;1、为委托单位提供详尽的有关软件项目委托测试\n&quot; +</span>
+                        &quot;   的相关法律法规、优惠政策、业务办理流程等\n&quot; +
+                        &quot;   事项。&quot;,
+                textfont, Element.ALIGN_LEFT, 17, 2, fixedLeading, paddings3, borderWidth));
+<span class="fc" id="L209">        table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen011(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L210">        table.addCell(ItextUtils.createCell(&quot;2、建议委托单位阅读《软件项目委托测试流程图\n&quot; +</span>
+                        &quot;   和工作介绍》，了解申报流程；\n&quot;,
+                textfont, Element.ALIGN_LEFT, 17, 2, fixedLeading, paddings3, borderWidth));
+<span class="fc" id="L213">        table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen012(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L214">        table.addCell(ItextUtils.createCell(&quot;3、根据《软件项目委托测试提交材料》，指导委\n&quot; +</span>
+                        &quot;   托单位提交申报资料。&quot;,
+                textfont, Element.ALIGN_LEFT, 17, 2, fixedLeading, paddings3, borderWidth));
+<span class="fc" id="L217">        table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen013(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));</span>
+
+<span class="fc" id="L219">        table.addCell(ItextUtils.createCell(&quot;2&quot;, textfont, Element.ALIGN_LEFT, 2, 4, paddings3, borderWidth));</span>
+<span class="fc" id="L220">        table.addCell(ItextUtils.createCell(&quot;填写《软件项目委托测试申请表》、《委托测试软件功能列表》，按《软件项目委托测试提交材料》提交材料；&quot;, textfont, Element.ALIGN_LEFT, 9, 4, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L221">        table.addCell(ItextUtils.createCell(&quot;1、确保委托方应填内容正确、完备；纸质材料已\n&quot; +</span>
+                        &quot;   盖公章；&quot;,
+                textfont, Element.ALIGN_LEFT, 17, 2, fixedLeading, paddings3, borderWidth));
+<span class="fc" id="L224">        table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen021(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L225">        table.addCell(ItextUtils.createCell(&quot;2、明确委托方按《软件项目委托测试提交材料》\n&quot; +</span>
+                        &quot;   提交材料。&quot;,
+                textfont, Element.ALIGN_LEFT, 17, 2, fixedLeading, paddings3, borderWidth));
+<span class="fc" id="L228">        table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen022(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));</span>
+
+<span class="fc" id="L230">        table.addCell(ItextUtils.createCell(&quot;3&quot;, textfont, Element.ALIGN_LEFT, 2, 4, paddings3, borderWidth));</span>
+<span class="fc" id="L231">        table.addCell(ItextUtils.createCell(&quot;签订《软件项目委托测试合同》、《软件项目委托测试保密协议》&quot;, textfont, Element.ALIGN_LEFT, 9, 4, paddings3, borderWidth));</span>
+<span class="fc" id="L232">        table.addCell(ItextUtils.createCell(&quot;1、合同及保密协议内容、数量符合要求；&quot;,</span>
+                textfont, Element.ALIGN_LEFT, 17, 2, fixedLeading, paddings3, borderWidth));
+<span class="fc" id="L234">        table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen031(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L235">        table.addCell(ItextUtils.createCell(&quot;2、合同编号方式符合要求；&quot;,</span>
+                textfont, Element.ALIGN_LEFT, 17, 2, fixedLeading, paddings3, borderWidth));
+<span class="fc" id="L237">        table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen032(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));</span>
+
+<span class="fc" id="L239">        table.addCell(ItextUtils.createCell(&quot;二、对委托测试软件的可测状态进行评估&quot;, textfont, Element.ALIGN_LEFT, 33, 2, paddings2, borderWidth));</span>
+
+<span class="fc" id="L241">        table.addCell(ItextUtils.createCell(&quot;4&quot;, textfont, Element.ALIGN_LEFT, 2, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L242">        table.addCell(ItextUtils.createCell(&quot;对委托测试软件的可测状态进行评估&quot;, textfont, Element.ALIGN_LEFT, 9, 2, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L243">        table.addCell(ItextUtils.createCell(&quot;实验室在收到委托单位的有关资料后，即成立测试项目小组，该项目小组的任务是消化用户提供的有关资料，对委托软件的可测状态进行评估， 若委托软件未达到可测状态，&quot; +</span>
+                        &quot;则向委托方提出改进建议，直到委托软件达到可测状态为止。项目小组的任务包括负责编制测试方案，搭建测试环境，执行测试过程，记录测试结果，编制测试报告，提交测试报告，将有关资料归档等。&quot;,
+                textfont, Element.ALIGN_JUSTIFIED, 17, 2, fixedLeading, new float[]{4f, 4f, 5.5f, 5.5f}, borderWidth));
+<span class="fc" id="L246">        table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen041(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));</span>
+
+<span class="fc" id="L248">        table.addCell(ItextUtils.createCell(&quot;三、实施测试&quot;, textfont, Element.ALIGN_LEFT, 33, 2, paddings2, borderWidth));</span>
+
+<span class="fc" id="L250">        table.addCell(ItextUtils.createCell(&quot;5&quot;, textfont, Element.ALIGN_LEFT, 2, 10, new float[]{34f, 34f, 5.5f, 5.5f}, borderWidth));</span>
+<span class="fc" id="L251">        table.addCell(ItextUtils.createCell(&quot;编制测试方案&quot;, textfont, Element.ALIGN_LEFT, 9, 10, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L252">        table.addCell(ItextUtils.createCell(&quot;1、测试方案必须经实验室质量负责人审核，技术\n&quot; +</span>
+                        &quot;   负责人批准方能生效。&quot;,
+                textfont, Element.ALIGN_LEFT, 17, 2, fixedLeading, paddings3, borderWidth));
+<span class="fc" id="L255">        table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen051(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L256">        table.addCell(ItextUtils.createCell(&quot;2、委托测试软件介绍：简要介绍委托测试软件的\n&quot; +</span>
+                        &quot;   功能特点、应用行业及技术特性等。&quot;,
+                textfont, Element.ALIGN_LEFT, 17, 2, fixedLeading, paddings3, borderWidth));
+<span class="fc" id="L259">        table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen052(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L260">        table.addCell(ItextUtils.createCell(&quot;3、软件功能：以委托单位提供的功能列表为依\n&quot; +</span>
+                        &quot;   据，以表格形式列出所有功能项目，并对功能\n&quot; +
+                        &quot;   列表的各功能项目按照层次关系进行编号，以\n&quot; +
+                        &quot;   便于标识。&quot;,
+                textfont, Element.ALIGN_LEFT, 17, 2, fixedLeading, paddings3, borderWidth));
+<span class="fc" id="L265">        table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen053(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L266">        table.addCell(ItextUtils.createCell(&quot;4、资源需求：资源需求要列出人员需求和软硬件\n&quot; +</span>
+                        &quot;   设备需求。人员需求要列出人员名单、职称及\n&quot; +
+                        &quot;   所承担的角色（项目组长或成员）；软硬件设\n&quot; +
+                        &quot;   备需求要根据委托测试软件要求的运行环境及\n&quot; +
+                        &quot;   实验室的设备情况，列出硬件设备的名称、型\n&quot; +
+                        &quot;   号、配置、机身编号、用途，软件的名称、版\n&quot; +
+                        &quot;   本号、用途等。&quot;,
+                textfont, Element.ALIGN_LEFT, 17, 2, fixedLeading, paddings3, borderWidth));
+<span class="fc" id="L274">        table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen054(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L275">        table.addCell(ItextUtils.createCell(&quot;5、参考文档：列出编制本方案所参考的标准、规\n&quot; +</span>
+                        &quot;   范及用户文档等的名称、作者、类型、版本/\n&quot; +
+                        &quot;   标识号。&quot;,
+                textfont, Element.ALIGN_LEFT, 17, 2, fixedLeading, paddings3, borderWidth));
+<span class="fc" id="L279">        table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen055(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));</span>
+
+<span class="fc" id="L281">        table.addCell(ItextUtils.createCell(&quot;6&quot;, textfont, Element.ALIGN_LEFT, 2, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L282">        table.addCell(ItextUtils.createCell(&quot;搭建测试环境&quot;, textfont, Element.ALIGN_LEFT, 9, 2, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L283">        table.addCell(ItextUtils.createCell(&quot;1、实验室按照委托方提供的委托测试软件运行环\n&quot; +</span>
+                        &quot;   境搭建测试环境；&quot;,
+                textfont, Element.ALIGN_LEFT, 17, 2, fixedLeading, paddings3, borderWidth));
+<span class="fc" id="L286">        table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen061(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));</span>
+
+<span class="fc" id="L288">        table.addCell(ItextUtils.createCell(&quot;7&quot;, textfont, Element.ALIGN_LEFT, 2, 6, paddings3, borderWidth));</span>
+<span class="fc" id="L289">        table.addCell(ItextUtils.createCell(&quot;实施测试&quot;, textfont, Element.ALIGN_LEFT, 9, 6, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L290">        table.addCell(ItextUtils.createCell(&quot;1、测试过程主要以测试方案为依据，按照用户手\n&quot; +</span>
+                        &quot;   册所述的操作方法运行软件，考察软件是否具\n&quot; +
+                        &quot;   有用户手册所描述的操作界面，对功能列表的\n&quot; +
+                        &quot;   主要功能逐项进行符合性测试并作记录，对未\n&quot; +
+                        &quot;   测的次要功能或细节部分，应作出说明。&quot;,
+                textfont, Element.ALIGN_LEFT, 17, 2, fixedLeading, paddings3, borderWidth));
+<span class="fc" id="L296">        table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen071(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L297">        table.addCell(ItextUtils.createCell(&quot;2、对文档的测试：从完整性、正确性、一致性、\n&quot; +</span>
+                        &quot;   易理解性、易浏览性和外观质量六个方面，对\n&quot; +
+                        &quot;   用户文档进行评审。&quot;,
+                textfont, Element.ALIGN_LEFT, 17, 2, fixedLeading, paddings3, borderWidth));
+<span class="fc" id="L301">        table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen072(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L302">        table.addCell(ItextUtils.createCell(&quot;3、对测试过程观察到的结果进行如实记录，对发\n&quot; +</span>
+                        &quot;   现的问题整理成问题清单；&quot;,
+                textfont, Element.ALIGN_LEFT, 17, 2, fixedLeading, paddings3, borderWidth));
+<span class="fc" id="L305">        table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen073(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));</span>
+
+<span class="fc" id="L307">        table.addCell(ItextUtils.createCell(&quot;8&quot;, textfont, Element.ALIGN_LEFT, 2, 8, paddings3, borderWidth));</span>
+<span class="fc" id="L308">        table.addCell(ItextUtils.createCell(&quot;编制测试报告&quot;, textfont, Element.ALIGN_LEFT, 9, 8, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L309">        table.addCell(ItextUtils.createCell(&quot;1、根据《软件项目委托测试报告编制作业指导书》\n&quot; +</span>
+                        &quot;   和测试结果编制测试报告。&quot;,
+                textfont, Element.ALIGN_LEFT, 17, 2, fixedLeading, new float[]{5f, 5f, 3f, 0f}, borderWidth));
+<span class="fc" id="L312">        table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen081(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L313">        table.addCell(ItextUtils.createCell(&quot;2、检查测试报告，并填写《报告检查表》。&quot;,</span>
+                textfont, Element.ALIGN_LEFT, 17, 2, fixedLeading, new float[]{5f, 5f, 3f, 0f}, borderWidth));
+<span class="fc" id="L315">        table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen082(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L316">        table.addCell(ItextUtils.createCell(&quot;3、测试报告的编码请参阅《测试报告编码规则》。&quot;,</span>
+                textfont, Element.ALIGN_LEFT, 17, 2, fixedLeading, new float[]{5f, 5f, 3f, 0f}, borderWidth));
+<span class="fc" id="L318">        table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen083(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L319">        table.addCell(ItextUtils.createCell(&quot;4、报告审查：在分发报告前，应按实验室质量管\n&quot; +</span>
+                        &quot;   理程序对报告进行严格审查。&quot;,
+                textfont, Element.ALIGN_LEFT, 17, 2, fixedLeading, new float[]{5f, 5f, 3f, 0f}, borderWidth));
+<span class="fc" id="L322">        table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen084(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));</span>
+
+<span class="fc" id="L324">        table.addCell(ItextUtils.createCell(&quot;9&quot;, textfont, Element.ALIGN_LEFT, 2, 6, paddings3, borderWidth));</span>
+<span class="fc" id="L325">        table.addCell(ItextUtils.createCell(&quot;评测资料归档&quot;, textfont, Element.ALIGN_LEFT, 9, 6, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L326">        table.addCell(ItextUtils.createCell(&quot;1、委托测试的软件产品及测试相关文件、原始记\n&quot; +</span>
+                        &quot;   录等能够随时复现测试过程所需的材料，也同\n&quot; +
+                        &quot;   测试报告一并交由实验室资料室的材料管理员\n&quot; +
+                        &quot;   归档，以作为日后对测试结果产生异议时进行\n&quot; +
+                        &quot;   复核或仲裁的依据。上述材料由实验室保存三\n&quot; +
+                        &quot;   年后，委托方可凭样品接收单取回或由实验室\n&quot; +
+                        &quot;   进行销毁。&quot;,
+                textfont, Element.ALIGN_LEFT, 17, 2, fixedLeading, paddings3, borderWidth));
+<span class="fc" id="L334">        table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen091(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L335">        table.addCell(ItextUtils.createCell(&quot;2、归档资料同时填写《软件项目委托测试资料清\n&quot; +</span>
+                        &quot;   单》，打印《软件委托测试资料标签》并编号\n&quot; +
+                        &quot;   号码，贴于档案盒制定位置。&quot;,
+                textfont, Element.ALIGN_LEFT, 17, 2, fixedLeading, paddings3, borderWidth));
+<span class="fc" id="L339">        table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen092(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));</span>
+<span class="fc" id="L340">        table.addCell(ItextUtils.createCell(&quot;3、该检查表与本次软件委托测试归档资料一同归\n&quot; +</span>
+                        &quot;   档，与《软件项目委托测试资料目录》、《软\n&quot; +
+                        &quot;   件项目委托测试试资料清单》一起，作为软件\n&quot; +
+                        &quot;   委托测试测试工作的检查、资料查询的主要依\n&quot; +
+                        &quot;   据。&quot;,
+                textfont, Element.ALIGN_LEFT, 17, 2, fixedLeading, paddings3, borderWidth));
+<span class="fc" id="L346">        table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen093(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));</span>
+
+<span class="fc" id="L348">        table.addCell(ItextUtils.createCell(&quot;10&quot;, textfont, Element.ALIGN_LEFT, 2, 16, paddings3, borderWidth));</span>
+<span class="fc" id="L349">        table.addCell(ItextUtils.createCell(&quot;附件目录&quot;, textfont, Element.ALIGN_LEFT, 9, 16, fixedLeading, paddings3, borderWidth));</span>
+<span class="fc" id="L350">        table.addCell(ItextUtils.createCell(&quot;1、《软件项目委托测试工作流程》&quot;, textfont, Element.ALIGN_LEFT, 22, 2, fixedLeading, paddings3, borderWidth));</span>
+//        table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen0101(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));
+<span class="fc" id="L352">        table.addCell(ItextUtils.createCell(&quot;2、《需提供的书面文档》&quot;, textfont, Element.ALIGN_LEFT, 22, 2, fixedLeading, paddings3, borderWidth));</span>
+//        table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen0102(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));
+<span class="fc" id="L354">        table.addCell(ItextUtils.createCell(&quot;3、《软件项目委托测试报告编制作业指导书》&quot;, textfont, Element.ALIGN_LEFT, 22, 2, fixedLeading, paddings3, borderWidth));</span>
+        // table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen0103(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));
+<span class="fc" id="L356">        table.addCell(ItextUtils.createCell(&quot;4、《报告检查表》&quot;, textfont, Element.ALIGN_LEFT, 22, 2, fixedLeading, paddings3, borderWidth));</span>
+        // table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen0104(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));
+<span class="fc" id="L358">        table.addCell(ItextUtils.createCell(&quot;5、《测试报告编码规则》&quot;, textfont, Element.ALIGN_LEFT, 22, 2, fixedLeading, paddings3, borderWidth));</span>
+        // table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen0105(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));
+<span class="fc" id="L360">        table.addCell(ItextUtils.createCell(&quot;6、《软件委托测试资料清单》&quot;, textfont, Element.ALIGN_LEFT, 22, 2, fixedLeading, paddings3, borderWidth));</span>
+        // table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen0106(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));
+<span class="fc" id="L362">        table.addCell(ItextUtils.createCell(&quot;7、《软件委托测试资料标签》&quot;, textfont, Element.ALIGN_LEFT, 22, 2, fixedLeading, paddings3, borderWidth));</span>
+        // table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen0107(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));
+<span class="fc" id="L364">        table.addCell(ItextUtils.createCell(&quot;8、《软件委托测试资料目录》&quot;, textfont, Element.ALIGN_LEFT, 22, 2, fixedLeading, paddings3, borderWidth));</span>
+        // table.addCell(ItextUtils.createCell(JS012Json.getInputQueRen0108(), textfont, Element.ALIGN_LEFT, 5, 2, paddings3, borderWidth));
+
+<span class="fc" id="L367">        document.add(new Paragraph(&quot;\n&quot;));</span>
+<span class="fc" id="L368">        document.add(title);</span>
+<span class="fc" id="L369">        document.add(text);</span>
+<span class="fc" id="L370">        document.add(table);</span>
+<span class="fc" id="L371">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

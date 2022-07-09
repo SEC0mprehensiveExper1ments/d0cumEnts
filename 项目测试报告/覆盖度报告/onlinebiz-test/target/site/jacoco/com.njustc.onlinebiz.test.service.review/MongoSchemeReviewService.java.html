@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MongoSchemeReviewService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-test</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.test.service.review</a> &gt; <span class="el_source">MongoSchemeReviewService.java</span></div><h1>MongoSchemeReviewService.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.test.service.review;
+
+
+import com.njustc.onlinebiz.common.model.Role;
+import com.njustc.onlinebiz.common.model.test.project.ProjectStage;
+import com.njustc.onlinebiz.common.model.test.review.SchemeReview;
+import com.njustc.onlinebiz.test.dao.project.ProjectDAO;
+import com.njustc.onlinebiz.test.dao.review.SchemeReviewDAO;
+import com.njustc.onlinebiz.test.exception.review.ReviewDAOFailureException;
+import com.njustc.onlinebiz.test.exception.review.ReviewInvalidStageException;
+import com.njustc.onlinebiz.test.exception.review.ReviewNotFoundException;
+import com.njustc.onlinebiz.test.exception.review.ReviewPermissionDeniedException;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+@Service
+public class MongoSchemeReviewService implements SchemeReviewService {
+
+    private static final String SCANNED_COPY_DIR = &quot;/root/test/review/&quot;;
+    private final SchemeReviewDAO schemeReviewDAO;
+    private final ProjectDAO projectDAO;
+<span class="fc" id="L28">    public MongoSchemeReviewService(SchemeReviewDAO schemeReviewDAO, ProjectDAO projectDAO) {</span>
+<span class="fc" id="L29">        this.schemeReviewDAO = schemeReviewDAO;</span>
+<span class="fc" id="L30">        this.projectDAO = projectDAO;</span>
+<span class="fc" id="L31">    }</span>
+
+    @Override
+    public String createSchemeReview(String projectId, String serialNumber, Long qaId, Long testerId) {
+        // 创建一份空的检查表
+<span class="fc" id="L36">        SchemeReview schemeReview = new SchemeReview();</span>
+<span class="fc" id="L37">        schemeReview.setProjectId(projectId);</span>
+<span class="fc" id="L38">        schemeReview.setSerialNumber(serialNumber);</span>
+        // 获取检查表ID
+<span class="fc" id="L40">        return schemeReviewDAO.insertSchemeReview(schemeReview).getId();</span>
+    }
+
+    @Override
+    public SchemeReview findSchemeReview(String schemeReviewId, Long userId, Role userRole) {
+<span class="fc" id="L45">        SchemeReview schemeReview = schemeReviewDAO.findSchemeReviewById(schemeReviewId);</span>
+<span class="fc bfc" id="L46" title="All 2 branches covered.">        if (schemeReview == null) {</span>
+<span class="fc" id="L47">            throw new ReviewNotFoundException(&quot;该测试方案评审表不存在: &quot; + schemeReviewId);</span>
+<span class="fc bfc" id="L48" title="All 2 branches covered.">        } else if (!hasFindAuthority(schemeReview, userId, userRole)) {</span>
+<span class="fc" id="L49">            throw new ReviewPermissionDeniedException(&quot;无权查看该测试方案评审表&quot;);</span>
+        } else {
+<span class="fc" id="L51">            ProjectStage projectStage = projectDAO.findProjectById(schemeReview.getProjectId()).getStatus().getStage();</span>
+<span class="fc bfc" id="L52" title="All 4 branches covered.">            if(projectStage == ProjectStage.WAIT_FOR_QA || projectStage == ProjectStage.SCHEME_UNFILLED) {</span>
+<span class="fc" id="L53">                throw new ReviewInvalidStageException(&quot;此阶段不能查看测试方案评审表&quot;);</span>
+            }
+        }
+<span class="fc" id="L56">        return schemeReview;</span>
+    }
+
+    private Boolean hasFindAuthority(SchemeReview schemeReview, Long userId, Role userRole) {
+<span class="pc bpc" id="L60" title="2 of 4 branches missed.">        if (userId == null || userRole == null) {</span>
+<span class="nc" id="L61">            return false;</span>
+<span class="fc bfc" id="L62" title="All 2 branches covered.">        } else if (userRole == Role.ADMIN) {</span>
+<span class="fc" id="L63">            return true;</span>
+        }
+        // 测试部主管 和 质量部主管 都可以查看
+<span class="fc bfc" id="L66" title="All 4 branches covered.">        else if (userRole == Role.TESTING_SUPERVISOR || userRole == Role.QA_SUPERVISOR) {</span>
+<span class="fc" id="L67">            return true;</span>
+        }
+        // 质量部相关人员均可查看
+<span class="fc bfc" id="L70" title="All 2 branches covered.">        else if (userId.equals(projectDAO.findProjectById(schemeReview.getProjectId()).getProjectBaseInfo().getQaId())) {</span>
+<span class="fc" id="L71">            return true;</span>
+        }
+        // 测试部相关人员均可查看
+<span class="fc bfc" id="L74" title="All 2 branches covered.">        else if (userId.equals(projectDAO.findProjectById(schemeReview.getProjectId()).getProjectBaseInfo().getTesterId())) {</span>
+<span class="fc" id="L75">            return true;</span>
+        }
+<span class="fc" id="L77">        return false;</span>
+    }
+
+    @Override
+    public void updateSchemeReview(String schemeReviewId, SchemeReview schemeReview, Long userId, Role userRole) {
+<span class="fc" id="L82">        SchemeReview origin = schemeReviewDAO.findSchemeReviewById(schemeReviewId);</span>
+        // 检查测试方案评审表是否存在
+<span class="fc bfc" id="L84" title="All 2 branches covered.">        if (origin == null) {</span>
+<span class="fc" id="L85">            throw new ReviewNotFoundException(&quot;该测试方案评审表不存在&quot;);</span>
+        }
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">        if (!origin.getId().equals(schemeReview.getId())) {</span>
+<span class="nc" id="L88">            throw new ReviewPermissionDeniedException(&quot;测试方案评审表ID不一致&quot;);</span>
+        }
+        // 检查测试项目的阶段
+<span class="fc" id="L91">        ProjectStage projectStage = projectDAO.findProjectById(origin.getProjectId()).getStatus().getStage();</span>
+<span class="fc bfc" id="L92" title="All 2 branches covered.">        if(projectStage == ProjectStage.SCHEME_AUDITING) {</span>
+<span class="fc bfc" id="L93" title="All 2 branches covered.">            if (!hasUpdateOrDeleteAuthority(schemeReview, userId, userRole)) {</span>
+<span class="fc" id="L94">                throw new ReviewPermissionDeniedException(&quot;无权修改此测试方案评审表&quot;);</span>
+            }
+        } else {
+<span class="fc" id="L97">            throw new ReviewInvalidStageException(&quot;此阶段不能修改测试方案评审表&quot;);</span>
+        }
+        // 更新测试方案评审表
+<span class="fc bfc" id="L100" title="All 2 branches covered.">        if (!schemeReviewDAO.updateSchemeReview(schemeReviewId, schemeReview)) {</span>
+<span class="fc" id="L101">            throw new ReviewDAOFailureException(&quot;测试方案评审表更新失败&quot;);</span>
+        }
+<span class="fc" id="L103">    }</span>
+
+    private Boolean hasUpdateOrDeleteAuthority(SchemeReview schemeReview, Long userId, Role userRole) {
+<span class="pc bpc" id="L106" title="2 of 4 branches missed.">        if (userId == null || userRole == null) {</span>
+<span class="nc" id="L107">            return false;</span>
+<span class="fc bfc" id="L108" title="All 2 branches covered.">        } else if (userRole == Role.ADMIN) {</span>
+<span class="fc" id="L109">            return true;</span>
+        }
+        // 质量部主管都可以更改
+<span class="fc bfc" id="L112" title="All 2 branches covered.">        else if (userRole == Role.QA_SUPERVISOR) {</span>
+<span class="fc" id="L113">            return true;</span>
+        }
+        // 质量部相关人员可以删改
+<span class="fc bfc" id="L116" title="All 2 branches covered.">        else if (userId.equals(projectDAO.findProjectById(schemeReview.getProjectId()).getProjectBaseInfo().getQaId())) {</span>
+<span class="fc" id="L117">            return true;</span>
+        }
+<span class="fc" id="L119">        return false;</span>
+    }
+
+    @Override
+    public void saveScannedCopy(String schemeReviewId, MultipartFile scannedCopy, Long userId, Role userRole) throws IOException {
+<span class="fc bfc" id="L124" title="All 2 branches covered.">        if (scannedCopy.isEmpty()) {</span>
+<span class="fc" id="L125">            throw new ReviewPermissionDeniedException(&quot;不能上传空的测试方案评审表的扫描件&quot;);</span>
+        }
+<span class="fc" id="L127">        SchemeReview schemeReview = schemeReviewDAO.findSchemeReviewById(schemeReviewId);</span>
+        // 检查阶段
+<span class="fc" id="L129">        ProjectStage projectStage = projectDAO.findProjectById(schemeReview.getProjectId()).getStatus().getStage();</span>
+<span class="fc bfc" id="L130" title="All 2 branches covered.">        if (projectStage != ProjectStage.SCHEME_AUDITING_PASSED) {</span>
+<span class="fc" id="L131">            throw new ReviewInvalidStageException(&quot;项目当前状态不支持该操作&quot;);</span>
+        }
+        // 检查权限
+<span class="fc bfc" id="L134" title="All 2 branches covered.">        if (!hasUploadOrDownloadAuthority(schemeReview, userId, userRole)) {</span>
+<span class="fc" id="L135">            throw new ReviewPermissionDeniedException(&quot;无权上传测试方案评审表&quot;);</span>
+        }
+        // 保存测试方案评审表到磁盘
+<span class="fc" id="L138">        String originalFilename = scannedCopy.getOriginalFilename();</span>
+<span class="fc bfc" id="L139" title="All 2 branches covered.">        if (originalFilename == null) {</span>
+<span class="fc" id="L140">            throw new ReviewPermissionDeniedException(&quot;扫描文件名不能为空&quot;);</span>
+        }
+<span class="fc" id="L142">        String suffix = originalFilename.substring(originalFilename.lastIndexOf('.'));</span>
+<span class="fc" id="L143">        String path = SCANNED_COPY_DIR + schemeReviewId + suffix;</span>
+<span class="fc" id="L144">        scannedCopy.transferTo(new File(path.replaceAll(&quot;\\\\&quot;, &quot;/&quot;)));</span>
+        // 将路径保存到合同对象中
+<span class="fc bfc" id="L146" title="All 2 branches covered.">        if (!schemeReviewDAO.updateScannedCopyPath(schemeReviewId, path)) {</span>
+<span class="fc" id="L147">            throw new ReviewDAOFailureException(&quot;保存扫描文件路径失败&quot;);</span>
+        }
+<span class="fc" id="L149">    }</span>
+
+    @Override
+    public Resource getScannedCopy(String schemeReviewId, Long userId, Role userRole) throws IOException {
+<span class="fc" id="L153">        SchemeReview schemeReview = schemeReviewDAO.findSchemeReviewById(schemeReviewId);</span>
+<span class="fc" id="L154">        ProjectStage projectStage = projectDAO.findProjectById(schemeReview.getProjectId()).getStatus().getStage();</span>
+        // 检查阶段
+<span class="fc bfc" id="L156" title="All 10 branches covered.">        if (projectStage == ProjectStage.WAIT_FOR_QA ||</span>
+            projectStage == ProjectStage.SCHEME_UNFILLED ||
+            projectStage == ProjectStage.SCHEME_AUDITING ||
+            projectStage == ProjectStage.SCHEME_AUDITING_DENIED ||
+            projectStage == ProjectStage.SCHEME_AUDITING_PASSED) {
+<span class="fc" id="L161">            throw new ReviewInvalidStageException(&quot;项目当前状态不支持该操作&quot;);</span>
+        }
+        // 检查权限
+<span class="pc bpc" id="L164" title="1 of 2 branches missed.">        if (!hasUploadOrDownloadAuthority(schemeReview, userId, userRole)) {</span>
+<span class="fc" id="L165">            throw new ReviewPermissionDeniedException(&quot;无权下载扫描件&quot;);</span>
+        }
+        // 从磁盘读取文件
+<span class="nc" id="L168">        return new InputStreamResource(new FileInputStream(schemeReview.getScannedCopyPath()));</span>
+    }
+
+    @Override
+    public String getScannedCopyFileName(String schemeReviewId, Long userId, Role userRole) {
+<span class="nc" id="L173">        SchemeReview schemeReview = schemeReviewDAO.findSchemeReviewById(schemeReviewId);</span>
+<span class="nc" id="L174">        ProjectStage projectStage = projectDAO.findProjectById(schemeReview.getProjectId()).getStatus().getStage();</span>
+        // 检查阶段
+<span class="nc bnc" id="L176" title="All 10 branches missed.">        if (projectStage == ProjectStage.WAIT_FOR_QA ||</span>
+            projectStage == ProjectStage.SCHEME_UNFILLED ||
+            projectStage == ProjectStage.SCHEME_AUDITING ||
+            projectStage == ProjectStage.SCHEME_AUDITING_DENIED ||
+            projectStage == ProjectStage.SCHEME_AUDITING_PASSED) {
+<span class="nc" id="L181">            throw new ReviewInvalidStageException(&quot;项目当前状态不支持该操作&quot;);</span>
+        }
+        // 检查权限
+<span class="nc bnc" id="L184" title="All 2 branches missed.">        if (!hasUploadOrDownloadAuthority(schemeReview, userId, userRole)) {</span>
+<span class="nc" id="L185">            throw new ReviewPermissionDeniedException(&quot;无权下载扫描件&quot;);</span>
+        }
+        // 获取文件名
+<span class="nc" id="L188">        return schemeReview.getScannedCopyPath().substring(schemeReview.getScannedCopyPath().lastIndexOf('/') + 1);</span>
+    }
+
+    private Boolean hasUploadOrDownloadAuthority(SchemeReview schemeReview, Long userId, Role userRole){
+<span class="pc bpc" id="L192" title="2 of 4 branches missed.">        if (userId == null || userRole == null) {</span>
+<span class="nc" id="L193">            return false;</span>
+<span class="fc bfc" id="L194" title="All 2 branches covered.">        } else if (userRole == Role.ADMIN) {</span>
+<span class="fc" id="L195">            return true;</span>
+<span class="fc bfc" id="L196" title="All 4 branches covered.">        } else if (userRole == Role.TESTING_SUPERVISOR || userRole == Role.QA_SUPERVISOR) {</span>
+<span class="fc" id="L197">            return true;</span>
+        }
+        // 项目的质量相关人员也可以上传下载
+<span class="fc bfc" id="L200" title="All 2 branches covered.">        else if (userId.equals(projectDAO.findProjectById(schemeReview.getProjectId()).getProjectBaseInfo().getQaId())) {</span>
+<span class="fc" id="L201">            return true;</span>
+        }
+<span class="fc" id="L203">        return false;</span>
+    }
+
+    @Override
+    public void removeSchemeReview(String schemeReviewId, Long userId, Role userRole) {
+<span class="fc" id="L208">        SchemeReview schemeReview = schemeReviewDAO.findSchemeReviewById(schemeReviewId);</span>
+<span class="fc bfc" id="L209" title="All 2 branches covered.">        if (schemeReview == null) {</span>
+<span class="fc" id="L210">            throw new ReviewNotFoundException(&quot;尝试删除不存在的测试方案评审表&quot;);</span>
+        }
+<span class="fc bfc" id="L212" title="All 2 branches covered.">        if (!hasUpdateOrDeleteAuthority(schemeReview, userId, userRole)) {</span>
+<span class="fc" id="L213">            throw new ReviewPermissionDeniedException(&quot;无权删除此测试方案评审表&quot;);</span>
+        }
+<span class="fc bfc" id="L215" title="All 2 branches covered.">        if (!schemeReviewDAO.deleteSchemeAuditById(schemeReview.getId())) {</span>
+<span class="fc" id="L216">            throw new ReviewDAOFailureException(&quot;删除测试方案评审表失败&quot;);</span>
+        }
+<span class="fc" id="L218">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

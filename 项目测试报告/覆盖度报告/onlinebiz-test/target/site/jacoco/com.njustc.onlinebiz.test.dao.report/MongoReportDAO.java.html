@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MongoReportDAO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-test</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.test.dao.report</a> &gt; <span class="el_source">MongoReportDAO.java</span></div><h1>MongoReportDAO.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.test.dao.report;
+
+import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
+import com.njustc.onlinebiz.common.model.test.report.Report;
+import org.bson.types.ObjectId;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MongoReportDAO implements ReportDAO {
+  public static final String COLLECTION_NAME = &quot;testReport&quot;;
+  private final MongoTemplate mongoTemplate;
+
+<span class="fc" id="L18">  public MongoReportDAO(MongoTemplate mongoTemplate) {</span>
+<span class="fc" id="L19">    this.mongoTemplate = mongoTemplate;</span>
+<span class="fc" id="L20">  }</span>
+
+  @Override
+  public Report insertReport(Report report) {
+<span class="nc" id="L24">    return mongoTemplate.insert(report, COLLECTION_NAME);</span>
+  }
+
+  @Override
+  public Report findReportById(String id) {
+<span class="nc" id="L29">    return mongoTemplate.findById(id, Report.class, COLLECTION_NAME);</span>
+  }
+
+  @Override
+  public boolean updateContent(String id, Report.ReportContent content) {
+<span class="nc" id="L34">    Update update = new Update().set(&quot;content&quot;, content);</span>
+<span class="nc" id="L35">    return updateFirstWithId(id, update);</span>
+  }
+
+  @Override
+  public boolean deleteReport(String id) {
+<span class="nc" id="L40">    Query query = new Query().addCriteria(Criteria.where(&quot;_id&quot;).is(new ObjectId(id)));</span>
+<span class="nc" id="L41">    DeleteResult result = mongoTemplate.remove(query, COLLECTION_NAME);</span>
+<span class="nc bnc" id="L42" title="All 4 branches missed.">    return result.wasAcknowledged() &amp;&amp; result.getDeletedCount() == 1;</span>
+  }
+
+  private boolean updateFirstWithId(String id, Update update) {
+<span class="nc" id="L46">    Query query = new Query().addCriteria(Criteria.where(&quot;_id&quot;).is(new ObjectId(id)));</span>
+<span class="nc" id="L47">    UpdateResult result = mongoTemplate.updateFirst(query, update, COLLECTION_NAME);</span>
+<span class="nc bnc" id="L48" title="All 4 branches missed.">    return result.wasAcknowledged() &amp;&amp; result.getMatchedCount() == 1;</span>
+  }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

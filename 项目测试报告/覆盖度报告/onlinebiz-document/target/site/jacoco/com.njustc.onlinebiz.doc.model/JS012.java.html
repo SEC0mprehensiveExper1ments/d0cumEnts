@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JS012.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-document</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.doc.model</a> &gt; <span class="el_source">JS012.java</span></div><h1>JS012.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.doc.model;
+
+
+import com.njustc.onlinebiz.common.model.test.review.EntrustTestReview;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.Accessors;
+
+import java.util.List;
+
+<span class="pc bnc" id="L12" title="All 302 branches missed.">@Data</span>
+<span class="fc" id="L13">@NoArgsConstructor</span>
+<span class="nc" id="L14">@AllArgsConstructor</span>
+@Accessors(chain = true)
+public class JS012 {
+<span class="pc" id="L17">    private String inputRuanJianMingChen = &quot;&quot;;</span>
+<span class="pc" id="L18">    private String inputBanBenHao = &quot;&quot;;</span>
+<span class="pc" id="L19">    private String inputShenBaoDanWei = &quot;&quot;;</span>
+<span class="pc" id="L20">    private String inputQiShiShiJian0Nian = &quot;&quot;;</span>
+<span class="pc" id="L21">    private String inputQiShiShiJian0Yue = &quot;&quot;;</span>
+<span class="pc" id="L22">    private String inputQiShiShiJian0Ri = &quot;&quot;;</span>
+<span class="pc" id="L23">    private String inputYuJiShiJian0Nian = &quot;&quot;;</span>
+<span class="pc" id="L24">    private String inputYuJiShiJian0Yue = &quot;&quot;;</span>
+<span class="pc" id="L25">    private String inputYuJiShiJian0Ri = &quot;&quot;;</span>
+<span class="pc" id="L26">    private String inputZhuCeRen = &quot;&quot;;</span>
+<span class="pc" id="L27">    private String inputShiJiShiJian0Nian = &quot;&quot;;</span>
+<span class="pc" id="L28">    private String inputShiJiShiJian0Yue = &quot;&quot;;</span>
+<span class="pc" id="L29">    private String inputShiJiShiJian0Ri = &quot;&quot;;</span>
+<span class="pc" id="L30">    private String inputQueRen011 = &quot;&quot;;</span>
+<span class="pc" id="L31">    private String inputQueRen012 = &quot;&quot;;</span>
+<span class="pc" id="L32">    private String inputQueRen013 = &quot;&quot;;</span>
+<span class="pc" id="L33">    private String inputQueRen021 = &quot;&quot;;</span>
+<span class="pc" id="L34">    private String inputQueRen022 = &quot;&quot;;</span>
+<span class="pc" id="L35">    private String inputQueRen031 = &quot;&quot;;</span>
+<span class="pc" id="L36">    private String inputQueRen032 = &quot;&quot;;</span>
+<span class="pc" id="L37">    private String inputQueRen041 = &quot;&quot;;</span>
+<span class="pc" id="L38">    private String inputQueRen051 = &quot;&quot;;</span>
+<span class="pc" id="L39">    private String inputQueRen052 = &quot;&quot;;</span>
+<span class="pc" id="L40">    private String inputQueRen053 = &quot;&quot;;</span>
+<span class="pc" id="L41">    private String inputQueRen054 = &quot;&quot;;</span>
+<span class="pc" id="L42">    private String inputQueRen055 = &quot;&quot;;</span>
+<span class="pc" id="L43">    private String inputQueRen061 = &quot;&quot;;</span>
+<span class="pc" id="L44">    private String inputQueRen071 = &quot;&quot;;</span>
+<span class="pc" id="L45">    private String inputQueRen072 = &quot;&quot;;</span>
+<span class="pc" id="L46">    private String inputQueRen073 = &quot;&quot;;</span>
+<span class="pc" id="L47">    private String inputQueRen081 = &quot;&quot;;</span>
+<span class="pc" id="L48">    private String inputQueRen082 = &quot;&quot;;</span>
+<span class="pc" id="L49">    private String inputQueRen083 = &quot;&quot;;</span>
+<span class="pc" id="L50">    private String inputQueRen084 = &quot;&quot;;</span>
+<span class="pc" id="L51">    private String inputQueRen091 = &quot;&quot;;</span>
+<span class="pc" id="L52">    private String inputQueRen092 = &quot;&quot;;</span>
+<span class="pc" id="L53">    private String inputQueRen093 = &quot;&quot;;</span>
+
+    public String safe(String s) {
+<span class="nc bnc" id="L56" title="All 2 branches missed.">        return s == null ? &quot;&quot; : s;</span>
+    }
+
+<span class="nc" id="L59">    public JS012(EntrustTestReview entrustTestReview) {</span>
+<span class="nc bnc" id="L60" title="All 2 branches missed.">        if (entrustTestReview == null) {</span>
+<span class="nc" id="L61">            throw new IllegalArgumentException(&quot;entrustTestReview is null&quot;);</span>
+        }
+<span class="nc" id="L63">        this.inputRuanJianMingChen = entrustTestReview.getSoftwareName();</span>
+<span class="nc" id="L64">        this.inputBanBenHao = entrustTestReview.getVersion();</span>
+<span class="nc" id="L65">        this.inputShenBaoDanWei = entrustTestReview.getPrincipal();</span>
+<span class="nc bnc" id="L66" title="All 2 branches missed.">        if (entrustTestReview.getStartDate() != null) {</span>
+<span class="nc" id="L67">            this.inputQiShiShiJian0Nian = entrustTestReview.getStartDate().substring(0, 4);</span>
+<span class="nc" id="L68">            this.inputQiShiShiJian0Yue = entrustTestReview.getStartDate().substring(5, 7);</span>
+<span class="nc" id="L69">            this.inputQiShiShiJian0Ri = entrustTestReview.getStartDate().substring(8, 10);</span>
+        }
+<span class="nc bnc" id="L71" title="All 2 branches missed.">        if (entrustTestReview.getExpectFinishDate() != null) {</span>
+<span class="nc" id="L72">            this.inputYuJiShiJian0Nian = entrustTestReview.getExpectFinishDate().substring(0, 4);</span>
+<span class="nc" id="L73">            this.inputYuJiShiJian0Yue = entrustTestReview.getExpectFinishDate().substring(5, 7);</span>
+<span class="nc" id="L74">            this.inputYuJiShiJian0Ri = entrustTestReview.getExpectFinishDate().substring(8, 10);</span>
+        }
+<span class="nc" id="L76">        this.inputZhuCeRen = entrustTestReview.getMainTester();</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">        if (entrustTestReview.getFinishDate() != null) {</span>
+<span class="nc" id="L78">            this.inputShiJiShiJian0Nian = entrustTestReview.getFinishDate().substring(0, 4);</span>
+<span class="nc" id="L79">            this.inputShiJiShiJian0Yue = entrustTestReview.getFinishDate().substring(5, 7);</span>
+<span class="nc" id="L80">            this.inputShiJiShiJian0Ri = entrustTestReview.getFinishDate().substring(8, 10);</span>
+        }
+<span class="nc" id="L82">        List&lt;String&gt; conclusions = entrustTestReview.getConclusions();</span>
+<span class="nc bnc" id="L83" title="All 4 branches missed.">        if (conclusions != null &amp;&amp; conclusions.size() == 24) {</span>
+<span class="nc" id="L84">            this.inputQueRen011 = safe(conclusions.get(0));</span>
+<span class="nc" id="L85">            this.inputQueRen012 = safe(conclusions.get(1));</span>
+<span class="nc" id="L86">            this.inputQueRen013 = safe(conclusions.get(2));</span>
+<span class="nc" id="L87">            this.inputQueRen021 = safe(conclusions.get(3));</span>
+<span class="nc" id="L88">            this.inputQueRen022 = safe(conclusions.get(4));</span>
+<span class="nc" id="L89">            this.inputQueRen031 = safe(conclusions.get(5));</span>
+<span class="nc" id="L90">            this.inputQueRen032 = safe(conclusions.get(6));</span>
+<span class="nc" id="L91">            this.inputQueRen041 = safe(conclusions.get(7));</span>
+<span class="nc" id="L92">            this.inputQueRen051 = safe(conclusions.get(8));</span>
+<span class="nc" id="L93">            this.inputQueRen052 = safe(conclusions.get(9));</span>
+<span class="nc" id="L94">            this.inputQueRen053 = safe(conclusions.get(10));</span>
+<span class="nc" id="L95">            this.inputQueRen054 = safe(conclusions.get(11));</span>
+<span class="nc" id="L96">            this.inputQueRen055 = safe(conclusions.get(12));</span>
+<span class="nc" id="L97">            this.inputQueRen061 = safe(conclusions.get(13));</span>
+<span class="nc" id="L98">            this.inputQueRen071 = safe(conclusions.get(14));</span>
+<span class="nc" id="L99">            this.inputQueRen072 = safe(conclusions.get(15));</span>
+<span class="nc" id="L100">            this.inputQueRen073 = safe(conclusions.get(16));</span>
+<span class="nc" id="L101">            this.inputQueRen081 = safe(conclusions.get(17));</span>
+<span class="nc" id="L102">            this.inputQueRen082 = safe(conclusions.get(18));</span>
+<span class="nc" id="L103">            this.inputQueRen083 = safe(conclusions.get(19));</span>
+<span class="nc" id="L104">            this.inputQueRen084 = safe(conclusions.get(20));</span>
+<span class="nc" id="L105">            this.inputQueRen091 = safe(conclusions.get(21));</span>
+<span class="nc" id="L106">            this.inputQueRen092 = safe(conclusions.get(22));</span>
+<span class="nc" id="L107">            this.inputQueRen093 = safe(conclusions.get(23));</span>
+        }
+<span class="nc" id="L109">    }</span>
+}
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

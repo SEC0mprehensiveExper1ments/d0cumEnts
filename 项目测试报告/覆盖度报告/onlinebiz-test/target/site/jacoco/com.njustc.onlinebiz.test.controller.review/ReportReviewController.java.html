@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReportReviewController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">onlinebiz-test</a> &gt; <a href="index.source.html" class="el_package">com.njustc.onlinebiz.test.controller.review</a> &gt; <span class="el_source">ReportReviewController.java</span></div><h1>ReportReviewController.java</h1><pre class="source lang-java linenums">package com.njustc.onlinebiz.test.controller.review;
+
+import com.njustc.onlinebiz.common.model.Role;
+import com.njustc.onlinebiz.common.model.test.review.ReportReview;
+import com.njustc.onlinebiz.test.service.review.ReportReviewService;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+
+/**
+ * 报告审查控制器
+ *
+ */
+@RestController
+@RequestMapping(&quot;/api&quot;)
+public class ReportReviewController {
+    private final ReportReviewService reportReviewService;
+
+<span class="fc" id="L23">    public ReportReviewController(ReportReviewService reportReviewService) {</span>
+<span class="fc" id="L24">        this.reportReviewService = reportReviewService;</span>
+<span class="fc" id="L25">    }</span>
+
+    /**
+     * 获取检查表详情
+     *
+     * @param reportReviewId 报告评论id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @return {@link ReportReview}
+     */
+    @GetMapping(&quot;/review/report/{reportReviewId}&quot;)
+    public ReportReview getReportReview(
+            @PathVariable(&quot;reportReviewId&quot;) String reportReviewId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole) {
+<span class="nc" id="L40">        return reportReviewService.findReportReview(reportReviewId, userId, userRole);</span>
+    }
+
+    /**
+     * 更新检查表内容
+     *
+     * @param reportReviewId 报告评论id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @param reportReview 报告审查
+     */
+    @PostMapping(&quot;/review/report/{reportReviewId}&quot;)
+    public void updateReportReview(
+            @PathVariable(&quot;reportReviewId&quot;) String reportReviewId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole,
+            @RequestBody ReportReview reportReview
+    ) {
+<span class="nc" id="L58">        reportReviewService.updateReportReview(reportReviewId, reportReview, userId, userRole);</span>
+<span class="nc" id="L59">    }</span>
+
+    /**
+     * 上传测试报告检查表扫描件
+     *
+     * @param reportReviewId 报告评论id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @param scannedCopy 扫描副本
+     * @throws IOException ioexception
+     */
+    @PutMapping(&quot;/review/report/{reportReviewId}/upload&quot;)
+    public void updateScannedCopy(
+            @PathVariable(&quot;reportReviewId&quot;) String reportReviewId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole,
+            @RequestPart(&quot;scannedCopy&quot;) MultipartFile scannedCopy
+    ) throws IOException {
+<span class="nc" id="L77">        reportReviewService.saveScannedCopy(reportReviewId, scannedCopy, userId, userRole);</span>
+<span class="nc" id="L78">    }</span>
+
+    /**
+     * 下载测试报告检查表扫描件
+     *
+     * @param reportReviewId 报告评论id
+     * @param userId 用户id
+     * @param userRole 用户角色
+     * @return {@link ResponseEntity&lt;Resource&gt;}
+     * @throws IOException ioexception
+     */
+    @GetMapping(&quot;/review/report/{reportReviewId}/download&quot;)
+    public ResponseEntity&lt;Resource&gt; downloadScannedCopy(
+            @PathVariable(&quot;reportReviewId&quot;) String reportReviewId,
+            @RequestParam(&quot;userId&quot;) Long userId,
+            @RequestParam(&quot;userRole&quot;) Role userRole
+    ) throws IOException {
+<span class="nc" id="L95">        String fileName = reportReviewService.getScannedCopyFileName(reportReviewId, userId, userRole);</span>
+<span class="nc" id="L96">        Resource resource = reportReviewService.getScannedCopy(reportReviewId, userId, userRole);</span>
+<span class="nc" id="L97">        return ResponseEntity.ok().header(&quot;Content-Disposition&quot;,&quot;attachment; filename=&quot; + fileName).contentType(MediaType.APPLICATION_OCTET_STREAM).body(resource);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
